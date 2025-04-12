@@ -75,7 +75,7 @@ CREATE TABLE carrelli_prodotti (
      idprodotto INT NOT NULL,
      idordine INT NOT NULL,
      quantita INT NOT NULL,
-     CONSTRAINT idcarrelloprodotti PRIMARY KEY (idordine, idprodotto)
+     CONSTRAINT idcarrelliprodotti PRIMARY KEY (idordine, idprodotto)
 );
 
 CREATE TABLE composizioni (
@@ -153,7 +153,7 @@ FOREIGN KEY (username)
 REFERENCES utenti (username);
 
 ALTER TABLE personalizzazioni 
-ADD CONSTRAINT fkcarrello_personalizzazione 
+ADD CONSTRAINT fkcarrelli_personalizzazione 
 FOREIGN KEY (idordine) 
 REFERENCES ordini (idordine);
 
@@ -167,12 +167,12 @@ ADD CONSTRAINT fkappartenenza
 FOREIGN KEY (idcategoria) 
 REFERENCES categorie (idcategoria);
 
-ALTER TABLE carrello_prodotti 
+ALTER TABLE carrelli_prodotti 
 ADD CONSTRAINT fkcar_ord 
 FOREIGN KEY (idordine) 
 REFERENCES ordini (idordine);
 
-ALTER TABLE carrello_prodotti 
+ALTER TABLE carrelli_prodotti 
 ADD CONSTRAINT fkcar_pro 
 FOREIGN KEY (idprodotto) 
 REFERENCES prodotti (idprodotto);
@@ -223,8 +223,8 @@ CREATE INDEX idx_ordini_username ON ordini (username);
 CREATE INDEX idx_personalizzazioni_idordine ON personalizzazioni (idordine);
 CREATE INDEX idx_personalizzazioni_idprodotto ON personalizzazioni (idprodotto);
 CREATE INDEX idx_prodotti_idcategoria ON prodotti (idcategoria);
-CREATE INDEX idx_carrelloprodotti_idordine ON carrello_prodotti (idordine);
-CREATE INDEX idx_carrelloprodotti_idprodotto ON carrello_prodotti (idprodotto);
+CREATE INDEX idx_carrelliprodotti_idordine ON carrelli_prodotti (idordine);
+CREATE INDEX idx_carrelliprodotti_idprodotto ON carrelli_prodotti (idprodotto);
 CREATE INDEX idx_composizioni_idprodotto ON composizioni (idprodotto);
 CREATE INDEX idx_composizioni_idingrediente ON composizioni (idingrediente);
 CREATE INDEX idx_modifichestato_idordine ON modifiche_stato (idordine);
