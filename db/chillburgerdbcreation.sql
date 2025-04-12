@@ -16,219 +16,219 @@ USE chillburgerdb;
 -- Tables Section
 -- _____________ 
 
-CREATE TABLE categoria (
-     codicecategoria CHAR(5) NOT NULL,
+CREATE TABLE categorie (
+     idcategoria INT AUTO_INCREMENT NOT NULL,
      descrizione VARCHAR(255) NOT NULL,
-     CONSTRAINT idcategoria PRIMARY KEY (codicecategoria)
+     CONSTRAINT idcategorie PRIMARY KEY (idcategoria)
 );
 
-CREATE TABLE ingrediente (
-     codiceingrediente CHAR(5) NOT NULL,
+CREATE TABLE ingredienti (
+     idingrediente INT AUTO_INCREMENT NOT NULL,
      nome VARCHAR(255) NOT NULL,
      sovrapprezzo DECIMAL(10, 2),
      giacenza INT NOT NULL,
-     CONSTRAINT idingrediente PRIMARY KEY (codiceingrediente)
+     CONSTRAINT idingredienti PRIMARY KEY (idingrediente)
 );
 
-CREATE TABLE notifica (
-     codicenotifica CHAR(5) NOT NULL,
+CREATE TABLE notifiche (
+     idnotifica INT AUTO_INCREMENT NOT NULL,
      titolo VARCHAR(255) NOT NULL,
      testo TEXT NOT NULL,
      vista BOOLEAN NOT NULL,
      data DATE NOT NULL,
      ora TIME NOT NULL,
-	 tipo ENUM('ordine', 'prodotto', 'ingrediente') NOT NULL,     
+     tipo ENUM('ordine', 'prodotto', 'ingrediente') NOT NULL,     
      username VARCHAR(255) NOT NULL,
-     codiceprodotto CHAR(5),
-     codiceingrediente CHAR(5),
-     codiceordine CHAR(5),
-     CONSTRAINT idnotifica PRIMARY KEY (codicenotifica)
+     idprodotto INT,
+     idingrediente INT,
+     idordine INT,
+     CONSTRAINT idnotifiche PRIMARY KEY (idnotifica)
 );
 
-CREATE TABLE ordine (
-     codiceordine CHAR(5) NOT NULL,
+CREATE TABLE ordini (
+     idordine INT AUTO_INCREMENT NOT NULL,
      data DATE NOT NULL,
      ora TIME NOT NULL,
      username VARCHAR(255) NOT NULL,
-     CONSTRAINT idordine_id PRIMARY KEY (codiceordine)
+     CONSTRAINT idordini_id PRIMARY KEY (idordine)
 );
 
-CREATE TABLE personalizzazione (
-     codicepersonalizzazione CHAR(5) NOT NULL,
+CREATE TABLE personalizzazioni (
+     idpersonalizzazione INT AUTO_INCREMENT NOT NULL,
      prezzo DECIMAL(10, 2) NOT NULL,
      quantita INT NOT NULL,
-     codiceordine CHAR(5) NOT NULL,
-     codiceprodotto CHAR(5) NOT NULL,
-     CONSTRAINT idpersonalizzazione_id PRIMARY KEY (codicepersonalizzazione)
+     idordine INT NOT NULL,
+     idprodotto INT NOT NULL,
+     CONSTRAINT idpersonalizzazioni_id PRIMARY KEY (idpersonalizzazione)
 );
 
-CREATE TABLE prodotto (
-     codiceprodotto CHAR(5) NOT NULL,
+CREATE TABLE prodotti (
+     idprodotto INT AUTO_INCREMENT NOT NULL,
      nome VARCHAR(255) NOT NULL,
      prezzo DECIMAL(10, 2) NOT NULL,
      disponibilita INT NOT NULL,
-     codicecategoria CHAR(5) NOT NULL,
-     CONSTRAINT idprodotto PRIMARY KEY (codiceprodotto)
+     idcategoria INT NOT NULL,
+     CONSTRAINT idprodotti PRIMARY KEY (idprodotto)
 );
 
-CREATE TABLE carrello_prodotti (
-     codiceprodotto CHAR(5) NOT NULL,
-     codiceordine CHAR(5) NOT NULL,
+CREATE TABLE carrelli_prodotti (
+     idprodotto INT NOT NULL,
+     idordine INT NOT NULL,
      quantita INT NOT NULL,
-     CONSTRAINT idcarrelloprodotti PRIMARY KEY (codiceordine, codiceprodotto)
+     CONSTRAINT idcarrelloprodotti PRIMARY KEY (idordine, idprodotto)
 );
 
-CREATE TABLE composizione (
-     codiceprodotto CHAR(5) NOT NULL,
-     codiceingrediente CHAR(5) NOT NULL,
+CREATE TABLE composizioni (
+     idprodotto INT NOT NULL,
+     idingrediente INT NOT NULL,
      quantita INT NOT NULL,
-     CONSTRAINT idcomposizione PRIMARY KEY (codiceprodotto, codiceingrediente)
+     CONSTRAINT idcomposizioni PRIMARY KEY (idprodotto, idingrediente)
 );
 
-CREATE TABLE modifica_stato (
+CREATE TABLE modifiche_stato (
      descrizione VARCHAR(255) NOT NULL,
-     codiceordine CHAR(5) NOT NULL,
+     idordine INT NOT NULL,
      data DATE NOT NULL,
      orario TIME NOT NULL,
-     CONSTRAINT idmodificastato PRIMARY KEY (codiceordine, descrizione)
+     CONSTRAINT idmodifichestato PRIMARY KEY (idordine, descrizione)
 );
 
-CREATE TABLE modifica_ingrediente (
-     codicepersonalizzazione CHAR(5) NOT NULL,
-     codiceingrediente CHAR(5) NOT NULL,
+CREATE TABLE modifiche_ingredienti (
+     idpersonalizzazione INT NOT NULL,
+     idingrediente INT NOT NULL,
      azione ENUM('aggiunto', 'rimosso') NOT NULL,
-     CONSTRAINT idmodifica PRIMARY KEY (codicepersonalizzazione, codiceingrediente)
+     CONSTRAINT idmodifiche PRIMARY KEY (idpersonalizzazione, idingrediente)
 );
 
-CREATE TABLE recensione (
-     codicerecensione CHAR(5) NOT NULL,
-     codiceordine CHAR(5) NOT NULL,
+CREATE TABLE recensioni (
+     idrecensione INT AUTO_INCREMENT NOT NULL,
+     idordine INT NOT NULL,
      titolo VARCHAR(255) NOT NULL,
-	 voto INT NOT NULL CHECK (voto BETWEEN 1 AND 5),
+     voto INT NOT NULL CHECK (voto BETWEEN 1 AND 5),
      commento TEXT,
-     CONSTRAINT idrecensione PRIMARY KEY (codicerecensione),
-     CONSTRAINT fkriguardo_id UNIQUE (codiceordine)
+     CONSTRAINT idrecensioni PRIMARY KEY (idrecensione),
+     CONSTRAINT fkriguardo_id UNIQUE (idordine)
 );
 
-CREATE TABLE stato_ordine (
+CREATE TABLE stati_ordine (
      descrizione VARCHAR(255) NOT NULL,
-     CONSTRAINT idstato_ordine PRIMARY KEY (descrizione)
+     CONSTRAINT idstatiordine PRIMARY KEY (descrizione)
 );
 
-CREATE TABLE utente (
+CREATE TABLE utenti (
      nome VARCHAR(255) NOT NULL,
      cognome VARCHAR(255) NOT NULL,
      username VARCHAR(255) NOT NULL,
      password VARCHAR(255) NOT NULL,
      tipo ENUM('cliente', 'venditore') NOT NULL,
-     CONSTRAINT idutente PRIMARY KEY (username)
+     CONSTRAINT idutenti PRIMARY KEY (username)
 );
 
 -- Constraints Section
 -- ___________________ 
 
-ALTER TABLE notifica 
+ALTER TABLE notifiche 
 ADD CONSTRAINT fkrelativa 
 FOREIGN KEY (username) 
-REFERENCES utente (username);
+REFERENCES utenti (username);
 
-ALTER TABLE notifica 
+ALTER TABLE notifiche 
 ADD CONSTRAINT fknotifica_prodotto 
-FOREIGN KEY (codiceprodotto) 
-REFERENCES prodotto (codiceprodotto);
+FOREIGN KEY (idprodotto) 
+REFERENCES prodotti (idprodotto);
 
-ALTER TABLE notifica 
+ALTER TABLE notifiche 
 ADD CONSTRAINT fknotifica_ingrediente 
-FOREIGN KEY (codiceingrediente) 
-REFERENCES ingrediente (codiceingrediente);
+FOREIGN KEY (idingrediente) 
+REFERENCES ingredienti (idingrediente);
 
-ALTER TABLE notifica 
+ALTER TABLE notifiche 
 ADD CONSTRAINT fknotifica_ordine 
-FOREIGN KEY (codiceordine) 
-REFERENCES ordine (codiceordine);
+FOREIGN KEY (idordine) 
+REFERENCES ordini (idordine);
 
-ALTER TABLE ordine 
+ALTER TABLE ordini 
 ADD CONSTRAINT fkr 
 FOREIGN KEY (username) 
-REFERENCES utente (username);
+REFERENCES utenti (username);
 
-ALTER TABLE personalizzazione 
+ALTER TABLE personalizzazioni 
 ADD CONSTRAINT fkcarrello_personalizzazione 
-FOREIGN KEY (codiceordine) 
-REFERENCES ordine (codiceordine);
+FOREIGN KEY (idordine) 
+REFERENCES ordini (idordine);
 
-ALTER TABLE personalizzazione 
+ALTER TABLE personalizzazioni 
 ADD CONSTRAINT fksu 
-FOREIGN KEY (codiceprodotto) 
-REFERENCES prodotto (codiceprodotto);
+FOREIGN KEY (idprodotto) 
+REFERENCES prodotti (idprodotto);
 
-ALTER TABLE prodotto 
+ALTER TABLE prodotti 
 ADD CONSTRAINT fkappartenenza 
-FOREIGN KEY (codicecategoria) 
-REFERENCES categoria (codicecategoria);
+FOREIGN KEY (idcategoria) 
+REFERENCES categorie (idcategoria);
 
 ALTER TABLE carrello_prodotti 
 ADD CONSTRAINT fkcar_ord 
-FOREIGN KEY (codiceordine) 
-REFERENCES ordine (codiceordine);
+FOREIGN KEY (idordine) 
+REFERENCES ordini (idordine);
 
 ALTER TABLE carrello_prodotti 
 ADD CONSTRAINT fkcar_pro 
-FOREIGN KEY (codiceprodotto) 
-REFERENCES prodotto (codiceprodotto);
+FOREIGN KEY (idprodotto) 
+REFERENCES prodotti (idprodotto);
 
-ALTER TABLE composizione 
+ALTER TABLE composizioni 
 ADD CONSTRAINT fkcom_ing 
-FOREIGN KEY (codiceingrediente) 
-REFERENCES ingrediente (codiceingrediente);
+FOREIGN KEY (idingrediente) 
+REFERENCES ingredienti (idingrediente);
 
-ALTER TABLE composizione 
+ALTER TABLE composizioni 
 ADD CONSTRAINT fkcom_pro 
-FOREIGN KEY (codiceprodotto) 
-REFERENCES prodotto (codiceprodotto);
+FOREIGN KEY (idprodotto) 
+REFERENCES prodotti (idprodotto);
 
-ALTER TABLE modifica_stato 
+ALTER TABLE modifiche_stato 
 ADD CONSTRAINT fkdi_ord 
-FOREIGN KEY (codiceordine) 
-REFERENCES ordine (codiceordine);
+FOREIGN KEY (idordine) 
+REFERENCES ordini (idordine);
 
-ALTER TABLE modifica_stato 
+ALTER TABLE modifiche_stato 
 ADD CONSTRAINT fkdi_sta 
 FOREIGN KEY (descrizione) 
-REFERENCES stato_ordine (descrizione);
+REFERENCES stati_ordine (descrizione);
 
-ALTER TABLE modifica_ingrediente 
+ALTER TABLE modifiche_ingredienti 
 ADD CONSTRAINT fkmod_ing 
-FOREIGN KEY (codiceingrediente) 
-REFERENCES ingrediente (codiceingrediente);
+FOREIGN KEY (idingrediente) 
+REFERENCES ingredienti (idingrediente);
 
-ALTER TABLE modifica_ingrediente 
+ALTER TABLE modifiche_ingredienti 
 ADD CONSTRAINT fkmod_per 
-FOREIGN KEY (codicepersonalizzazione) 
-REFERENCES personalizzazione (codicepersonalizzazione);
+FOREIGN KEY (idpersonalizzazione) 
+REFERENCES personalizzazioni (idpersonalizzazione);
 
-ALTER TABLE recensione 
+ALTER TABLE recensioni 
 ADD CONSTRAINT fkriguardo_fk 
-FOREIGN KEY (codiceordine) 
-REFERENCES ordine (codiceordine);
+FOREIGN KEY (idordine) 
+REFERENCES ordini (idordine);
 
 -- Index Section
 -- _____________ 
 
-CREATE INDEX idx_notifica_username ON notifica (username);
-CREATE INDEX idx_notifica_codiceprodotto ON notifica (codiceprodotto);
-CREATE INDEX idx_notifica_codiceingrediente ON notifica (codiceingrediente);
-CREATE INDEX idx_notifica_codiceordine ON notifica (codiceordine);
-CREATE INDEX idx_ordine_username ON ordine (username);
-CREATE INDEX idx_personalizzazione_codiceordine ON personalizzazione (codiceordine);
-CREATE INDEX idx_personalizzazione_codiceprodotto ON personalizzazione (codiceprodotto);
-CREATE INDEX idx_prodotto_codicecategoria ON prodotto (codicecategoria);
-CREATE INDEX idx_carrelloprodotti_codiceordine ON carrello_prodotti (codiceordine);
-CREATE INDEX idx_carrelloprodotti_codiceprodotto ON carrello_prodotti (codiceprodotto);
-CREATE INDEX idx_composizione_codiceprodotto ON composizione (codiceprodotto);
-CREATE INDEX idx_composizione_codiceingrediente ON composizione (codiceingrediente);
-CREATE INDEX idx_modificastato_codiceordine ON modifica_stato (codiceordine);
-CREATE INDEX idx_modificastato_descrizione ON modifica_stato (descrizione);
-CREATE INDEX idx_modificaingrediente_codicepersonalizzazione ON modifica_ingrediente (codicepersonalizzazione);
-CREATE INDEX idx_modificaingrediente_codiceingrediente ON modifica_ingrediente (codiceingrediente);
-CREATE INDEX idx_recensione_codiceordine ON recensione (codiceordine);
+CREATE INDEX idx_notifiche_username ON notifiche (username);
+CREATE INDEX idx_notifiche_idprodotto ON notifiche (idprodotto);
+CREATE INDEX idx_notifiche_idingrediente ON notifiche (idingrediente);
+CREATE INDEX idx_notifiche_idordine ON notifiche (idordine);
+CREATE INDEX idx_ordini_username ON ordini (username);
+CREATE INDEX idx_personalizzazioni_idordine ON personalizzazioni (idordine);
+CREATE INDEX idx_personalizzazioni_idprodotto ON personalizzazioni (idprodotto);
+CREATE INDEX idx_prodotti_idcategoria ON prodotti (idcategoria);
+CREATE INDEX idx_carrelloprodotti_idordine ON carrello_prodotti (idordine);
+CREATE INDEX idx_carrelloprodotti_idprodotto ON carrello_prodotti (idprodotto);
+CREATE INDEX idx_composizioni_idprodotto ON composizioni (idprodotto);
+CREATE INDEX idx_composizioni_idingrediente ON composizioni (idingrediente);
+CREATE INDEX idx_modifichestato_idordine ON modifiche_stato (idordine);
+CREATE INDEX idx_modifichestato_descrizione ON modifiche_stato (descrizione);
+CREATE INDEX idx_modificheingredienti_idpersonalizzazione ON modifiche_ingredienti (idpersonalizzazione);
+CREATE INDEX idx_modificheingredienti_idingrediente ON modifiche_ingredienti (idingrediente);
+CREATE INDEX idx_recensioni_idordine ON recensioni (idordine);
