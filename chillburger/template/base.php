@@ -19,9 +19,13 @@
                     data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <a class="navbar-brand" href="#">
-                    <h1>ChillBurger</h1>
-                </a>
+                <div class="d-flex align-items-center">
+                    <a class="navbar-brand me-2" href="#">
+                        <h1 class="m-0">ChillBurger</h1>
+                    </a>
+                    <i class="fas fa-hamburger fa-2x text-black"></i>
+                </div>
+
                 <div>
                     <a class="text-decoration-none" href="#">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="black"
@@ -69,9 +73,11 @@
 
     <footer class="bg-light py-3">
         <div class="container">
-            <div class="col-md-4 mb-3">
-                <strong class="mb-4">Seguici</strong>
-                <div class="mt-2">
+            <div class="d-flex flex-column">
+                <div class="d-flex justify-content-center">
+                    <strong class="mb-4">Seguici</strong>
+                </div>
+                <div class=" d-flex justify-content-center mt-2">
                     <a href="https://www.facebook.com/" class=" me-3"
                         title="visualizza la nostra pagina facebook per restare aggioranato"><strong
                             class="fab fa-facebook fa-2x text-black"></strong></a>
@@ -83,9 +89,9 @@
                             class="fab fa-square-x-twitter fa-2x text-black"></strong></a>
                 </div>
             </div>
-            <div>
-                <p class="text-center">&copy; 2023 ChillBurger. Tutti i diritti riservati.</p>
-            </div>
+        </div>
+        <div>
+            <p class="text-center">&copy; 2023 ChillBurger. Tutti i diritti riservati.</p>
         </div>
     </footer>
 
