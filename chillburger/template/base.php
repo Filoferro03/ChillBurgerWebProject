@@ -7,20 +7,20 @@
     <title><?php echo $templateParams["titolo"]; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 </head>
 
 <body>
     <header>
-        <nav class="navbar bg-body-tertiary">
+        <nav class="navbar p-2">
             <div class="container-fluid">
                 <button class="navbar-toggler mx-3" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="d-flex align-items-center">
-                    <a class="navbar-brand me-2" href="#">
+                    <a class="navbar-brand me-2" href="index.php">
                         <h1 class="m-0">ChillBurger</h1>
                     </a>
                     <i class="fas fa-hamburger fa-2x text-black"></i>
@@ -51,10 +51,16 @@
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#">Home</a>
+                                <a class="nav-link fs-3" aria-current="page" href="#">Menu</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Link</a>
+                                <a class="nav-link fs-3" href="#">Ordina ora</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link fs-3" href="#">About us</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link fs-3" href="reviews.php">Recensioni</a>
                             </li>
                         </ul>
                     </div>
@@ -71,7 +77,7 @@
         </section>
     </main>
 
-    <footer class="bg-light py-3">
+    <footer class="py-3">
         <div class="container">
             <div class="d-flex flex-column">
                 <div class="d-flex justify-content-center">
@@ -98,7 +104,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
         crossorigin="anonymous"></script>
-</body>
 </body>
 
 </html>
