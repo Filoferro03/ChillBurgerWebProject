@@ -19,7 +19,7 @@
                     data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center m-1">
                     <a class="navbar-brand me-2" href="#">
                         <h1 class="m-0">ChillBurger</h1>
                     </a>
@@ -64,11 +64,7 @@
     </header>
 
     <main>
-        <!-- Main content goes here -->
-        <section class="container my-5">
-            <h1>Welcome to ChillBurger</h1>
-            <p>This is the main content area.</p>
-        </section>
+        <?php require($templateParams["nome"]); ?>
     </main>
 
     <footer class="bg-light py-3">
