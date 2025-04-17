@@ -110,7 +110,7 @@
     </header>
 
     <main>
-        <?php require($templateParams["nome"]); ?>
+        <?php /*require($templateParams["nome"]);*/ require("template/homepage.php") ?>
     </main>
 
     <footer class="py-3">
