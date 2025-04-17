@@ -9,7 +9,7 @@
 -- Database Section
 -- ________________ 
 
-DROP DATABASE chillburgerdb;
+DROP DATABASE IF EXISTS chillburgerdb;
 CREATE DATABASE IF NOT EXISTS chillburgerdb;
 USE chillburgerdb;
 
@@ -19,7 +19,7 @@ USE chillburgerdb;
 CREATE TABLE categorie (
      idcategoria INT AUTO_INCREMENT NOT NULL,
      descrizione VARCHAR(255) NOT NULL,
-     CONSTRAINT idcategorie PRIMARY KEY (idcategoria)
+     PRIMARY KEY (idcategoria)
 );
 
 CREATE TABLE ingredienti (
@@ -27,14 +27,15 @@ CREATE TABLE ingredienti (
      nome VARCHAR(255) NOT NULL,
      sovrapprezzo DECIMAL(10, 2),
      giacenza INT NOT NULL,
-     CONSTRAINT idingredienti PRIMARY KEY (idingrediente)
+     image VARCHAR(255),
+     PRIMARY KEY (idingrediente)
 );
 
 CREATE TABLE notifiche (
      idnotifica INT AUTO_INCREMENT NOT NULL,
      titolo VARCHAR(255) NOT NULL,
      testo TEXT NOT NULL,
-     vista BOOLEAN NOT NULL,
+     vista BOOLEAN NOT NULL DEFAULT FALSE,
      data DATE NOT NULL,
      ora TIME NOT NULL,
      tipo ENUM('ordine', 'prodotto', 'ingrediente') NOT NULL,     
@@ -42,7 +43,7 @@ CREATE TABLE notifiche (
      idprodotto INT,
      idingrediente INT,
      idordine INT,
-     CONSTRAINT idnotifiche PRIMARY KEY (idnotifica)
+     PRIMARY KEY (idnotifica)
 );
 
 CREATE TABLE ordini (
@@ -50,7 +51,7 @@ CREATE TABLE ordini (
      data DATE NOT NULL,
      ora TIME NOT NULL,
      username VARCHAR(255) NOT NULL,
-     CONSTRAINT idordini_id PRIMARY KEY (idordine)
+     PRIMARY KEY (idordine)
 );
 
 CREATE TABLE personalizzazioni (
@@ -59,7 +60,7 @@ CREATE TABLE personalizzazioni (
      quantita INT NOT NULL,
      idordine INT NOT NULL,
      idprodotto INT NOT NULL,
-     CONSTRAINT idpersonalizzazioni_id PRIMARY KEY (idpersonalizzazione)
+     PRIMARY KEY (idpersonalizzazione)
 );
 
 CREATE TABLE prodotti (
@@ -68,21 +69,22 @@ CREATE TABLE prodotti (
      prezzo DECIMAL(10, 2) NOT NULL,
      disponibilita INT NOT NULL,
      idcategoria INT NOT NULL,
-     CONSTRAINT idprodotti PRIMARY KEY (idprodotto)
+     image VARCHAR(255),
+     PRIMARY KEY (idprodotto)
 );
 
 CREATE TABLE carrelli_prodotti (
      idprodotto INT NOT NULL,
      idordine INT NOT NULL,
      quantita INT NOT NULL,
-     CONSTRAINT idcarrelliprodotti PRIMARY KEY (idordine, idprodotto)
+     PRIMARY KEY (idordine, idprodotto)
 );
 
 CREATE TABLE composizioni (
      idprodotto INT NOT NULL,
      idingrediente INT NOT NULL,
      quantita INT NOT NULL,
-     CONSTRAINT idcomposizioni PRIMARY KEY (idprodotto, idingrediente)
+     PRIMARY KEY (idprodotto, idingrediente)
 );
 
 CREATE TABLE modifiche_stato (
@@ -90,14 +92,14 @@ CREATE TABLE modifiche_stato (
      idordine INT NOT NULL,
      data DATE NOT NULL,
      orario TIME NOT NULL,
-     CONSTRAINT idmodifichestato PRIMARY KEY (idordine, descrizione)
+     PRIMARY KEY (idordine, descrizione)
 );
 
 CREATE TABLE modifiche_ingredienti (
      idpersonalizzazione INT NOT NULL,
      idingrediente INT NOT NULL,
      azione ENUM('aggiunto', 'rimosso') NOT NULL,
-     CONSTRAINT idmodifiche PRIMARY KEY (idpersonalizzazione, idingrediente)
+     PRIMARY KEY (idpersonalizzazione, idingrediente)
 );
 
 CREATE TABLE recensioni (
@@ -106,13 +108,13 @@ CREATE TABLE recensioni (
      titolo VARCHAR(255) NOT NULL,
      voto INT NOT NULL CHECK (voto BETWEEN 1 AND 5),
      commento TEXT,
-     CONSTRAINT idrecensioni PRIMARY KEY (idrecensione),
-     CONSTRAINT fkriguardo_id UNIQUE (idordine)
+     PRIMARY KEY (idrecensione),
+     UNIQUE (idordine)
 );
 
 CREATE TABLE stati_ordine (
      descrizione VARCHAR(255) NOT NULL,
-     CONSTRAINT idstatiordine PRIMARY KEY (descrizione)
+     PRIMARY KEY (descrizione)
 );
 
 CREATE TABLE utenti (
@@ -121,7 +123,7 @@ CREATE TABLE utenti (
      username VARCHAR(255) NOT NULL,
      password VARCHAR(255) NOT NULL,
      tipo ENUM('cliente', 'venditore') NOT NULL,
-     CONSTRAINT idutenti PRIMARY KEY (username)
+     PRIMARY KEY (username)
 );
 
 -- Constraints Section
