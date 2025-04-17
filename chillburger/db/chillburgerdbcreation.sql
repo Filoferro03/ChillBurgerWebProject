@@ -39,7 +39,7 @@ CREATE TABLE notifiche (
      data DATE NOT NULL,
      ora TIME NOT NULL,
      tipo ENUM('ordine', 'prodotto', 'ingrediente') NOT NULL,     
-     username VARCHAR(255) NOT NULL,
+     idutente INT NOT NULL,
      idprodotto INT,
      idingrediente INT,
      idordine INT,
@@ -50,7 +50,7 @@ CREATE TABLE ordini (
      idordine INT AUTO_INCREMENT NOT NULL,
      data DATE NOT NULL,
      ora TIME NOT NULL,
-     username VARCHAR(255) NOT NULL,
+     idutente INT NOT NULL,
      PRIMARY KEY (idordine)
 );
 
@@ -118,12 +118,13 @@ CREATE TABLE stati_ordine (
 );
 
 CREATE TABLE utenti (
+     idutente INT AUTO_INCREMENT NOT NULL,
      nome VARCHAR(255) NOT NULL,
      cognome VARCHAR(255) NOT NULL,
      username VARCHAR(255) NOT NULL,
      password VARCHAR(255) NOT NULL,
      tipo ENUM('cliente', 'venditore') NOT NULL,
-     PRIMARY KEY (username)
+     PRIMARY KEY (idutente)
 );
 
 -- Constraints Section
@@ -131,8 +132,8 @@ CREATE TABLE utenti (
 
 ALTER TABLE notifiche 
 ADD CONSTRAINT fkrelativa 
-FOREIGN KEY (username) 
-REFERENCES utenti (username);
+FOREIGN KEY (idutente) 
+REFERENCES utenti (idutente);
 
 ALTER TABLE notifiche 
 ADD CONSTRAINT fknotifica_prodotto 
@@ -151,8 +152,8 @@ REFERENCES ordini (idordine);
 
 ALTER TABLE ordini 
 ADD CONSTRAINT fkr 
-FOREIGN KEY (username) 
-REFERENCES utenti (username);
+FOREIGN KEY (idutente) 
+REFERENCES utenti (idutente);
 
 ALTER TABLE personalizzazioni 
 ADD CONSTRAINT fkcarrelli_personalizzazione 
@@ -217,11 +218,11 @@ REFERENCES ordini (idordine);
 -- Index Section
 -- _____________ 
 
-CREATE INDEX idx_notifiche_username ON notifiche (username);
+CREATE INDEX idx_notifiche_username ON notifiche (idutente);
 CREATE INDEX idx_notifiche_idprodotto ON notifiche (idprodotto);
 CREATE INDEX idx_notifiche_idingrediente ON notifiche (idingrediente);
 CREATE INDEX idx_notifiche_idordine ON notifiche (idordine);
-CREATE INDEX idx_ordini_username ON ordini (username);
+CREATE INDEX idx_ordini_username ON ordini (idutente);
 CREATE INDEX idx_personalizzazioni_idordine ON personalizzazioni (idordine);
 CREATE INDEX idx_personalizzazioni_idprodotto ON personalizzazioni (idprodotto);
 CREATE INDEX idx_prodotti_idcategoria ON prodotti (idcategoria);
