@@ -91,3 +91,13 @@ INSERT INTO chillburgerdb.stati_ordine (descrizione) VALUES
 INSERT INTO chillburgerdb.utenti (nome, cognome, username, password, tipo) VALUES
 ('Mario', 'Rossi', 'mario.rossi', 'password123', 'cliente'),
 ('Luigi', 'Bianchi', 'luigi.bianchi', 'password123', 'venditore');
+
+-- Insert Ordini
+INSERT INTO chillburgerdb.ordini (data, ora, idutente) VALUES
+('2023-10-01', '12:30:00', 1),
+('2023-10-02', '14:45:00', 2);
+
+-- Insert Recensioni
+INSERT INTO chillburgerdb.recensioni (idordine, titolo, voto, commento) VALUES
+(1, 'Delizioso!', 5, 'Il Bacon Cheeseburger era fantastico!'),
+(2, 'Buono ma migliorabile', 3, 'Il Chicken Deluxe era buono ma avrebbe potuto essere migliorato.');
