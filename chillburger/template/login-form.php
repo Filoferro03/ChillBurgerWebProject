@@ -36,7 +36,7 @@
                         <label for="confermapassword">Conferma Password</label>
                         <input type="password" id="confermapassword" class="form-control m-1">
                         <div class="text-center">
-                            <input type="submit" value="Registrati" class="m-1">
+                            <input type="submit" value="Registrati" class="m-2">
                         </div>
 
                     </fieldset>
