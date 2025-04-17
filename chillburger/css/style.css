@@ -2,6 +2,13 @@ header, footer {
     background-color: #af902b;
 }
 
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+
 .mobile {
     display: none;
 }
@@ -25,4 +32,27 @@ header, footer {
     .logo {
         max-height: 40px;
     }
+}
+
+.hero-section {
+    background-image: url('../resources/ChillBurgerHomePage.png');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    color: white;
+    position: relative;
+}
+
+.hero-overlay {
+    background-color: rgba(0, 0, 0, 0.5); /* opacità scura per leggibilità */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
 }
