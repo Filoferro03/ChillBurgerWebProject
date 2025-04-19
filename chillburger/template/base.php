@@ -23,7 +23,7 @@
                 <div class="d-flex align-items-center">
                     <a class="navbar-brand me-2 d-flex" href="index.php">
                         <img src="./resources/ChillBurgerLogoMobile.png" alt="ChillBurger Logo" class="logo me-2" />
-                        <h1 class="m-0">ChillBurger</h1>
+                        <h1 class="chill-burger-title m-0">ChillBurger</h1>
                     </a>
 
                 </div>
@@ -76,16 +76,16 @@
                 <a href="index.php"><img src="./resources/ChillBurgerLogo.png" alt="ChillBurger Logo" class="logo" /></a>
                 <ul class="list-group list-group-horizontal d-flex justify-content-center gap-4">
                     <li class="list-group-item">
-                        <a class="nav-link fs-3" aria-current="page" href="#">Menu</a>
+                        <a class="nav-link header-menu fs-3" aria-current="page" href="#">Menu</a>
                     </li>
                     <li class="list-group-item">
-                        <a class="nav-link fs-3" href="#">Ordina ora</a>
+                        <a class="nav-link header-menu fs-3" href="#">Ordina ora</a>
                     </li>
                     <li class="list-group-item">
-                        <a class="nav-link fs-3" href="#">About us</a>
+                        <a class="nav-link header-menu fs-3" href="#">About us</a>
                     </li>
                     <li class="list-group-item">
-                        <a class="nav-link fs-3" href="reviews.php">Recensioni</a>
+                        <a class="nav-link header-menu fs-3" href="reviews.php">Recensioni</a>
                     </li>
                 </ul>
                 <div>

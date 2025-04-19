@@ -11,7 +11,6 @@ header {
 
 body {
     font-family: cute, Arial, Helvetica, sans-serif;
-    color: black;
 }
 
 footer {
@@ -47,18 +46,6 @@ h1 {
     border: none;
 }
 
-@media (max-width: 768px) {
-    .mobile {
-        display: block;
-    }
-    .desktop {
-        display: none;
-    }
-    .logo {
-        max-height: 40px;
-    }
-}
-
 .hero-section {
     background-image: url('../resources/ChillBurgerHomePage3.png');
     background-size: cover;
@@ -82,6 +69,17 @@ h1 {
     z-index: 2;
 }
 
+/* Cambia il colore della scritta Chill Burger */
+
+.welcome-to-title {
+    color: white;
+}
+
+.chill-burger-title {
+    color: #DDB892;
+    text-shadow: 4px 4px white;
+}
+
 /* 
     FIXME 
     bottoni, capire quale sia la configurazione migliore
@@ -96,13 +94,47 @@ h1 {
 .btn-body:hover {
     background-color: transparent;
     border: 4px solid #9C6644;
-    color: white;
+    color: #DDB892;
+}
+
+/* Sottolineatura al passaggio del mouse sugli <a> nell'header */
+.header-menu {
+    position: relative;
+    text-decoration: none;
+}
+
+.header-menu::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 4px;
+    background-color: #DDB892;
+    transition: width 0.3s ease;
+    border-radius: 5px;
+}
+
+.header-menu:hover::before {
+    width: 100%;
 }
 
 
-/* Sottolineatura al passaggio del mouse sugli <a> nell'header */
-header a:hover {
-    text-decoration: underline black; /* Aggiunge la sottolineatura */
+/* Mobile */
+@media (max-width: 768px) {
+    .mobile {
+        display: block;
+    }
+    .desktop {
+        display: none;
+    }
+    .logo {
+        max-height: 40px;
+    }
+    .chill-burger-title {
+        color: #DDB892;
+        text-shadow: 2px 2px white;
+    }
 }
 
 
