@@ -12,13 +12,17 @@ body {
     text-shadow: 4px 4px 0 white; 
 }
 
+.custom-title .emoji { 
+    text-shadow: none; 
+}
+
 .custom-section {
     color: #9C6644;
     
 }
 
-.custom-title .emoji { 
-    text-shadow: none; 
+.mission-vision { 
+    color: #DDB892; 
 }
 
 .bg-light {
@@ -64,6 +68,10 @@ body {
     background-color: #9C6644;
     border-radius: 5px;
     animation: underline 1s ease forwards; /* Animazione che parte subito */
+}
+
+.animate-underline.bg::before {
+    background-color: #DDB892;
 }
 
 @keyframes underline {
