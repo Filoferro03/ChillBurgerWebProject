@@ -5,11 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $templateParams["titolo"]; ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous"/>
-    <link rel="stylesheet" href="./css/style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+
+    <!-- CSS “core” -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <?php
+    /* ==========  CSS extra (per‑pagina)  ========== */
+    if (!empty($templateParams['css'])) {
+        foreach ($templateParams['css'] as $css) {
+            echo '<link rel="stylesheet" href="' . htmlspecialchars($css, ENT_QUOTES) . '">' . PHP_EOL;
+        }
+    }
+
+    /* ==========  JS extra (per‑pagina) – facoltativo  ========== */
+    if (!empty($templateParams['js'])) {
+        foreach ($templateParams['js'] as $js) {
+            echo '<script src="' . htmlspecialchars($js, ENT_QUOTES) . '" defer></script>' . PHP_EOL;
+        }
+    }
+    ?>
 </head>
+
 
 <body>
     <header>
@@ -59,7 +81,7 @@
                                 <a class="nav-link fs-3" href="#">Ordina ora</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fs-3" href="#">About us</a>
+                                <a class="nav-link fs-3" href="about_us.php">About us</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link fs-3" href="reviews.php">Recensioni</a>
@@ -82,7 +104,7 @@
                         <a class="nav-link header-menu fs-2" href="#">Ordina ora</a>
                     </li>
                     <li class="list-group-item">
-                        <a class="nav-link header-menu fs-2" href="#">About us</a>
+                        <a class="nav-link header-menu fs-2" href="about_us.php">About us</a>
                     </li>
                     <li class="list-group-item">
                         <a class="nav-link header-menu fs-2" href="reviews.php">Recensioni</a>
