@@ -1,0 +1,73 @@
+body {
+    background-color: #DDB892;
+}
+
+.custom-title {
+    color: #9C6644;
+    text-shadow: white;
+}
+
+/* ombra solo sul testo, NON sulle emoji */
+.custom-title .txt { 
+    text-shadow: 4px 4px 0 white; 
+}
+
+.custom-section {
+    color: #9C6644;
+    
+}
+
+.custom-title .emoji { 
+    text-shadow: none; 
+}
+
+.bg-light {
+    background-color: #9C6644 !important;
+}
+
+.display-5 {
+    font-size: 3rem;
+}
+
+.timeline { 
+    border-left: 4px solid #9C6644; 
+}
+
+.timeline li { 
+    position: relative; 
+    padding-left: 1.5rem; 
+}
+
+.timeline li::before {
+    content: "";
+    position: absolute;
+    left: -11px;
+    top: 0.35rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #9C6644;
+}
+
+.animate-underline {
+    position: relative;
+    text-decoration: none;
+}
+
+.animate-underline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 0; /* Inizia con larghezza 0 */
+    height: 4px;
+    background-color: #9C6644;
+    border-radius: 5px;
+    animation: underline 1s ease forwards; /* Animazione che parte subito */
+}
+
+@keyframes underline {
+    to {
+        width: 100%; /* La linea si espande al 100% della larghezza */
+    }
+}
