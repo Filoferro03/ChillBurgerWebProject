@@ -79,3 +79,17 @@ body {
         width: 100%; /* La linea si espande al 100% della larghezza */
     }
 }
+
+#aboutCarousel .carousel-item img {
+    width: 80%;          /* riempie tutta la larghezza del contenitore */
+    height: 600px;        /* altezza fissa (scegli tu: 300‑600px) */
+    object-fit: cover;    /* mantiene il rapporto, ritagliando l’eccesso */
+}
+
+/* esempio responsive: altezza più bassa su mobile */
+@media (max-width: 576px) {
+    #aboutCarousel .carousel-item img {
+        height: 250px;
+    }
+}
+

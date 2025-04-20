@@ -70,23 +70,82 @@
         </div>
     </div>
 
+    <!-- Carosello immagini -->
+    <div id="aboutCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+
+        <!-- indicatori -->
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="0"
+                    class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="1"
+                    aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="2"
+                    aria-label="Slide 3"></button>
+            <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="3"
+                    aria-label="Slide 4"></button>
+            <button type="button" data-bs-target="#aboutCarousel" data-bs-slide-to="4"
+                    aria-label="Slide 5"></button>
+        </div>
+
+        <!-- slide -->
+        <div class="carousel-inner rounded-4 shadow">
+            <div class="carousel-item active">
+                <img src="./resources/carousel/rest_2.jpg" class="d-block w-100"
+                    alt="La nostra gioia">
+            </div>
+
+            <div class="carousel-item">
+                <img src="./resources/carousel/smash_1.jpg" class="d-block w-100"
+                    alt="La griglia in azione">
+            </div>
+
+            <div class="carousel-item">
+                <img src="./resources/carousel/ham_1.jpg" class="d-block w-100"
+                    alt="Il nostro prodotto">
+            </div>
+
+            <div class="carousel-item">
+                <img src="./resources/carousel/fries_1.jpg" class="d-block w-100"
+                    alt="Le nostre fries">
+            </div>
+
+            <div class="carousel-item">
+                <img src="./resources/carousel/rest_1.jpg" class="d-block w-100"
+                    alt="Il nostro ristorante">
+            </div>
+        </div>
+
+        <!-- frecce -->
+        <button class="carousel-control-prev" type="button"
+                data-bs-target="#aboutCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+            <span class="visually-hidden">Precedente</span>
+        </button>
+        <button class="carousel-control-next" type="button"
+                data-bs-target="#aboutCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+            <span class="visually-hidden">Successiva</span>
+        </button>
+    </div>
+
+
     <!-- Timeline aziendale -->
     <h3 class="h4 animate-underline custom-section fw-bold text-center mb-4">Il nostro percorso 🗺️</h3>
     <ul class="timeline list-unstyled px-md-5">
         <li class="mb-4">
-            <h4 class="h6 fw-semibold mb-1">2024 — L’inizio</h4>
+            <h4 class="h6 fw-semibold mb-1">2023 — L’inizio</h4>
             <p class="text-muted small mb-0">
                 Apertura del primo punto vendita a Cesena: un piccolo locale con grande entusiasmo.
             </p>
         </li>
         <li class="mb-4">
-            <h4 class="h6 fw-semibold mb-1">2025 — Crescita</h4>
+            <h4 class="h6 fw-semibold mb-1">2024 — Crescita</h4>
             <p class="text-muted small mb-0">
                 Lancio del servizio di consegna eco‑friendly con e‑bike e veicoli elettrici.
             </p>
         </li>
         <li>
-            <h4 class="h6 fw-semibold mb-1">2026 — Oggi</h4>
+            <h4 class="h6 fw-semibold mb-1">2025 — Oggi</h4>
             <p class="text-muted small mb-0">
                 Community fidelizzata, menù stagionali e costante ricerca di partner sostenibili.
             </p>
