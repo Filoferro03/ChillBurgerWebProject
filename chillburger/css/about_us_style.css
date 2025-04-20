@@ -86,6 +86,30 @@ body {
     object-fit: cover;    /* mantiene il rapporto, ritagliando l’eccesso */
 }
 
+/* TODO adatta la classe heder-menu in style.css */
+/* Sottolineatura al passaggio del mouse sugli <a> */
+.write-menu {
+    position: relative;
+    text-decoration: none;
+}
+
+.write-menu::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 4px;
+    background-color: #9C6644;
+    transition: width 0.3s ease;
+    border-radius: 5px;
+}
+
+.write-menu:hover::before {
+    width: 100%;
+}
+
+
 /* esempio responsive: altezza più bassa su mobile */
 @media (max-width: 576px) {
     #aboutCarousel .carousel-item img {

@@ -16,9 +16,13 @@
     <!-- Lista prodotti -->
     <div class="row g-4" id="menuGrid">
 
-        <!-- Esempio di card prodotto -->
+        <!-- card prodotto -->
         <?php
-        // array fittizio di prodotti (in futuro potrai caricarlo dal DB)
+
+        /* TODO:
+         *  
+         * array fittizio di prodotti (in futuro potrai caricarlo dal DB)
+         */
         $prodotti = [
             ["cat"=>"burger","img"=>"./resources/menu/burger_classic.jpg",
              "nome"=>"Classic Burger","desc"=>"Manzo 150 g • Cheddar • Salsa house","prezzo"=>"8,90 €"],

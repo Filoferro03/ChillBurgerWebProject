@@ -1,6 +1,10 @@
 /* --------------------   colori di sfondo / titolo   -------------------- */
+body {
+    background-color: #DDB892;
+}
+
 body.menu-page {
-    background-color: #fff8f1;
+    background-color: #DDB892;
 }
 
 .menu-title {
@@ -10,7 +14,7 @@ body.menu-page {
 /* --------------------   pulsanti filtro   -------------------- */
 .btn-filter {
     border: 1px solid #9C6644;
-    background: #fff;
+    background: white;
     color: #9C6644;
     transition: all .2s;
     padding: .35rem 1rem;
@@ -18,7 +22,7 @@ body.menu-page {
 .btn-filter:hover,
 .btn-filter.active {
     background: #9C6644;
-    color: #fff;
+    color: white;
 }
 
 /* --------------------   card prodotto   -------------------- */

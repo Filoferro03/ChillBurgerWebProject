@@ -11,7 +11,7 @@
     <!-- Sottotitolo -->
     <p class="lead text-center mb-5">
         Dal <strong>2024</strong> trasformiamo ingredienti locali di primissima qualità in burger dal gusto
-        indimenticabile. Siamo <em>ChillBurger</em>: passione per la cucina, attenzione all’ambiente
+        indimenticabile. Siamo <em>Chill Burger</em>: passione per la cucina, attenzione all’ambiente
         e un sorriso per ogni cliente. 😊
     </p>
 
@@ -154,7 +154,7 @@
 
     <!-- Call to Action -->
     <div class="text-center mt-5">
-        <a href="menu.php" class="btn btn-custom btn-lg px-5">
+        <a href="menu.php" class="h6 write-menu ">
             Scopri il nostro menù 📝
         </a>
     </div>
