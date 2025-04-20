@@ -1,0 +1,41 @@
+/* --------------------   colori di sfondo / titolo   -------------------- */
+body.menu-page {
+    background-color: #fff8f1;
+}
+
+.menu-title {
+    color: #9C6644;
+}
+
+/* --------------------   pulsanti filtro   -------------------- */
+.btn-filter {
+    border: 1px solid #9C6644;
+    background: #fff;
+    color: #9C6644;
+    transition: all .2s;
+    padding: .35rem 1rem;
+}
+.btn-filter:hover,
+.btn-filter.active {
+    background: #9C6644;
+    color: #fff;
+}
+
+/* --------------------   card prodotto   -------------------- */
+.card-img-top {
+    height: 160px;
+    object-fit: cover;
+}
+
+.hover-up {
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.hover-up:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 18px rgba(0,0,0,.12);
+}
+
+/* responsive: altezza immagine leggermente maggiore su desktop */
+@media (min-width: 768px) {
+    .card-img-top { height: 180px; }
+}

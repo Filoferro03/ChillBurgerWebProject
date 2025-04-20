@@ -67,7 +67,7 @@ body {
     height: 4px;
     background-color: #9C6644;
     border-radius: 5px;
-    animation: underline 1s ease forwards; /* Animazione che parte subito */
+    animation: underline 2s ease forwards; /* Animazione che parte subito */
 }
 
 .animate-underline.bg::before {

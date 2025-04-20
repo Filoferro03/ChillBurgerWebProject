@@ -75,7 +75,7 @@
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
                             <li class="nav-item">
-                                <a class="nav-link fs-3" aria-current="page" href="#">Menu</a>
+                                <a class="nav-link fs-3" aria-current="page" href="menu.php">Menu</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link fs-3" href="#">Ordina ora</a>
@@ -98,7 +98,7 @@
                 <a href="index.php"><img src="./resources/ChillBurgerLogo.png" alt="ChillBurger Logo" class="logo" /></a>
                 <ul class="list-group list-group-horizontal d-flex justify-content-center gap-4">
                     <li class="list-group-item">
-                        <a class="nav-link header-menu fs-2" aria-current="page" href="#">Menu</a>
+                        <a class="nav-link header-menu fs-2" aria-current="page" href="menu.php">Menu</a>
                     </li>
                     <li class="list-group-item">
                         <a class="nav-link header-menu fs-2" href="#">Ordina ora</a>
