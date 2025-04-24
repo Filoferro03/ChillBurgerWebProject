@@ -21,6 +21,11 @@ async function tryLogin(username, password) {
     formData.append('action', 'login');
 
     const json = await fetchData(url, formData);
+    if(json){
+        console.log("logineseguito con successo")
+    }else{
+        console.log("errore con successo")
+    }
 }
 
 async function tryRegistration(name, surname, username, password) {
@@ -35,7 +40,6 @@ async function tryRegistration(name, surname, username, password) {
     const json = await fetchData(url, formData);
 }
 
-const main = document.querySelector("main");
 
 // Gestione del form di login
 document.querySelector('#formlogin').addEventListener("submit", function (event) {
