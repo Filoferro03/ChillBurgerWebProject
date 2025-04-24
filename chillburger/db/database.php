@@ -13,7 +13,7 @@ class DatabaseHelper
 
     public function checkLogin($username, $password)
     {
-        $query = "SELECT username, nome, cognome, tipo FROM chillburger.utenti WHERE username = ? AND password = ?";
+        $query = "SELECT username, nome, cognome, tipo FROM utenti WHERE username = ? AND password = ?";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param('ss', $username, $password);
         $stmt->execute();
@@ -26,7 +26,7 @@ class DatabaseHelper
 
     public function registerUser($username, $password, $name, $surname, $type)
     {
-        $query = "INSERT INTO chillburger.utenti (nome, cognome, username, password, tipo) VALUES (?, ?, ?, ?, ?)";
+        $query = "INSERT INTO utenti (nome, cognome, username, password, tipo) VALUES (?, ?, ?, ?, ?)";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param('sssss', $name, $surname, $username, $password, $type);
 
