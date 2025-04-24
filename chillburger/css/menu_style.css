@@ -1,12 +1,4 @@
 /* --------------------   colori di sfondo / titolo   -------------------- */
-body {
-    background-color: #DDB892;
-}
-
-body.menu-page {
-    background-color: #DDB892;
-}
-
 .menu-title {
     color: #9C6644;
 }
@@ -19,13 +11,22 @@ body.menu-page {
     transition: all .2s;
     padding: .35rem 1rem;
 }
-.btn-filter:hover,
-.btn-filter.active {
+
+.btn-filter:hover, .btn-filter.active {
     background: #9C6644;
     color: white;
 }
 
 /* --------------------   card prodotto   -------------------- */
+/* Per il footer della card */
+.card-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
 .card-img-top {
     height: 160px;
     object-fit: cover;

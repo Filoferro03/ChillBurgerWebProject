@@ -22,6 +22,10 @@ header, footer {
     background-color: #9C6644;
 }
 
+body {
+    background-color: #DDB892;
+}
+
 html, body {
     height: 100%;
     margin: 0;

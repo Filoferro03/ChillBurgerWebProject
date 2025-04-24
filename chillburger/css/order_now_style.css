@@ -1,17 +1,3 @@
-/* Per il footer della card */
-.card-footer {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-}
-
-/* Stile del prezzo */
-.card-footer .d-block {
-    margin-bottom: 1rem;
-}
-
 /* Pulsanti all'interno del footer, stilizzati */
 .card-footer .btn {
     width: 48%;

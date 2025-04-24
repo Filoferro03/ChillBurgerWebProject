@@ -2,7 +2,7 @@
 <section class="container py-5">
 
     <h2 class="display-4 menu-title text-center mb-5">
-        Il nostro menù 🍔
+       Ordina Ora 🤩
     </h2>
 
     <!-- Filtri opzionali -->
@@ -24,13 +24,13 @@
          * array fittizio di prodotti (in futuro potrai caricarlo dal DB)
          */
         $prodotti = [
-            ["cat"=>"burger","img"=>"./resources/menu/burger_classic.jpg",
+            ["cat"=>"burger","img"=>"./resources/menu/stock.jpg",
              "nome"=>"Classic Burger","desc"=>"Manzo 150 g • Cheddar • Salsa house","prezzo"=>"8,90 €"],
-            ["cat"=>"burger","img"=>"./resources/menu/burger_double.jpg",
+            ["cat"=>"burger","img"=>"./resources/menu/stock.jpg",
              "nome"=>"Double Smash","desc"=>"Doppio manzo • Bacon croccante","prezzo"=>"11,50 €"],
-            ["cat"=>"fries","img"=>"./resources/menu/fries.jpg",
+            ["cat"=>"fries","img"=>"./resources/menu/stock.jpg",
              "nome"=>"Patatine Rustiche","desc"=>"Patate fresche con buccia","prezzo"=>"3,50 €"],
-            ["cat"=>"drink","img"=>"./resources/menu/cola.jpg",
+            ["cat"=>"drink","img"=>"./resources/menu/stock.jpg",
              "nome"=>"Cola Bio 33 cl","desc"=>"Dolcificata con zucchero di canna","prezzo"=>"2,50 €"],
         ];
 
