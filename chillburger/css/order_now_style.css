@@ -1,0 +1,31 @@
+/* Per il footer della card */
+.card-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+/* Stile del prezzo */
+.card-footer .d-block {
+    margin-bottom: 1rem;
+}
+
+/* Pulsanti all'interno del footer, stilizzati */
+.card-footer .btn {
+    width: 48%;
+    font-size: 0.85rem;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.card-footer .d-flex {
+    width: 100%; /* Imposta larghezza al 100% per i pulsanti */
+    gap: 0.5rem; /* Distanza tra i due pulsanti */
+}
+
+.card-footer .btn-sm {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+}

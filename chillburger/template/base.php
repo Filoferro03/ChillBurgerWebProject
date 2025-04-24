@@ -101,7 +101,7 @@
                         <a class="nav-link header-menu fs-2" aria-current="page" href="menu.php">Menu</a>
                     </li>
                     <li class="list-group-item">
-                        <a class="nav-link header-menu fs-2" href="#">Ordina ora</a>
+                        <a class="nav-link header-menu fs-2" href="order_now.php">Ordina ora</a>
                     </li>
                     <li class="list-group-item">
                         <a class="nav-link header-menu fs-2" href="about_us.php">About us</a>
