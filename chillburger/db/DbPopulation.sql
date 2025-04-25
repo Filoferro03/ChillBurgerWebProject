@@ -1,10 +1,10 @@
 -- *********************************************
--- * SQL MySQL population                      
+-- * SQL MySQL population                      
 -- *--------------------------------------------
--- * DB-MAIN version: 11.0.2              
--- * Generator date: Sep 14 2021              
--- * Generation date: Sat Apr  5 11:34:23 2025 
--- ********************************************* 
+-- * DB-MAIN version: 11.0.2              
+-- * Generator date: Sep 14 2021              
+-- * Generation date: Sat Apr  5 11:34:23 2025 
+-- ********************************************* 
 
 USE chillburgerdb;
 
@@ -98,6 +98,33 @@ INSERT INTO chillburgerdb.ordini (data, ora, idutente) VALUES
 ('2023-10-02', '14:45:00', 2);
 
 -- Insert Recensioni
-INSERT INTO chillburgerdb.recensioni (idordine, titolo, voto, commento) VALUES
-(1, 'Delizioso!', 5, 'Il Bacon Cheeseburger era fantastico!'),
-(2, 'Buono ma migliorabile', 3, 'Il Chicken Deluxe era buono ma avrebbe potuto essere migliorato.');
+INSERT INTO chillburgerdb.recensioni (idordine, titolo, voto, commento, data, ora) VALUES
+(1, 'Delizioso!', 5, 'Il Bacon Cheeseburger era fantastico!', '2025-01-14', '22:00'),
+(2, 'Buono ma migliorabile', 3, 'Il Chicken Deluxe era buono ma avrebbe potuto essere migliorato.', '2025-04-15', '20:15');
+
+-- Aggiungiamo qualche altro utente
+INSERT INTO chillburgerdb.utenti (nome, cognome, username, password, tipo) VALUES
+('Anna', 'Verdi', 'anna.verdi', 'pass456', 'cliente'),
+('Giuseppe', 'Gialli', 'giuseppe.gialli', 'pass789', 'cliente'),
+('Francesca', 'Neri', 'francesca.neri', 'pass101', 'venditore');
+
+-- Aggiungiamo qualche altro ordine
+INSERT INTO chillburgerdb.ordini (data, ora, idutente) VALUES
+('2025-04-25', '18:00:00', 1), -- Mario Rossi
+('2025-04-25', '19:15:00', 3), -- Anna Verdi
+('2025-04-26', '13:30:00', 1), -- Mario Rossi
+('2025-04-26', '20:00:00', 4), -- Giuseppe Gialli
+('2025-04-27', '12:00:00', 3), -- Anna Verdi
+('2025-04-27', '19:00:00', 1), -- Mario Rossi
+('2025-04-28', '11:30:00', 4); -- Giuseppe Gialli
+
+
+-- Inseriamo le recensioni
+INSERT INTO chillburgerdb.recensioni (idordine, titolo, voto, commento, data, ora) VALUES
+(3, 'Ottimo burger!', 5, 'Il miglior burger che abbia mai mangiato! La carne era succosa e il pane soffice.', '2025-04-25', '18:30:00'), -- Ordine di Mario Rossi
+(4, 'Buono, ma...', 4, 'Il burger era buono, ma il servizio un po\' lento. Comunque consigliato.', '2025-04-25', '19:30:00'), -- Ordine di Anna Verdi
+(5, 'Delusione', 2, 'Mi aspettavo di più. Il burger era asciutto e le patatine fredde.', '2025-04-26', '14:00:00'), -- Ordine di Mario Rossi
+(6, 'Perfetto!', 5, 'Tutto perfetto, dal cibo all\'atmosfera. Ci tornerò sicuramente.', '2025-04-26', '20:30:00'), -- Ordine di Giuseppe Gialli
+(7, 'Nella media', 3, 'Un burger nella media, niente di eccezionale ma nemmeno male.', '2025-04-27', '12:30:00'), -- Ordine di Anna Verdi
+(8, 'Il migliore in città', 5, 'A mani basse il miglior burger di tutta la città. Ingredienti freschi e di qualità.', '2025-04-27', '19:00:00'), -- Ordine di Mario Rossi
+(9, 'Da riprovare', 4, 'Un\'esperienza positiva, ma voglio riprovarlo per confermare il mio giudizio.', '2025-04-28', '12:00:00'); -- Ordine di Giuseppe Gialli

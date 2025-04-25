@@ -1,0 +1,44 @@
+/* Reviews Section Styles */
+.star-rating {
+    font-size: 1.2rem;
+    letter-spacing: 3px;
+}
+
+.reviews-card-fluid {
+    margin: 0 auto;
+    border-radius: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    overflow: hidden;
+    background-color: #DDB892;
+}
+
+.reviews-card-fluid .card-header {
+    border-bottom: 1px solid rgba(0,0,0,0.125);
+    padding: 1.5rem;
+}
+
+#reviewsList {
+    padding: 0;
+}
+
+#reviewsList .list-group-item {
+    text-align: left;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.125);
+}
+
+#reviewsList .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.reviews-card .card-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid rgba(0,0,0,0.125);
+    padding: 1rem;
+}
+
+.star-rating i {
+    color: #9C6644;
+}

@@ -108,6 +108,8 @@ CREATE TABLE recensioni (
      titolo VARCHAR(255) NOT NULL,
      voto INT NOT NULL CHECK (voto BETWEEN 1 AND 5),
      commento TEXT,
+     data DATE NOT NULL,
+     ora TIME NOT NULL,
      PRIMARY KEY (idrecensione),
      UNIQUE (idordine)
 );

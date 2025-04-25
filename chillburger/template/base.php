@@ -14,22 +14,6 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
-    <?php
-    /* ==========  CSS extra (per‑pagina)  ========== */
-    if (!empty($templateParams['css'])) {
-        foreach ($templateParams['css'] as $css) {
-            echo '<link rel="stylesheet" href="' . htmlspecialchars($css, ENT_QUOTES) . '">' . PHP_EOL;
-        }
-    }
-
-    /* ==========  JS extra (per‑pagina) – facoltativo  ========== */
-    if (!empty($templateParams['js'])) {
-        foreach ($templateParams['js'] as $js) {
-            echo '<script src="' . htmlspecialchars($js, ENT_QUOTES) . '" defer></script>' . PHP_EOL;
-        }
-    }
-    ?>
 </head>
 
 
@@ -164,6 +148,13 @@
     </footer>
 
     <?php
+    if (isset($templateParams["css"])):
+        foreach ($templateParams["css"] as $style):
+    ?>
+            <link rel="stylesheet" href="<?php echo $style; ?>">
+    <?php
+        endforeach;
+    endif;
     if (isset($templateParams["js"])):
         foreach ($templateParams["js"] as $script):
     ?>
