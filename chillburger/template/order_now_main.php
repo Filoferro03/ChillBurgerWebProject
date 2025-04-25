@@ -2,12 +2,12 @@
 <section class="container py-5">
 
     <h2 class="display-4 menu-title text-center mb-5">
-        Il nostro menù 🤤
+       Ordina Ora 🤩
     </h2>
 
     <!-- Filtri opzionali -->
     <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
-        <button class="btn btn-filter active"   data-category="all">Tutto</button>
+        <button class="btn btn-filter active" data-category="all">Tutto</button>
         <button class="btn btn-filter"          data-category="burger">Burger</button>
         <button class="btn btn-filter"          data-category="fries">Fries</button>
         <button class="btn btn-filter"          data-category="drink">Drink</button>
@@ -35,6 +35,7 @@
         ];
 
         foreach ($prodotti as $p): ?>
+        <!-- Card prodotto -->
         <div class="col-6 col-md-4 col-lg-3 menu-item" data-category="<?= $p['cat']; ?>">
             <div class="card h-100 text-center shadow-sm hover-up">
                 <img src="<?= $p['img']; ?>" class="card-img-top" alt="<?= $p['nome']; ?>">
@@ -43,10 +44,19 @@
                     <p class="card-text small text-muted"><?= $p['desc']; ?></p>
                 </div>
                 <div class="card-footer bg-white border-0">
-                    <span class="fw-bold text-primary"><?= $p['prezzo']; ?></span>
+                    <!-- Prezzo sopra i bottoni -->
+                    <div class="d-block mb-3">
+                        <span class="fw-bold text-primary"><?= $p['prezzo']; ?></span>
+                    </div>
+                    <!-- Bottoni aggiungi e rimuovi -->
+                    <div class="d-flex justify-content-between">
+                        <button class="btn btn-outline-success btn-sm btn-add" data-id="<?= $p['nome']; ?>">+ Aggiungi</button>
+                        <button class="btn btn-outline-danger btn-sm btn-remove" data-id="<?= $p['nome']; ?>">− Rimuovi</button>
+                    </div>
                 </div>
             </div>
         </div>
+
         <?php endforeach; ?>
     </div>
 </section>

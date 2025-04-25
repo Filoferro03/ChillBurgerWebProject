@@ -8,12 +8,12 @@
 
     <!-- CSS “core” -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
-          crossorigin="anonymous">
+        rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
+        crossorigin="anonymous">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <?php
     /* ==========  CSS extra (per‑pagina)  ========== */
@@ -78,7 +78,7 @@
                                 <a class="nav-link fs-3" aria-current="page" href="menu.php">Menu</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fs-3" href="#">Ordina ora</a>
+                                <a class="nav-link fs-3"  href="order_now.php">Ordina ora</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link fs-3" href="about_us.php">About us</a>
@@ -101,7 +101,7 @@
                         <a class="nav-link header-menu fs-2" aria-current="page" href="menu.php">Menu</a>
                     </li>
                     <li class="list-group-item">
-                        <a class="nav-link header-menu fs-2" href="#">Ordina ora</a>
+                        <a class="nav-link header-menu fs-2" href="order_now.php">Ordina ora</a>
                     </li>
                     <li class="list-group-item">
                         <a class="nav-link header-menu fs-2" href="about_us.php">About us</a>
@@ -132,7 +132,11 @@
     </header>
 
     <main>
-        <?php require($templateParams["nome"]); ?>
+        <?php
+        if (isset($templateParams["nome"])) {
+            require($templateParams["nome"]);
+        }
+        ?>
     </main>
 
     <footer class="py-3">
@@ -158,6 +162,16 @@
             <p class="text-center">&copy; 2023 ChillBurger. Tutti i diritti riservati.</p>
         </div>
     </footer>
+
+    <?php
+    if (isset($templateParams["js"])):
+        foreach ($templateParams["js"] as $script):
+    ?>
+            <script src="<?php echo $script; ?>"></script>
+    <?php
+        endforeach;
+    endif;
+    ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
