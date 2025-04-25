@@ -29,6 +29,10 @@ h1 {
     color: #DDB892;
 }
 
+.black-text {
+    color: black;
+}
+
 /* -------------------- Text size -------------------- */
 .display-5 {
     font-size: 3rem;

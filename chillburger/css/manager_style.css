@@ -1,0 +1,19 @@
+/* link a colonna: icona sopra, testo sotto */
+.manager-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem;
+    text-decoration: none;
+    color: black;               /* bianco sul bg scuro della card */
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: transform .2s;
+}
+
+.manager-icon {
+    width: 48px;               /* dimensioni icona */
+    height: 48px;
+    filter: brightness(0) invert(1);   /* rende bianco l'SVG scuro; rimuovi se hai PNG già bianchi */
+    transition: transform .2s;
+}

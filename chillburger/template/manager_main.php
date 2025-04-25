@@ -14,16 +14,28 @@
             <div class="card shadow-sm p-4 text-center bg-dark">
                 <div class="row row-cols-2 g-3">
                     <div class="col">
-                        <a href="orders.php" class="h3 a-underline light">Orders</a>
+                        <a href="stock.php" class="manager-link">
+                            <img src="./resources/icons/stock.svg"   alt="" class="manager-icon">
+                            <span class="h3 a-underline light">Orders</span>
+                        </a>
                     </div>
                     <div class="col">
-                        <a href="menu_admin.php" class="h3 a-underline light">Menu</a>
+                        <a href="stock.php" class="manager-link">
+                            <img src="./resources/icons/stock.svg"   alt="" class="manager-icon">
+                            <span class="h3 a-underline light">Menu</span>
+                        </a>
                     </div>
                     <div class="col">
-                        <a href="stock.php" class="h3 a-underline light">Stock</a>
+                        <a href="stock.php" class="manager-link">
+                            <img src="./resources/icons/stock.svg"   alt="" class="manager-icon">
+                            <span class="h3 a-underline light">Stock</span>
+                        </a>
                     </div>
                     <div class="col">
-                        <a href="notifications.php" class="h3 a-underline light">Notification</a>
+                        <a href="stock.php" class="manager-link">
+                            <img src="./resources/icons/stock.svg"   alt="" class="manager-icon">
+                            <span class="h3 a-underline light">Notifiche</span>
+                        </a>
                     </div>
                 </div>
             </div>
