@@ -17,3 +17,8 @@
     filter: brightness(0) invert(1);   /* rende bianco l'SVG scuro; rimuovi se hai PNG già bianchi */
     transition: transform .2s;
 }
+
+.dark-brown-logo {
+    color: #9C6644;
+    text-shadow: 3px 3px white;
+}
