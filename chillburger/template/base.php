@@ -78,7 +78,7 @@
                                 <a class="nav-link fs-3" aria-current="page" href="menu.php">Menu</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fs-3" href="#">Ordina ora</a>
+                                <a class="nav-link fs-3"  href="order_now.php">Ordina ora</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link fs-3" href="about_us.php">About us</a>
