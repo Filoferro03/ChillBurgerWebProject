@@ -18,8 +18,8 @@
     <!-- Mission & Vision -->
     <div class="row mb-5">
         <div class="col-md-6">
-            <div class="p-4 rounded-3 h-100 bg-light">
-                <h3 class="h5 mission-vision animate-underline bg fw-semibold mb-3">La nostra missione 🚀</h3>
+            <div class="p-4 rounded-3 h-100 bg-dark">
+                <h3 class="h5 light-brown-text animate-underline light-brown fw-semibold mb-3">La nostra missione 🚀</h3>
                 <p class="mb-0">
                     Creare esperienze culinarie memorabili, servendo burger artigianali preparati al momento,
                     in un ambiente accogliente dove ogni cliente si senta a casa.
@@ -27,8 +27,8 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="p-4 rounded-3 h-100 bg-light">
-                <h3 class="h5 mission-vision animate-underline bg fw-semibold mb-3 ">La nostra visione 🌟</h3>
+            <div class="p-4 rounded-3 h-100 bg-dark">
+                <h3 class="h5 light-brown-text animate-underline light-brown fw-semibold mb-3 ">La nostra visione 🌟</h3>
                 <p class="mb-0">
                     Diffondere la cultura del “good fast‑food”: rapidità di servizio,
                     qualità da ristorante e sostenibilità in ogni fase del processo produttivo.
@@ -38,7 +38,7 @@
     </div>
 
     <!-- Valori aziendali -->
-    <h3 class="h4 custom-section animate-underline fw-bold text-center mb-4">I nostri valori fondamentali 🤝</h3>
+    <h3 class="h4 dark-brown-text animate-underline fw-bold text-center mb-4">I nostri valori fondamentali 🤝</h3>
     <div class="row text-center gy-4 mb-5">
         <div class="col-6 col-md-3">
             <span class="display-5">🌱</span>
@@ -130,7 +130,7 @@
 
 
     <!-- Timeline aziendale -->
-    <h3 class="h4 animate-underline custom-section fw-bold text-center mb-4">Il nostro percorso 🗺️</h3>
+    <h3 class="h4 animate-underline dark-brown-text fw-bold text-center mb-4">Il nostro percorso 🗺️</h3>
     <ul class="timeline list-unstyled px-md-5">
         <li class="mb-4">
             <h4 class="h6 fw-semibold mb-1">2023 — L’inizio</h4>
@@ -154,7 +154,7 @@
 
     <!-- Call to Action -->
     <div class="text-center mt-5">
-        <a href="menu.php" class="h6 write-menu ">
+        <a href="menu.php" class="h6 a-underline">
             Scopri il nostro menù 📝
         </a>
     </div>
