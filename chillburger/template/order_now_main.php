@@ -1,16 +1,18 @@
 <!-- template/menu_main.php -->
 <section class="container py-5">
 
-    <h2 class="display-4 menu-title text-center mb-5">
-       Ordina Ora 🤩
+    <!-- Titolo principale -->
+    <h2 class="display-4 custom-title text-center mb-3">
+        <span class="txt">Ordina Ora</span>
+        <span class="emoji">🤩</span>
     </h2>
 
     <!-- Filtri opzionali -->
     <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
         <button class="btn btn-filter active" data-category="all">Tutto</button>
-        <button class="btn btn-filter"          data-category="burger">Burger</button>
-        <button class="btn btn-filter"          data-category="fries">Fries</button>
-        <button class="btn btn-filter"          data-category="drink">Drink</button>
+        <button class="btn btn-filter" data-category="burger">Burger</button>
+        <button class="btn btn-filter" data-category="fries">Fries</button>
+        <button class="btn btn-filter" data-category="drink">Drink</button>
     </div>
 
     <!-- Lista prodotti -->

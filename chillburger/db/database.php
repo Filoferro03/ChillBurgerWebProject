@@ -41,4 +41,41 @@ class DatabaseHelper
             return false;
         }
     }
+
+    public function getReviews($page, $perPage = 5) {
+        // Calcola l'offset per la paginazione
+        $offset = ($page - 1) * $perPage;
+        
+        // Prima ottieni il conteggio totale delle recensioni
+        $countQuery = "SELECT COUNT(*) AS totalReviews FROM chillburgerdb.recensioni";
+        $countStmt = $this->db->prepare($countQuery);
+        $countStmt->execute();
+        $countResult = $countStmt->get_result();
+        $totalReviews = $countResult->fetch_assoc()['totalReviews'];
+        $countResult->free();
+        $countStmt->close();
+        
+        // Poi ottieni le recensioni paginate
+        $query = "SELECT titolo, voto, commento, data, ora
+                  FROM chillburgerdb.recensioni 
+                  ORDER BY data DESC, ora DESC
+                  LIMIT ? OFFSET ?"; 
+        
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('ii', $perPage, $offset);
+        $stmt->execute();
+        
+        $result = $stmt->get_result();
+        $reviews = $result->fetch_all(MYSQLI_ASSOC);
+        
+        $result->free();
+        $stmt->close();
+        
+        // Restituisci i dati con le informazioni di paginazione
+        return [
+            'reviews' => $reviews,
+            'currentPage' => $page,
+            'totalPages' => ceil($totalReviews / $perPage)
+        ];
+    }
 }
