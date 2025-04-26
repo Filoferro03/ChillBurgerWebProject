@@ -1,3 +1,3 @@
 <section>
-    <a href="index.php" class="btn btn-danger" onclick="logout()">Logout</a>
+    <div><button type="submit" class="btn btn-danger">Logout</button></div>
 </section>

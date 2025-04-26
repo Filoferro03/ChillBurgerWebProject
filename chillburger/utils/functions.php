@@ -20,4 +20,7 @@ function logout()
     unset($_SESSION["tipo"]);
     unset($_SESSION["nome"]);
     unset($_SESSION["cognome"]);
+    log("logout", "Logout effettuato con successo.");
 }
+
+?>

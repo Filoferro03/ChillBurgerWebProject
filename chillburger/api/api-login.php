@@ -32,7 +32,12 @@ if (isset($_POST['action']) && $_POST['action'] == 'login' && isset($_POST["logi
         $result['registerresult'] = false;
         $result['registermsg'] = "Campi mancanti";
     }
+} else if (isset($_POST['action']) && $_POST['action'] == 'logout') {
+    logout();
+    $result['logoutresult'] = !isUserLoggedIn();
 }
 
 header("Content-Type: application/json");
 echo json_encode($result);
+
+?>
