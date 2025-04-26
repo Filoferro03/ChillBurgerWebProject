@@ -14,6 +14,8 @@
                         <label for="loginpassword" class="form-label m-1">Password</label>
                         <input type="password" id="loginpassword" name="loginpassword" class="form-control m-1">
 
+                        <p id="login-message" class="m-1"></p>
+
                         <div class="text-center">
                             <input type="submit" value="Login" class="m-2">
                         </div>
@@ -43,6 +45,9 @@
 
                         <label for="confirmpassword" class="form-label m-1">Conferma Password</label>
                         <input type="password" id="confirmpassword" name="confirmpassword" class="form-control m-1">
+
+                        <p id="login-message" class="m-1"></p>
+
 
                         <div class="text-center">
                             <input type="submit" value="Registrati" class="m-2">
