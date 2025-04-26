@@ -126,9 +126,6 @@
     <footer class="py-3">
         <div class="container">
             <div class="d-flex flex-column">
-                <div class="d-flex justify-content-center">
-                    <strong class="mb-4">Seguici</strong>
-                </div>
                 <div class=" d-flex justify-content-center mt-2">
                     <a href="https://www.facebook.com/" class=" me-3"
                         title="visualizza la nostra pagina facebook per restare aggioranato"><strong
@@ -143,7 +140,7 @@
             </div>
         </div>
         <div>
-            <p class="text-center">&copy; 2023 ChillBurger. Tutti i diritti riservati.</p>
+            <p class="text-center my-2">&copy; 2023 ChillBurger. Tutti i diritti riservati.</p>
         </div>
     </footer>
 
