@@ -17,7 +17,7 @@
 </head>
 
 
-<body>
+<body class = "d-flex flex-column min-vh-100">
     <header>
         <!--Navbar for mobile-->
         <nav class="mobile navbar py-4">
@@ -121,7 +121,7 @@
         ?>
     </main>
 
-    <footer class="py-3">
+    <footer class="py-3 mt-auto">
         <div class="container">
             <div class="d-flex flex-column">
                 <div class=" d-flex justify-content-center mt-2">
