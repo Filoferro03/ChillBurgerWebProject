@@ -9,9 +9,11 @@ if (isset($_POST['action']) && $_POST['action'] == 'login' && isset($_POST["logi
     $login = $dbh->checkLogin($_POST["loginusername"], $_POST["loginpassword"]);
 
     if (count($login) == 0) {
-        $result['errorlogin'] = "Username e/o password non corretti";
+        $result['loginmsg'] = "Username e/o password non corretti";
+        $result["loginresult"] = false;
     } else {
-        $result["logineseguito"] = true;
+        registerLogin($login[0]);
+        $result['loginresult'] = isUserLoggedIn();
     }
 } else if (isset($_POST['action']) && $_POST['action'] == 'register') {
 

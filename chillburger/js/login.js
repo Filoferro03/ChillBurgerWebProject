@@ -16,16 +16,25 @@ async function fetchData(url, formData) {
 async function tryLogin(username, password) {
     const url = 'api/api-login.php';
     const formData = new FormData();
-    formData.append('username', username);
-    formData.append('password', password);
+    formData.append('loginusername', username);
+    formData.append('loginpassword', password);
     formData.append('action', 'login');
 
     const json = await fetchData(url, formData);
-    if(json){
-        console.log("logineseguito con successo")
-    }else{
-        console.log("errore con successo")
+    console.log(json);
+
+    const messageElement = document.getElementById("login-message");
+
+    if (json?.loginresult) {
+        messageElement.textContent = "Login effettuato con successo!";
+        messageElement.classList.remove("text-danger");
+        messageElement.classList.add("text-success");
+    } else {
+        messageElement.textContent = json?.loginmsg || "Errore generico durante il login.";
+        messageElement.classList.remove("text-success");
+        messageElement.classList.add("text-danger");
     }
+    
 }
 
 async function tryRegistration(name, surname, username, password) {
@@ -38,6 +47,18 @@ async function tryRegistration(name, surname, username, password) {
     formData.append('action', 'register');
 
     const json = await fetchData(url, formData);
+
+    const messageElement = document.getElementById("register-message");
+
+    if(json?.registerresult){
+        messageElement.textContent = json?.registermsg || "tutto ok";
+        messageElement.classList.remove("text-danger");
+        messageElement.classList.add("text-success");
+    }else{
+        messageElement.textContent = json?.registermsg || "Errore generico durante la registrazione.";
+        messageElement.classList.remove("text-success");
+        messageElement.classList.add("text-danger");
+    }
 }
 
 
@@ -46,6 +67,7 @@ document.querySelector('#formlogin').addEventListener("submit", function (event)
     event.preventDefault();
     const username = document.querySelector('#loginusername').value;
     const password = document.querySelector('#loginpassword').value;
+    console.log("ciao");
     tryLogin(username, password);
 });
 
