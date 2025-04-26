@@ -214,6 +214,10 @@ html, body {
     color: #DDB892;
 }
 
+#offcanvasNavbar {
+    background-color: #DDB892;
+}
+
 /* -------------------- Mobile --------------------  */
 @media (max-width: 768px) {
     .mobile {
