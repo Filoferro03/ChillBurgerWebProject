@@ -6,82 +6,67 @@
         <span class="emoji">📦</span>
     </h2>
 
-    <h2 class="animate-underline mb-4">Ordini Attuali</h2>
+    <!-- ORDINI ATTUALI -->
+    <h2 class="animate-underline mb-4">Ordini attuali</h2>
 
-    <div class="row g-4 mb-5" id="menuGrid">
-        <!-- card prodotto -->
+    <div class="row g-4 mb-5" id="ordersGrid">
         <?php
-        /* TODO:
-         * array fittizio di prodotti (in futuro potrai caricarlo dal DB)
-         */
-        $prodotti = [
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #1","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #2","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #3","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #4","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #5","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #6","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #7","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
+        $ordiniAttivi = [
+            ["id"=>1, "img"=>"./resources/ChillBurgerLogo.png",
+             "nome"=>"Order #1", "desc"=>"Double cheese burger • Organic Cola • Salsa house", "prezzo"=>"14,90 €"],
+            ["id"=>2, "img"=>"./resources/ChillBurgerLogo.png",
+             "nome"=>"Order #2", "desc"=>"Double cheese burger • Organic Cola • Salsa house", "prezzo"=>"14,90 €"],
+            ["id"=>3, "img"=>"./resources/ChillBurgerLogo.png",
+             "nome"=>"Order #3", "desc"=>"Double cheese burger • Organic Cola • Salsa house", "prezzo"=>"14,90 €"],
+            // TODO Altri oridni (colega al database)
         ];
 
-        foreach ($prodotti as $p): ?>
-        <div class="col-6 col-md-4 col-lg-3 menu-item">
-            <div class="card h-100 text-center shadow-sm hover-up">
-                <img src="<?= $p['img']; ?>" class="card-img-top" alt="<?= $p['nome']; ?>">
-                <div class="card-body">
-                    <h5 class="card-title"><?= $p['nome']; ?></h5>
-                    <p class="card-text small text-muted"><?= $p['desc']; ?></p>
+        foreach ($ordiniAttivi as $o): ?>
+        <div class="col-6 col-md-4 col-lg-3">
+            <!-- L’intera card è un link -->
+            <a href="order_details.php?id=<?= $o['id']; ?>" class="text-decoration-none">
+                <div class="card h-100 text-center shadow-sm hover-up">
+                    <img src="<?= $o['img']; ?>" class="card-img-top" alt="<?= $o['nome']; ?>">
+                    <div class="card-body">
+                        <h5 class="card-title"><?= $o['nome']; ?></h5>
+                        <p class="card-text small text-muted"><?= $o['desc']; ?></p>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <span class="fw-bold text-primary"><?= $o['prezzo']; ?></span>
+                    </div>
                 </div>
-                <div class="card-footer bg-white border-0">
-                    <span class="fw-bold text-primary"><?= $p['prezzo']; ?></span>
-                </div>
-            </div>
+            </a>
         </div>
         <?php endforeach; ?>
     </div>
 
-    <h2 class="animate-underline mb-4">Storico Ordini</h2>
-    <div class="row g-4" id="menuGrid">
+    <!-- STORICO ORDINI -->
+    <h2 class="animate-underline mb-4">Storico ordini</h2>
+
+    <div class="row g-4" id="historyGrid">
         <?php
-        /* TODO:
-         * array fittizio di prodotti (in futuro potrai caricarlo dal DB)
-         */
-        $prodotti = [
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #1","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #2","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #3","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #4","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #5","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #6","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
-            ["img"=>"./resources/ChillBurgerLogo.png",
-             "nome"=>"Order #7","desc"=>"Double cheese burger • Organic Cola • Salsa house","prezzo"=>"14,90 €"],
+        $storicoOrdini = [
+            ["id"=>10, "img"=>"./resources/ChillBurgerLogo.png",
+             "nome"=>"Order #10", "desc"=>"Double cheese burger • Organic Cola • Salsa house", "prezzo"=>"14,90 €"],
+            ["id"=>11, "img"=>"./resources/ChillBurgerLogo.png",
+             "nome"=>"Order #11", "desc"=>"Double cheese burger • Organic Cola • Salsa house", "prezzo"=>"14,90 €"],
+            // TODO Altri oridni (colega al database)
         ];
 
-        foreach ($prodotti as $p): ?>
-        <div class="col-6 col-md-4 col-lg-3 menu-item">
-            <div class="card h-100 text-center shadow-sm hover-up">
-                <img src="<?= $p['img']; ?>" class="card-img-top" alt="<?= $p['nome']; ?>">
-                <div class="card-body">
-                    <h5 class="card-title"><?= $p['nome']; ?></h5>
-                    <p class="card-text small text-muted"><?= $p['desc']; ?></p>
+        foreach ($storicoOrdini as $o): ?>
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="order_details.php?id=<?= $o['id']; ?>" class="text-decoration-none">
+                <div class="card h-100 text-center shadow-sm hover-up">
+                    <img src="<?= $o['img']; ?>" class="card-img-top" alt="<?= $o['nome']; ?>">
+                    <div class="card-body">
+                        <h5 class="card-title"><?= $o['nome']; ?></h5>
+                        <p class="card-text small text-muted"><?= $o['desc']; ?></p>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <span class="fw-bold text-primary"><?= $o['prezzo']; ?></span>
+                    </div>
                 </div>
-                <div class="card-footer bg-white border-0">
-                    <span class="fw-bold text-primary"><?= $p['prezzo']; ?></span>
-                </div>
-            </div>
+            </a>
         </div>
         <?php endforeach; ?>
     </div>
