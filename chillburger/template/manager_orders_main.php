@@ -24,7 +24,7 @@
         foreach ($ordiniAttivi as $o): ?>
         <div class="col-6 col-md-4 col-lg-3">
             <!-- L’intera card è un link -->
-            <a href="order_details.php?id=<?= $o['id']; ?>" class="text-decoration-none">
+            <a href="manager_order_details.php?id=<?= $o['id']; ?>" class="text-decoration-none">
                 <div class="card h-100 text-center shadow-sm hover-up">
                     <img src="<?= $o['img']; ?>" class="card-img-top" alt="<?= $o['nome']; ?>">
                     <div class="card-body">
@@ -55,7 +55,7 @@
 
         foreach ($storicoOrdini as $o): ?>
         <div class="col-6 col-md-4 col-lg-3">
-            <a href="order_details.php?id=<?= $o['id']; ?>" class="text-decoration-none">
+            <a href="manager_order_details.php?id=<?= $o['id']; ?>" class="text-decoration-none">
                 <div class="card h-100 text-center shadow-sm hover-up">
                     <img src="<?= $o['img']; ?>" class="card-img-top" alt="<?= $o['nome']; ?>">
                     <div class="card-body">

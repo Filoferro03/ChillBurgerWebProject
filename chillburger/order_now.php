@@ -2,7 +2,7 @@
 require_once "bootstrap.php";
 
 $templateParams = [
-    "titolo" => "ChillBurger – Orer_now",
+    "titolo" => "ChillBurger – Order_now",
     "nome"   => "template/order_now_main.php",
     "css"    => [
         "css/style.css",
