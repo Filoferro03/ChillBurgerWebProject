@@ -17,7 +17,7 @@
 
             <!-- Orders -->
             <div class="col">
-            <a href="orders.php" class="manager-link">
+            <a href="manager_orders.php" class="manager-link">
                 <span class="h1">📦</span>
                 <span class="h3 a-underline light">Orders</span>
             </a>

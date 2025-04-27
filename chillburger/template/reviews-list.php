@@ -1,8 +1,12 @@
 <section class="container-md m-auto py-4 text-center">
+    <h2 class="display-4 custom-title text-center mb-3">
+        <span class="txt">Recensioni</span>
+        <span class="emoji">✍🏻</span>
+    </h2>
+
     <div class="card reviews-card-fluid">
         <div class="card-header">
-            <h2 class="mb-2">Recensioni</h2>
-            <p class="mb-0">Leggi le recensioni dei nostri clienti e scopri cosa pensano di noi!</p>
+            <h2 class="animate-underline">Leggi le recensioni dei nostri clienti e scopri cosa pensano di noi!</h2>
         </div>
         <div id="reviewsList" class="list-group list-group-flush">
             <!-- Le recensioni verranno generate dinamicamente da JavaScript -->
