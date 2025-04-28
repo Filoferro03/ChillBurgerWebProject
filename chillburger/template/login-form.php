@@ -12,7 +12,12 @@
                         <input type="text" id="loginusername" name="loginusername" class="form-control m-1">
 
                         <label for="loginpassword" class="form-label m-1">Password</label>
-                        <input type="password" id="loginpassword" name="loginpassword" class="form-control m-1">
+                        <div class="d-flex flex-row">
+                            <input type="password" id="loginpassword" name="loginpassword" class="form-control m-1">
+                            <button type="button" id="loginshow" class="btn m-1">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
 
                         <p id="login-message" class="m-1"></p>
 
@@ -41,10 +46,20 @@
                         <input type="text" id="registerusername" name="registerusername" class="form-control m-1">
 
                         <label for="registerpassword" class="form-label m-1">Password</label>
-                        <input type="password" id="registerpassword" name="registerpassword" class="form-control m-1">
+                        <div class="d-flex flex-row">
+                            <input type="password" id="registerpassword" name="registerpassword" class="form-control m-1">
+                            <button type="button" id="registerpasswordshow" class="btn m-1">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
 
                         <label for="confirmpassword" class="form-label m-1">Conferma Password</label>
-                        <input type="password" id="confirmpassword" name="confirmpassword" class="form-control m-1">
+                        <div class="d-flex flex-row">
+                            <input type="password" id="confirmpassword" name="confirmpassword" class="form-control m-1">
+                            <button type="button" id="registerconfirmpasswordshow" class="btn m-1">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
 
                         <p id="register-message" class="m-1"></p>
 

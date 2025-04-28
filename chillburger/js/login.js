@@ -61,6 +61,30 @@ async function tryRegistration(name, surname, username, password) {
     }
 }
 
+function togglePasswordVisibility(button, passwordField) {
+    const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+    passwordField.setAttribute("type", type);
+    const icon = button.querySelector('i');
+    icon.classList.toggle("fa-eye");
+    icon.classList.toggle("fa-eye-slash");
+}
+
+document.querySelector('#loginshow').addEventListener("click", function(event) {
+    const password = document.querySelector("#loginpassword");
+    togglePasswordVisibility(this,password);
+})
+
+
+document.querySelector('#registerpasswordshow').addEventListener("click", function(event) {
+    const password = document.querySelector("#registerpassword");
+    togglePasswordVisibility(this,password);
+})
+
+document.querySelector('#registerconfirmpasswordshow').addEventListener("click", function(event) {
+    const password = document.querySelector("#confirmpassword");
+    togglePasswordVisibility(this,password);
+})
+
 
 // Gestione del form di login
 document.querySelector('#formlogin').addEventListener("submit", function (event) {
