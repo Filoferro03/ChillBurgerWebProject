@@ -1,3 +1,5 @@
 <section>
-    <div><button type="submit" class="btn btn-danger">Logout</button></div>
+    <div>
+        <button type="button" id="logout-button" class="btn btn-danger">Logout</button>
+    </div>
 </section>
