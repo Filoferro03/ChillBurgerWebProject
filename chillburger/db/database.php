@@ -116,7 +116,7 @@ class DatabaseHelper
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
             // Gestione errore preparazione statement
-            error_log("Errore preparazione statement getUserDataByUsername: " . $this->db->error);
+            error_log("Errore preparazione statement: " . $this->db->error);
             return null;
         }
         $stmt->bind_param('si', $username, $n);
