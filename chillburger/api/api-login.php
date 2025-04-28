@@ -18,16 +18,19 @@ if (isset($_POST['action']) && $_POST['action'] == 'login' && isset($_POST["logi
     }
 } else if (isset($_POST['action']) && $_POST['action'] == 'register') {
 
-    if (isset($_POST['registerusername']) && isset($_POST["registerpassword"]) && isset($_POST["nome"]) && isset($_POST["cognome"]) && !empty($_POST["registerusername"]) && !empty($_POST["registerpassword"]) && !empty($_POST["nome"]) && !empty($_POST["cognome"])) {
+    if (isset($_POST['registerusername']) && isset($_POST["registerpassword"]) && isset($_POST['confirmpassword']) && isset($_POST["nome"]) && isset($_POST["cognome"]) && !empty($_POST["registerusername"]) && !empty($_POST["registerpassword"]) && !empty($_POST["confirmpassword"]) && !empty($_POST["nome"]) && !empty($_POST["cognome"])) {
 
-        $registration = $dbh->registerUser($_POST["registerusername"], $_POST["registerpassword"], $_POST["nome"], $_POST["cognome"], "client");
+        if ($_POST['registerpassword'] === $_POST['confirmpassword']) {
 
-        if ($registration) {
-            $result['registerresult'] = true;
-            $result['registermsg'] = "Registrazione eseguita correttamente";
+            $registration = $dbh->registerUser($_POST["registerusername"], $_POST["registerpassword"], $_POST["nome"], $_POST["cognome"], "client");
+
+            if ($registration) {
+                $result['registerresult'] = true;
+                $result['registermsg'] = "Registrazione eseguita correttamente";
+            }
         } else {
             $result['registerresult'] = false;
-            $result['registermsg'] = "Registrazione fallita";
+            $result['registermsg'] = "Le password non combaciano";
         }
     } else {
         $result['registerresult'] = false;

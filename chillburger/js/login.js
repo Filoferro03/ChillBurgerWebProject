@@ -35,13 +35,14 @@ async function tryLogin(username, password) {
     
 }
 
-async function tryRegistration(name, surname, username, password) {
+async function tryRegistration(name, surname, username, password,confirmpassword) {
     const url = 'api/api-login.php';
     const formData = new FormData();
     formData.append('nome', name);
     formData.append('cognome', surname);
     formData.append('registerusername', username);
     formData.append('registerpassword', password);
+    formData.append('confirmpassword',confirmpassword);
     formData.append('action', 'register');
 
     const json = await fetchData(url, formData);
@@ -54,6 +55,10 @@ async function tryRegistration(name, surname, username, password) {
         messageElement.textContent = json?.registermsg || "registrazione effettuata correttamente";
         messageElement.classList.remove("text-danger");
         messageElement.classList.add("text-success");
+        setTimeout(function() {
+            tryLogin(username,password);
+        }, 1000);
+        
     }else{
         messageElement.textContent = json?.registermsg || "Errore generico durante la registrazione.";
         messageElement.classList.remove("text-success");
@@ -101,7 +106,8 @@ document.querySelector('#formregister').addEventListener("submit", function (eve
     const surname = document.querySelector('#cognome').value;
     const username = document.querySelector('#registerusername').value;
     const password = document.querySelector('#registerpassword').value;
-    tryRegistration(name, surname, username, password);
+    const confirmpassword = document.querySelector('#confirmpassword').value;
+    tryRegistration(name, surname, username, password,confirmpassword);
 });
 
 
