@@ -26,9 +26,7 @@ async function tryLogin(username, password) {
     const messageElement = document.getElementById("login-message");
 
     if (json?.loginresult) {
-        messageElement.textContent = "Login effettuato con successo!";
-        messageElement.classList.remove("text-danger");
-        messageElement.classList.add("text-success");
+        window.location.reload();
     } else {
         messageElement.textContent = json?.loginmsg || "Errore generico durante il login.";
         messageElement.classList.remove("text-success");
@@ -40,18 +38,20 @@ async function tryLogin(username, password) {
 async function tryRegistration(name, surname, username, password) {
     const url = 'api/api-login.php';
     const formData = new FormData();
-    formData.append('name', name);
-    formData.append('surname', surname);
-    formData.append('username', username);
-    formData.append('password', password);
+    formData.append('nome', name);
+    formData.append('cognome', surname);
+    formData.append('registerusername', username);
+    formData.append('registerpassword', password);
     formData.append('action', 'register');
 
     const json = await fetchData(url, formData);
+    console.log(json);
+
 
     const messageElement = document.getElementById("register-message");
 
     if(json?.registerresult){
-        messageElement.textContent = json?.registermsg || "tutto ok";
+        messageElement.textContent = json?.registermsg || "registrazione effettuata correttamente";
         messageElement.classList.remove("text-danger");
         messageElement.classList.add("text-success");
     }else{
@@ -67,7 +67,6 @@ document.querySelector('#formlogin').addEventListener("submit", function (event)
     event.preventDefault();
     const username = document.querySelector('#loginusername').value;
     const password = document.querySelector('#loginpassword').value;
-    console.log("ciao");
     tryLogin(username, password);
 });
 

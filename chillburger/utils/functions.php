@@ -21,5 +21,3 @@ function logout()
     unset($_SESSION["nome"]);
     unset($_SESSION["cognome"]);
 }
-
-?>

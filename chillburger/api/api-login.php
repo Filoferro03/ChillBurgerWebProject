@@ -14,12 +14,13 @@ if (isset($_POST['action']) && $_POST['action'] == 'login' && isset($_POST["logi
     } else {
         registerLogin($login[0]);
         $result['loginresult'] = isUserLoggedIn();
+        $result["currentuser"] = $login[0];
     }
 } else if (isset($_POST['action']) && $_POST['action'] == 'register') {
 
     if (isset($_POST['registerusername']) && isset($_POST["registerpassword"]) && isset($_POST["nome"]) && isset($_POST["cognome"]) && !empty($_POST["registerusername"]) && !empty($_POST["registerpassword"]) && !empty($_POST["nome"]) && !empty($_POST["cognome"])) {
 
-        $registration = $dbh->registerUser($_POST["username"], $_POST["password"], $_POST["name"], $_POST["surname"], "client");
+        $registration = $dbh->registerUser($_POST["registerusername"], $_POST["registerpassword"], $_POST["nome"], $_POST["cognome"], "client");
 
         if ($registration) {
             $result['registerresult'] = true;
@@ -39,5 +40,3 @@ if (isset($_POST['action']) && $_POST['action'] == 'login' && isset($_POST["logi
 
 header("Content-Type: application/json");
 echo json_encode($result);
-
-?>
