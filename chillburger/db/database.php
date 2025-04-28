@@ -107,11 +107,11 @@ class DatabaseHelper
 
     public function getUserOrders ($username, $n=5) {
         $query = "SELECT o.data, o.ora, so.descrizione 
-        FROM ordini o, ms modifiche_stato, so stati_ordine, utenti u 
+        FROM ordini o, modifiche_stato ms, stati_ordine so, utenti u 
         WHERE o.idordine = ms.idordine AND ms.idstato = so.idstato 
         AND u.username=?
         AND o.idutente = u.idutente
-        ORDER BY o.data, o.ora
+        ORDER BY o.data, o.ora DESC
         LIMIT ?";
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
