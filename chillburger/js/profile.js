@@ -14,6 +14,33 @@ async function fetchData(url, formData) {
     }
 }
 
+async function uploadProfile () {
+    const url = "api/api-profile.php";
+    const formData = new FormData();
+    const json = await fetchData(url, formData);
+
+    if (json && json.success && json.userData) {
+        console.log("Dati profilo ricevuti:", json.userData);
+        // Funzione per mostrare i dati nella pagina
+        displayProfileData(json.userData);
+    } else {
+        console.error("Impossibile caricare i dati del profilo.");
+    }
+}
+
+function displayProfileData(userData) {
+    // Seleziona gli elementi HTML tramite i loro ID
+    const nomeElement = document.getElementById('profile-nome');
+    const cognomeElement = document.getElementById('profile-cognome');
+    const usernameElement = document.getElementById('profile-username');
+
+    // Aggiorna il contenuto degli elementi se esistono
+    if (nomeElement) nomeElement.textContent = userData.nome || 'N/D'; // Usa 'N/D' se il dato manca
+    if (cognomeElement) cognomeElement.textContent = userData.cognome || 'N/D';
+    if (usernameElement) usernameElement.textContent = userData.username || 'N/D';
+}
+
+
 
 async function logout() {
     const url = "api/api-login.php";
@@ -45,3 +72,5 @@ document.addEventListener('DOMContentLoaded', (event) => {
         console.error("Elemento con ID 'logout-button' non trovato.");
     }
 });
+
+uploadProfile();

@@ -78,4 +78,54 @@ class DatabaseHelper
             'totalPages' => ceil($totalReviews / $perPage)
         ];
     }
+
+    /**
+     * Recupera i dati di un utente specifico dal suo username, escludendo la password.
+     * @param string $username L'username dell'utente da cercare.
+     * @return array|null Ritorna un array associativo con i dati dell'utente o null se non trovato.
+     */
+    public function getUserDataByUsername($username)
+    {
+        // Seleziona solo i campi necessari, ESCLUDENDO la password
+        $query = "SELECT idutente, nome, cognome, username FROM utenti WHERE username = ?";
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            // Gestione errore preparazione statement
+            error_log("Errore preparazione statement getUserDataByUsername: " . $this->db->error);
+            return null;
+        }
+        $stmt->bind_param('s', $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        // Usiamo fetch_assoc() perché ci aspettiamo al massimo un utente
+        $userData = $result->fetch_assoc();
+        $result->free();
+        $stmt->close();
+
+        return $userData; // Ritorna l'array associativo dei dati o null se l'utente non esiste
+    }
+
+    public function getUserOrders ($username, $n=5) {
+        $query = "SELECT o.data, o.ora, so.descrizione 
+        FROM ordini o, ms modifiche_stato, so stati_ordine, utenti u 
+        WHERE o.idordine = ms.idordine AND ms.idstato = so.idstato 
+        AND u.username=?
+        AND o.idutente = u.idutente
+        ORDER BY o.data, o.ora
+        LIMIT ?";
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            // Gestione errore preparazione statement
+            error_log("Errore preparazione statement getUserDataByUsername: " . $this->db->error);
+            return null;
+        }
+        $stmt->bind_param('si', $username, $n);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        // Usiamo fetch_assoc() perché ci aspettiamo al massimo un utente
+        $orders = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $orders;
+    }
 }

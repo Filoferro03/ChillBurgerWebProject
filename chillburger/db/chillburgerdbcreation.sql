@@ -88,11 +88,11 @@ CREATE TABLE composizioni (
 );
 
 CREATE TABLE modifiche_stato (
-     descrizione VARCHAR(255) NOT NULL,
+     idstato INT NOT NULL,
      idordine INT NOT NULL,
      data DATE NOT NULL,
      orario TIME NOT NULL,
-     PRIMARY KEY (idordine, descrizione)
+     PRIMARY KEY (idordine, idstato)
 );
 
 CREATE TABLE modifiche_ingredienti (
@@ -115,8 +115,9 @@ CREATE TABLE recensioni (
 );
 
 CREATE TABLE stati_ordine (
+     idstato INT AUTO_INCREMENT NOT NULL,
      descrizione VARCHAR(255) NOT NULL,
-     PRIMARY KEY (descrizione)
+     PRIMARY KEY (idstato)
 );
 
 CREATE TABLE utenti (
@@ -126,7 +127,8 @@ CREATE TABLE utenti (
      username VARCHAR(255) NOT NULL,
      password VARCHAR(255) NOT NULL,
      tipo ENUM('cliente', 'venditore') NOT NULL,
-     PRIMARY KEY (idutente)
+     PRIMARY KEY (idutente),
+     UNIQUE (username)
 );
 
 -- Constraints Section
@@ -199,8 +201,8 @@ REFERENCES ordini (idordine);
 
 ALTER TABLE modifiche_stato 
 ADD CONSTRAINT fkdi_sta 
-FOREIGN KEY (descrizione) 
-REFERENCES stati_ordine (descrizione);
+FOREIGN KEY (idstato) 
+REFERENCES stati_ordine (idstato);
 
 ALTER TABLE modifiche_ingredienti 
 ADD CONSTRAINT fkmod_ing 
@@ -233,7 +235,7 @@ CREATE INDEX idx_carrelliprodotti_idprodotto ON carrelli_prodotti (idprodotto);
 CREATE INDEX idx_composizioni_idprodotto ON composizioni (idprodotto);
 CREATE INDEX idx_composizioni_idingrediente ON composizioni (idingrediente);
 CREATE INDEX idx_modifichestato_idordine ON modifiche_stato (idordine);
-CREATE INDEX idx_modifichestato_descrizione ON modifiche_stato (descrizione);
+CREATE INDEX idx_modifichestato_descrizione ON modifiche_stato (idstato);
 CREATE INDEX idx_modificheingredienti_idpersonalizzazione ON modifiche_ingredienti (idpersonalizzazione);
 CREATE INDEX idx_modificheingredienti_idingrediente ON modifiche_ingredienti (idingrediente);
 CREATE INDEX idx_recensioni_idordine ON recensioni (idordine);
