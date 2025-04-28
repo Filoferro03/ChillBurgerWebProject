@@ -46,7 +46,7 @@
                         <label for="confirmpassword" class="form-label m-1">Conferma Password</label>
                         <input type="password" id="confirmpassword" name="confirmpassword" class="form-control m-1">
 
-                        <p id="login-message" class="m-1"></p>
+                        <p id="register-message" class="m-1"></p>
 
 
                         <div class="text-center">
