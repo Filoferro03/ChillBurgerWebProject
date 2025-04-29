@@ -42,10 +42,11 @@ class DatabaseHelper
         }
     }
 
-    public function getReviews($page, $perPage = 5) {
+    public function getReviews($page, $perPage = 5)
+    {
         // Calcola l'offset per la paginazione
         $offset = ($page - 1) * $perPage;
-        
+
         // Prima ottieni il conteggio totale delle recensioni
         $countQuery = "SELECT COUNT(*) AS totalReviews FROM chillburgerdb.recensioni";
         $countStmt = $this->db->prepare($countQuery);
@@ -54,23 +55,23 @@ class DatabaseHelper
         $totalReviews = $countResult->fetch_assoc()['totalReviews'];
         $countResult->free();
         $countStmt->close();
-        
+
         // Poi ottieni le recensioni paginate
         $query = "SELECT titolo, voto, commento, data, ora
                   FROM chillburgerdb.recensioni 
                   ORDER BY data DESC, ora DESC
-                  LIMIT ? OFFSET ?"; 
-        
+                  LIMIT ? OFFSET ?";
+
         $stmt = $this->db->prepare($query);
         $stmt->bind_param('ii', $perPage, $offset);
         $stmt->execute();
-        
+
         $result = $stmt->get_result();
         $reviews = $result->fetch_all(MYSQLI_ASSOC);
-        
+
         $result->free();
         $stmt->close();
-        
+
         // Restituisci i dati con le informazioni di paginazione
         return [
             'reviews' => $reviews,
@@ -105,7 +106,8 @@ class DatabaseHelper
         return $userData; // Ritorna l'array associativo dei dati o null se l'utente non esiste
     }
 
-    public function getUserOrders ($username, $n=5) {
+    public function getUserOrders($username, $n = 5)
+    {
         $query = "SELECT o.data, o.ora, so.descrizione 
         FROM ordini o, modifiche_stato ms, stati_ordine so, utenti u 
         WHERE o.idordine = ms.idordine AND ms.idstato = so.idstato 
@@ -127,5 +129,61 @@ class DatabaseHelper
         $result->free();
         $stmt->close();
         return $orders;
+    }
+
+    public function updateIngredientQuantity($id, $quantity)
+    {
+        $query = "UPDATE ingredienti SET giacenza = giacenza - ? WHERE idingrediente = ?";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('ii', $quantity, $id);
+        try {
+            $success = $stmt->execute();
+            $affectedRows = $stmt->affected_rows;
+            $stmt->close();
+
+            return $success && $affectedRows > 0;
+        } catch (mysqli_sql_exception $e) {
+            $stmt->close();
+            return false;
+        }
+    }
+
+    public function getLowStockIngredients()
+    {
+        $query = "SELECT * FROM ingredienti WHERE giacenza <= 2";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $ingredients = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $ingredients;
+    }
+
+    public function createLowStockIngredientNotification($idutente, $idingrediente, $nomeIngrediente)
+    {
+        $dataCorrente = date("Y-m-d");
+        $oraCorrente = date("H:i:s");
+
+        $titolo = "Attenzione: Ingrediente quasi finito";
+        $testo = "L'ingrediente '$nomeIngrediente' sta per finire.";
+
+        $query = "INSERT INTO notifiche (titolo, testo, vista, data, ora, tipo, idutente, idingrediente) 
+              VALUES (?, ?, FALSE, ?, ?, 'ingrediente', ?, ?)";
+
+        $stmt = $this->db->prepare($query);
+
+        $stmt->bind_param('ssssis', $titolo, $testo, $dataCorrente, $oraCorrente, $idutente, $idingrediente);
+
+        try {
+            $stmt->execute();
+            $stmt->close();
+            return true;
+        } catch (mysqli_sql_exception $e) {
+            $stmt->close();
+            return false;
+        }
     }
 }
