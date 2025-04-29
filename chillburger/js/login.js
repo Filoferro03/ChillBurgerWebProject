@@ -13,6 +13,20 @@ async function fetchData(url, formData) {
     }
 }
 
+function updateMessage(elementId, message, isSuccess) {
+    const messageElement = document.getElementById(elementId);
+    if (!messageElement) return;
+
+    messageElement.textContent = message;
+    if (isSuccess) {
+        messageElement.classList.remove("text-danger");
+        messageElement.classList.add("text-success");
+    } else {
+        messageElement.classList.remove("text-success");
+        messageElement.classList.add("text-danger");
+    }
+}
+
 async function tryLogin(username, password) {
     const url = 'api/api-login.php';
     const formData = new FormData();
@@ -23,47 +37,47 @@ async function tryLogin(username, password) {
     const json = await fetchData(url, formData);
     console.log(json);
 
-    const messageElement = document.getElementById("login-message");
-
     if (json?.loginresult) {
         window.location.reload();
     } else {
-        messageElement.textContent = json?.loginmsg || "Errore generico durante il login.";
-        messageElement.classList.remove("text-success");
-        messageElement.classList.add("text-danger");
+        updateMessage("login-message", json?.loginmsg || "Errore generico durante il login.", false);
     }
-    
 }
 
-async function tryRegistration(name, surname, username, password,confirmpassword) {
+async function tryRegistration(name, surname, username, password, confirmpassword) {
     const url = 'api/api-login.php';
     const formData = new FormData();
     formData.append('nome', name);
     formData.append('cognome', surname);
     formData.append('registerusername', username);
     formData.append('registerpassword', password);
-    formData.append('confirmpassword',confirmpassword);
+    formData.append('confirmpassword', confirmpassword);
     formData.append('action', 'register');
 
     const json = await fetchData(url, formData);
     console.log(json);
 
-
-    const messageElement = document.getElementById("register-message");
-
-    if(json?.registerresult){
-        messageElement.textContent = json?.registermsg || "registrazione effettuata correttamente";
-        messageElement.classList.remove("text-danger");
-        messageElement.classList.add("text-success");
+    if (json?.registerresult) {
+        updateMessage("register-message", json?.registermsg || "Registrazione effettuata correttamente", true);
         setTimeout(function() {
-            tryLogin(username,password);
+            tryLogin(username, password);
         }, 1000);
-        
-    }else{
-        messageElement.textContent = json?.registermsg || "Errore generico durante la registrazione.";
-        messageElement.classList.remove("text-success");
-        messageElement.classList.add("text-danger");
+    } else {
+        updateMessage("register-message", json?.registermsg || "Errore generico durante la registrazione.", false);
     }
+}
+
+
+function validatePassword(password) {
+    if(password.length >= 5 && /\d/.test(password) && /[A-Z]/.test(password)){
+        return true;
+    } 
+    return false;
+}
+
+
+function arePasswordsMatching(password, confirmPassword) {
+    return password === confirmPassword;
 }
 
 function togglePasswordVisibility(button, passwordField) {
@@ -102,12 +116,27 @@ document.querySelector('#formlogin').addEventListener("submit", function (event)
 // Gestione del form di registrazione
 document.querySelector('#formregister').addEventListener("submit", function (event) {
     event.preventDefault();
+
     const name = document.querySelector('#nome').value;
     const surname = document.querySelector('#cognome').value;
     const username = document.querySelector('#registerusername').value;
     const password = document.querySelector('#registerpassword').value;
     const confirmpassword = document.querySelector('#confirmpassword').value;
-    tryRegistration(name, surname, username, password,confirmpassword);
+
+    const messageElement = document.getElementById("register-message");
+
+    if (!arePasswordsMatching(password, confirmpassword)) {
+        updateMessage("register-message", "Le password non coincidono.", false);
+        return;
+    }
+
+    if (!validatePassword(password)) {
+        updateMessage("register-message", "La password non è valida: deve avere almeno 5 caratteri, un numero e una lettera maiuscola.", false);
+        return;
+    }
+
+    tryRegistration(name, surname, username, password, confirmpassword);
 });
+
 
 

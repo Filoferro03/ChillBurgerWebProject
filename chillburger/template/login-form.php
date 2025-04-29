@@ -61,7 +61,7 @@
                             </button>
                         </div>
 
-                        <p id="register-message" class="m-1"></p>
+                        <p id="register-message" class="m-1">La password deve avere una lunghezza di almeno 5 caratteri,contenere un numero e una lettera maiuscola</p>
 
 
                         <div class="text-center">
