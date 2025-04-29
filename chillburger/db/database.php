@@ -186,4 +186,28 @@ class DatabaseHelper
             return false;
         }
     }
+
+    public function getNotificationsByUserId($idutente)
+    {
+        $query = "SELECT * FROM notifiche WHERE idutente = ?";
+
+        $stmt = $this->db->prepare($query);
+
+        $stmt->bind_param("i", $idutente);
+
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $notifications = $result->fetch_all(MYSQLI_ASSOC);
+        } else {
+            $notifications = [];
+        }
+
+        $result->free();
+        $stmt->close();
+
+        return $notifications;
+    }
 }
