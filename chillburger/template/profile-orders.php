@@ -9,4 +9,11 @@
         <p><strong>Username:</strong> <span id="profile-username">Caricamento...</span></p>
         <button type="button" id="logout-button" class="btn btn-danger m-auto">Logout</button>
     </div>
+
+    <div class="card w-50 m-auto mt-4 p-3">
+        <h3 class="text-center mb-3">Storico Ordini</h3>
+        <div id="orders-list" class="list-group">
+            <!-- Orders will be loaded here dynamically -->
+        </div>
+    </div>
 </section>
