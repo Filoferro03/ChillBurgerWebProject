@@ -144,21 +144,12 @@ class DatabaseHelper
                   WHERE u.username = ?
                   ORDER BY o.data DESC, o.ora DESC
                   LIMIT ? OFFSET ?";
-    public function getUserOrders($username, $n = 5)
-    {
-        $query = "SELECT o.data, o.ora, so.descrizione 
-        FROM ordini o, modifiche_stato ms, stati_ordine so, utenti u 
-        WHERE o.idordine = ms.idordine AND ms.idstato = so.idstato 
-        AND u.username=?
-        AND o.idutente = u.idutente
-        ORDER BY o.data, o.ora DESC
-        LIMIT ?";
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
             error_log("Errore preparazione statement getUserOrdersByUserIdPaginated: " . $this->db->error);
             return ['orders' => [], 'currentPage' => $page, 'totalPages' => $totalPages];
         }
-        // Nota: i tipi sono i, i, i (userId, limit, offset)
+        // Nota: i tipi sono s, i, i (username, limit, offset)
         $stmt->bind_param('sii', $username, $perPage, $offset);
         $stmt->execute();
         $result = $stmt->get_result();
