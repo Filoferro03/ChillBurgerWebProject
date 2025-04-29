@@ -12,29 +12,6 @@
     color: white;
 }
 
-/* --------------------   card prodotto   -------------------- */
-/* Per il footer della card */
-.card-footer {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-}
-
-.card-img-top {
-    height: 160px;
-    object-fit: cover;
-}
-
-.hover-up {
-    transition: transform .2s ease, box-shadow .2s ease;
-}
-.hover-up:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 18px rgba(0,0,0,.12);
-}
-
 /* responsive: altezza immagine leggermente maggiore su desktop */
 @media (min-width: 768px) {
     .card-img-top { height: 180px; }

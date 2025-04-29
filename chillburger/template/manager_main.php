@@ -33,7 +33,7 @@
 
             <!-- Stock -->
             <div class="col">
-            <a href="stock.php" class="manager-link">
+            <a href="manager_stock.php" class="manager-link">
                 <span class="h1">✍🏻</span>
                 <span class="h3 a-underline light">Stock</span>
             </a>
@@ -41,7 +41,7 @@
 
             <!-- Notification -->
             <div class="col">
-            <a href="notifications.php" class="manager-link">
+            <a href="manager_notifications.php" class="manager-link">
                 <span class="h1">🔔</span>
                 <span class="h3 a-underline light">Notification</span>
             </a>
