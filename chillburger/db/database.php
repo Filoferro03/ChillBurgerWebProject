@@ -106,29 +106,62 @@ class DatabaseHelper
         return $userData; // Ritorna l'array associativo dei dati o null se l'utente non esiste
     }
 
-    public function getUserOrders($username, $n = 5)
+/**
+     * Recupera una pagina specifica di ordini per un utente.
+     * @param string $username L'username dell'utente.
+     * @param int $page La pagina richiesta (inizia da 1).
+     * @param int $perPage Quanti ordini per pagina.
+     * @return array Ritorna un array con 'orders', 'currentPage', 'totalPages'.
+     */
+    public function getUserOrdersByUserPaginated($username, $page = 1, $perPage = 5) // Rinominato e parametri aggiunti
     {
-        $query = "SELECT o.data, o.ora, so.descrizione 
-        FROM ordini o, modifiche_stato ms, stati_ordine so, utenti u 
-        WHERE o.idordine = ms.idordine AND ms.idstato = so.idstato 
-        AND u.username=?
-        AND o.idutente = u.idutente
-        ORDER BY o.data, o.ora DESC
-        LIMIT ?";
+        if ($page < 1) {
+            $page = 1;
+        }
+        $offset = ($page - 1) * $perPage;
+
+        // Query per contare il totale degli ordini dell'utente
+        $countQuery = "SELECT COUNT(*) AS totalOrders FROM ordini o JOIN utenti u ON o.idutente = u.idutente
+        WHERE username = ?";
+        $countStmt = $this->db->prepare($countQuery);
+        if (!$countStmt) {
+            error_log("Errore preparazione count statement getUserOrdersByUserIdPaginated: " . $this->db->error);
+            return ['orders' => [], 'currentPage' => $page, 'totalPages' => 0];
+        }
+        $countStmt->bind_param('s', $username);
+        $countStmt->execute();
+        $countResult = $countStmt->get_result();
+        $totalOrders = $countResult->fetch_assoc()['totalOrders'];
+        $countResult->free();
+        $countStmt->close();
+
+        $totalPages = ceil($totalOrders / $perPage);
+
+        // Query per recuperare gli ordini paginati
+        $query = "SELECT o.idordine, o.data, o.ora
+                  FROM ordini o
+                  JOIN utenti u ON o.idutente = u.idutente
+                  WHERE u.username = ?
+                  ORDER BY o.data DESC, o.ora DESC
+                  LIMIT ? OFFSET ?";
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
-            // Gestione errore preparazione statement
-            error_log("Errore preparazione statement: " . $this->db->error);
-            return null;
+            error_log("Errore preparazione statement getUserOrdersByUserIdPaginated: " . $this->db->error);
+            return ['orders' => [], 'currentPage' => $page, 'totalPages' => $totalPages];
         }
-        $stmt->bind_param('si', $username, $n);
+        // Nota: i tipi sono s, i, i (username, limit, offset)
+        $stmt->bind_param('sii', $username, $perPage, $offset);
         $stmt->execute();
         $result = $stmt->get_result();
-        // Usiamo fetch_assoc() perché ci aspettiamo al massimo un utente
         $orders = $result->fetch_all(MYSQLI_ASSOC);
         $result->free();
         $stmt->close();
-        return $orders;
+
+        return [
+            'orders' => $orders ?: [],
+            'currentPage' => $page,
+            'totalPages' => $totalPages
+        ];
     }
 
     public function updateIngredientQuantity($id, $quantity)

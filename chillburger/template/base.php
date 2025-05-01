@@ -141,6 +141,8 @@
             <p class="text-center my-2">&copy; 2023 ChillBurger. Tutti i diritti riservati.</p>
         </div>
     </footer>
+    
+    <script src="js/components.js"></script>
 
     <?php
     if (isset($templateParams["css"])):
