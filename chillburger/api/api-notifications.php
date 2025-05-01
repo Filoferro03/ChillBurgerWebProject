@@ -1,10 +1,10 @@
 <?php
-require("bootstrap.php");
+require("../bootstrap.php");
 
 $result = [];
 
 //MODIFICA IN UTILS IN MANIERA CHE IN SESSION HAI ANCHE IDUTENTE
-$notifications = $dbh->getNotificationsByUserId(1);
+$notifications = $dbh->getNotificationsByUserId($_SESSION["idutente"]);
 $result = $notifications;
 
 

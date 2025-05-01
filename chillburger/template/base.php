@@ -17,7 +17,7 @@
 </head>
 
 
-<body class = "d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100">
     <header>
         <!--Navbar for mobile-->
         <nav class="mobile navbar py-4">
@@ -46,7 +46,7 @@
                     <?php else: ?>
                         <!-- Mostra il link per il login se l'utente non è loggato -->
                         <a href="login.php" class="text-decoration-none mx-4">
-                            <i class="fa-solid fa-user text-black fs-2"></i>       
+                            <i class="fa-solid fa-user text-black fs-2"></i>
                         </a>
                     <?php endif; ?>
                 </div>
@@ -61,7 +61,7 @@
                                 <a class="nav-link fs-3" aria-current="page" href="menu.php">Menu</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fs-3"  href="order_now.php">Ordina ora</a>
+                                <a class="nav-link fs-3" href="order_now.php">Ordina ora</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link fs-3" href="about_us.php">About us</a>
@@ -105,7 +105,7 @@
                     <?php else: ?>
                         <!-- Mostra il link per il login se l'utente non è loggato -->
                         <a href="login.php" class="text-decoration-none mx-4">
-                            <i class="fa-solid fa-user text-black fs-2"></i>       
+                            <i class="fa-solid fa-user text-black fs-2"></i>
                         </a>
                     <?php endif; ?>
                 </div>
@@ -141,7 +141,7 @@
             <p class="text-center my-2">&copy; 2023 ChillBurger. Tutti i diritti riservati.</p>
         </div>
     </footer>
-    
+
     <script src="js/components.js"></script>
 
     <?php
@@ -149,12 +149,12 @@
         foreach ($templateParams["css"] as $style):
     ?>
             <link rel="stylesheet" href="<?php echo $style; ?>">
-    <?php
+        <?php
         endforeach;
     endif;
     if (isset($templateParams["js"])):
         foreach ($templateParams["js"] as $script):
-    ?>
+        ?>
             <script src="<?php echo $script; ?>"></script>
     <?php
         endforeach;
