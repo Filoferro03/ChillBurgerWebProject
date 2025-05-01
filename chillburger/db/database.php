@@ -13,7 +13,7 @@ class DatabaseHelper
 
     public function checkLogin($username, $password)
     {
-        $query = "SELECT username, nome, cognome, tipo FROM utenti WHERE username = ? AND password = ?";
+        $query = "SELECT username, nome, cognome, tipo, idutente FROM utenti WHERE username = ? AND password = ?";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param('ss', $username, $password);
         $stmt->execute();
@@ -88,7 +88,7 @@ class DatabaseHelper
     public function getUserDataByUsername($username)
     {
         // Seleziona solo i campi necessari, ESCLUDENDO la password
-        $query = "SELECT idutente, nome, cognome, username FROM utenti WHERE username = ?";
+        $query = "SELECT idutente, nome, cognome, username,idutente FROM utenti WHERE username = ?";
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
             // Gestione errore preparazione statement

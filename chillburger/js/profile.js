@@ -33,11 +33,13 @@ function displayProfileData(userData) {
     const nomeElement = document.getElementById('profile-nome');
     const cognomeElement = document.getElementById('profile-cognome');
     const usernameElement = document.getElementById('profile-username');
+    const idutenteElement = document.getElementById('profile-idutente');
 
     // Aggiorna il contenuto degli elementi se esistono
     if (nomeElement) nomeElement.textContent = userData.nome || 'N/D'; // Usa 'N/D' se il dato manca
     if (cognomeElement) cognomeElement.textContent = userData.cognome || 'N/D';
     if (usernameElement) usernameElement.textContent = userData.username || 'N/D';
+    if (idutenteElement) idutenteElement.textContent = userData.idutente || 'N/D';
 }
 
 

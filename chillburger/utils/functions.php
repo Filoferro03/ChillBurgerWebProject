@@ -7,6 +7,7 @@ function registerLogin($user)
     $_SESSION["tipo"] = $user["tipo"];
     $_SESSION["nome"] = $user["nome"];
     $_SESSION["cognome"] = $user["cognome"];
+    $_SESSION["idutente"] = $user["idutente"];
 }
 
 function isUserLoggedIn()
