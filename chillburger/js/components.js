@@ -1,85 +1,146 @@
 // js/components.js
 
 /**
- * Crea e restituisce l'elemento DOM del componente di paginazione.
- * @param {number} currentPage - La pagina attualmente attiva.
+ * Crea e restituisce l'elemento DOM del componente di paginazione con logica ellissi.
+ * @param {number} currentPage - La pagina attualmente attiva (basata su 1).
  * @param {number} totalPages - Il numero totale di pagine.
  * @param {function} onPageClick - La funzione da chiamare quando si clicca su un link di pagina (riceve il numero di pagina come argomento).
+ * @param {number} [visiblePages=5] - Numero massimo di link di pagina numerati visibili (inclusi primo/ultimo se necessario, ma non le ellissi). Deve essere dispari preferibilmente.
  * @returns {HTMLElement|null} L'elemento NAV della paginazione o null se non necessaria.
  */
-function createPaginationComponent(currentPage, totalPages, onPageClick) {
+function createPaginationComponent(currentPage, totalPages, onPageClick, visiblePages = 5) {
     if (totalPages <= 1) {
-        return null; // Non serve paginazione per 1 o meno pagine
+        return null; // No pagination needed
     }
 
-    // Crea gli elementi base
     const nav = document.createElement('nav');
-    nav.setAttribute('aria-label', 'Navigazione'); // Etichetta generica, può essere sovrascritta se necessario
+    nav.setAttribute('aria-label', 'Navigazione pagine'); // Etichetta più specifica
 
     const ul = document.createElement('ul');
     ul.className = 'pagination justify-content-center'; // Classi Bootstrap
 
-    // Funzione helper per creare un singolo item di paginazione (link o disabilitato)
-    const createPageItem = (pageNumber, label, isEnabled, isActive, ariaLabel) => {
+    // --- Helper Functions ---
+    const createPageItem = (pageNumber, label, isEnabled, isActive, ariaLabel, isEllipsis = false) => {
         const li = document.createElement('li');
-        li.className = `page-item ${!isEnabled ? 'disabled' : ''} ${isActive ? 'active' : ''}`;
+        // Le ellissi sono tecnicamente disabilitate ma non ricevono la classe 'disabled' di Bootstrap
+        li.className = `page-item ${!isEnabled && !isEllipsis ? 'disabled' : ''} ${isActive ? 'active' : ''}`;
 
-        const a = document.createElement('a');
-        a.className = 'page-link';
-        a.href = '#';
-        a.innerHTML = `<span aria-hidden="true">${label}</span>`; // Uso sicuro di innerHTML con label controllati
-        if (ariaLabel) {
-            a.setAttribute('aria-label', ariaLabel);
-            if(isActive) a.setAttribute('aria-current', 'page');
-        }
-
-        if (isEnabled) {
-            a.addEventListener('click', (event) => {
-                event.preventDefault();
-                onPageClick(pageNumber); // Chiama la callback
-            });
+        if (isEllipsis) {
+            // Elemento per le ellissi non cliccabile
+            const span = document.createElement('span');
+            span.className = 'page-link';
+            span.innerHTML = '...';
+            span.setAttribute('aria-hidden', 'true');
+            li.appendChild(span);
         } else {
-            a.setAttribute('tabindex', '-1');
-            a.setAttribute('aria-disabled', 'true');
-        }
+            // Link di pagina normale o disabilitato
+            const a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '#'; // Previene il salto della pagina
+             // Usiamo textContent per i numeri per sicurezza, innerHTML per le frecce
+            if (typeof label === 'number') {
+                 a.textContent = label;
+            } else {
+                 a.innerHTML = `<span aria-hidden="true">${label}</span>`; // Per &laquo; e &raquo;
+            }
 
-        li.appendChild(a);
+            if (ariaLabel) {
+                a.setAttribute('aria-label', ariaLabel);
+                if (isActive) a.setAttribute('aria-current', 'page');
+            }
+
+            if (isEnabled) {
+                a.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    if (currentPage !== pageNumber) { // Evita ricarica stessa pagina
+                        onPageClick(pageNumber);
+                    }
+                });
+            } else {
+                a.setAttribute('tabindex', '-1');
+                a.setAttribute('aria-disabled', 'true');
+            }
+            li.appendChild(a);
+        }
         return li;
     };
 
-    // --- Costruzione dei Pulsanti ---
+    const createEllipsisItem = () => createPageItem(0, '...', false, false, undefined, true);
 
-    // Pulsante "Precedente"
+    // --- Build Pagination ---
+
+    // 1. Previous Button
     ul.appendChild(createPageItem(
         currentPage - 1,
-        '&laquo;',
+        '&laquo;', // Left arrow
         currentPage > 1,
         false,
         'Precedente'
     ));
 
-    // Pulsanti Pagina Numerati (Logica Semplificata)
-    // TODO: Implementare logica "..." per molte pagine, se necessario
-    for (let i = 1; i <= totalPages; i++) {
-        ul.appendChild(createPageItem(
-            i,
-            i,
-            true,
-            i === currentPage,
-            `Vai a pagina ${i}`
-        ));
+    // 2. Numbered Pages with Ellipsis Logic
+    if (totalPages <= visiblePages) {
+        // Show all pages if total is less than or equal to visible limit
+        for (let i = 1; i <= totalPages; i++) {
+            ul.appendChild(createPageItem(i, i, true, i === currentPage, `Vai a pagina ${i}`));
+        }
+    } else {
+        // Show pages with ellipsis
+        const halfVisible = Math.floor((visiblePages - 2) / 2); // -2 for first/last page potentially shown
+        let startPage, endPage;
+
+        if (currentPage <= halfVisible + 1) {
+             startPage = 1;
+             // Adjust visiblePages calculation slightly to ensure enough buttons are shown near the start
+             endPage = Math.min(visiblePages - 1, totalPages); // Show first, ellipsis, last
+        } else if (currentPage >= totalPages - halfVisible) {
+            endPage = totalPages;
+             startPage = Math.max(totalPages - (visiblePages - 2), 1); // Show first, ellipsis, last
+        } else {
+             startPage = currentPage - halfVisible;
+             endPage = currentPage + halfVisible;
+        }
+
+
+        // Always show page 1
+        ul.appendChild(createPageItem(1, 1, true, 1 === currentPage, `Vai a pagina 1`));
+
+        // Show left ellipsis if needed
+        if (startPage > 2) {
+            ul.appendChild(createEllipsisItem());
+        }
+
+        // Determine the actual range to display, avoiding duplicates of 1 and totalPages
+        const firstPageToShow = Math.max(2, startPage);
+        const lastPageToShow = Math.min(totalPages - 1, endPage);
+
+
+        // Middle page numbers
+        for (let i = firstPageToShow; i <= lastPageToShow; i++) {
+             ul.appendChild(createPageItem(i, i, true, i === currentPage, `Vai a pagina ${i}`));
+        }
+
+
+        // Show right ellipsis if needed
+        if (endPage < totalPages - 1) {
+            ul.appendChild(createEllipsisItem());
+        }
+
+        // Always show last page (if different from page 1)
+         if (totalPages > 1) {
+              ul.appendChild(createPageItem(totalPages, totalPages, true, totalPages === currentPage, `Vai a pagina ${totalPages}`));
+         }
     }
 
-    // Pulsante "Successivo"
+    // 3. Next Button
     ul.appendChild(createPageItem(
         currentPage + 1,
-        '&raquo;',
+        '&raquo;', // Right arrow
         currentPage < totalPages,
         false,
         'Successivo'
     ));
 
     nav.appendChild(ul);
-    return nav; // Ritorna l'elemento <nav> completo
+    return nav;
 }
-

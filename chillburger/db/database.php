@@ -108,12 +108,12 @@ class DatabaseHelper
 
 /**
      * Recupera una pagina specifica di ordini per un utente.
-     * @param string $username L'username dell'utente.
+     * @param int $idutente L'idutente dell'utente.
      * @param int $page La pagina richiesta (inizia da 1).
      * @param int $perPage Quanti ordini per pagina.
      * @return array Ritorna un array con 'orders', 'currentPage', 'totalPages'.
      */
-    public function getUserOrdersByUserPaginated($username, $page = 1, $perPage = 5) // Rinominato e parametri aggiunti
+    public function getUserOrdersByUserPaginated($idutente, $page = 1, $perPage = 5) // Rinominato e parametri aggiunti
     {
         if ($page < 1) {
             $page = 1;
@@ -121,14 +121,13 @@ class DatabaseHelper
         $offset = ($page - 1) * $perPage;
 
         // Query per contare il totale degli ordini dell'utente
-        $countQuery = "SELECT COUNT(*) AS totalOrders FROM ordini o JOIN utenti u ON o.idutente = u.idutente
-        WHERE username = ?";
+        $countQuery = "SELECT COUNT(*) AS totalOrders FROM ordini WHERE idutente = ?";
         $countStmt = $this->db->prepare($countQuery);
         if (!$countStmt) {
             error_log("Errore preparazione count statement getUserOrdersByUserIdPaginated: " . $this->db->error);
             return ['orders' => [], 'currentPage' => $page, 'totalPages' => 0];
         }
-        $countStmt->bind_param('s', $username);
+        $countStmt->bind_param('i', $idutente);
         $countStmt->execute();
         $countResult = $countStmt->get_result();
         $totalOrders = $countResult->fetch_assoc()['totalOrders'];
@@ -138,19 +137,18 @@ class DatabaseHelper
         $totalPages = ceil($totalOrders / $perPage);
 
         // Query per recuperare gli ordini paginati
-        $query = "SELECT o.idordine, o.data, o.ora
-                  FROM ordini o
-                  JOIN utenti u ON o.idutente = u.idutente
-                  WHERE u.username = ?
-                  ORDER BY o.data DESC, o.ora DESC
+        $query = "SELECT idordine, data, ora
+                  FROM ordini
+                  WHERE idutente = ?
+                  ORDER BY data DESC, ora DESC
                   LIMIT ? OFFSET ?";
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
             error_log("Errore preparazione statement getUserOrdersByUserIdPaginated: " . $this->db->error);
             return ['orders' => [], 'currentPage' => $page, 'totalPages' => $totalPages];
         }
-        // Nota: i tipi sono s, i, i (username, limit, offset)
-        $stmt->bind_param('sii', $username, $perPage, $offset);
+        // Nota: i tipi sono i, i, i (idutente, limit, offset)
+        $stmt->bind_param('iii', $idutente, $perPage, $offset);
         $stmt->execute();
         $result = $stmt->get_result();
         $orders = $result->fetch_all(MYSQLI_ASSOC);
