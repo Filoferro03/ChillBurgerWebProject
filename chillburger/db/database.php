@@ -106,7 +106,7 @@ class DatabaseHelper
         return $userData; // Ritorna l'array associativo dei dati o null se l'utente non esiste
     }
 
-/**
+    /**
      * Recupera una pagina specifica di ordini per un utente.
      * @param string $username L'username dell'utente.
      * @param int $page La pagina richiesta (inizia da 1).
@@ -222,25 +222,55 @@ class DatabaseHelper
 
     public function getNotificationsByUserId($idutente)
     {
-        $query = "SELECT * FROM notifiche WHERE idutente = ?";
+        try {
+            $query = "SELECT * FROM notifiche WHERE idutente = ?";
+
+            $stmt = $this->db->prepare($query);
+
+            // Verifica che la preparazione sia riuscita
+            if ($stmt === false) {
+                throw new Exception('Preparazione della query fallita');
+            }
+
+            $stmt->bind_param("i", $idutente);
+
+            $stmt->execute();
+
+            $result = $stmt->get_result();
+
+            // Verifica se ci sono risultati
+            if ($result->num_rows > 0) {
+                $notifications = $result->fetch_all(MYSQLI_ASSOC);
+            } else {
+                $notifications = [];
+            }
+
+            $result->free();
+            $stmt->close();
+
+            return $notifications;
+        } catch (Exception $e) {
+            // Gestione degli errori
+            error_log('Errore nella funzione getNotificationsByUserId: ' . $e->getMessage());
+            return [];  // Ritorna un array vuoto in caso di errore
+        }
+    }
+
+    public function segnaNotificaComeLetta($idnotifica)
+    {
+        $query = "UPDATE notifiche SET vista = 1 WHERE idnotifica = ?";
 
         $stmt = $this->db->prepare($query);
-
-        $stmt->bind_param("i", $idutente);
-
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $notifications = $result->fetch_all(MYSQLI_ASSOC);
-        } else {
-            $notifications = [];
+        if (!$stmt) {
+            throw new Exception("Errore nella preparazione della query: " . $this->db->error);
         }
 
-        $result->free();
-        $stmt->close();
+        $stmt->bind_param("i", $idnotifica);
 
-        return $notifications;
+        if (!$stmt->execute()) {
+            throw new Exception("Errore durante l'esecuzione della query: " . $stmt->error);
+        }
+
+        $stmt->close();
     }
 }
