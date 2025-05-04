@@ -241,6 +241,59 @@ html, body {
     box-shadow: 0 8px 18px rgba(0,0,0,.12);
 }
 
+/* --- Stile Personalizzato Paginazione (Nero/Grigio) --- */
+
+/* Colore base dei link/pulsanti */
+.pagination .page-link {
+    color: #7f5539; /* Testo scuro */
+    background-color: #f8f9fa; /* Sfondo grigio molto chiaro */
+    border: 1px solid #7f5539; /* Bordo grigio chiaro */
+}
+
+/* Stile al passaggio del mouse (hover) */
+.pagination .page-link:hover {
+    color: #f8f9fa; /* Testo chiaro */
+    background-color: #b08968; /* Sfondo  medio */
+    border-color: #b08968; /* Bordo  medio */
+}
+
+/* Stile quando l'elemento ha il focus (per accessibilità) */
+.pagination .page-link:focus {
+    color: #f8f9fa; /* Testo chiaro */
+    background-color: #b08968; /* Sfondo  medio */
+    border-color: #b08968; /* Bordo  medio */
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5); /* Ombra grigia semitrasparente */
+}
+
+/* Stile per il pulsante della pagina attiva */
+.pagination .page-item.active .page-link {
+    z-index: 3;
+    color: #fff; /* Testo bianco */
+    background-color: #7f5539; /* Sfondo scuro */
+    border-color: #7f5539; /* Bordo scuro */
+}
+
+/* Stile per i pulsanti disabilitati (Precedente/Successivo o ellissi) */
+.pagination .page-item.disabled .page-link {
+    color: #b08968; /* Testo scuro */
+    pointer-events: none;
+    background-color: #e9ecef; /* Sfondo ancora più chiaro */
+    border-color: #e9ecef; /* Bordo chiaro */
+}
+
+/* Stile specifico per le ellissi */
+/* Rende lo span dentro l'<li> disabilitato visivamente simile ai link disabilitati */
+.pagination .page-item.disabled span.page-link {
+    color: #b08968;
+    background-color: #e9ecef;
+    border-color: #e9ecef;
+    padding-top: 0.375rem; /* Aggiusta padding se necessario */
+    padding-bottom: 0.375rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+
 /* -------------------- Mobile --------------------  */
 @media (max-width: 768px) {
     .mobile {

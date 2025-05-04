@@ -5,11 +5,11 @@ require_once '../bootstrap.php'; // Assicurati che il percorso sia corretto
 $response = [];
 
 // 1. Verifica se l'utente è loggato e recupera l'ID utente
-if (!isUserLoggedIn() || !isset($_SESSION['username'])) {
+if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
     http_response_code(401); // Unauthorized
     $response = ['success' => false, 'error' => 'Utente non autenticato o sessione non valida'];
 } else {
-    $username = $_SESSION['username'];
+    $idutente = $_SESSION['idutente'];
 
     // 2. Controlla l'azione (se usi ancora l'approccio con 'action')
     if (isset($_POST['action']) && $_POST['action'] == 'getByUser') {
@@ -22,7 +22,7 @@ if (!isUserLoggedIn() || !isset($_SESSION['username'])) {
 
         // 4. Recupera gli ordini paginati usando il nuovo metodo
         // Il terzo argomento è il numero di ordini per pagina (es. 5)
-        $paginatedData = $dbh->getUserOrdersByUserPaginated($username, $page);
+        $paginatedData = $dbh->getUserOrdersByUserPaginated($idutente, $page);
 
         // 5. Prepara la risposta
         $response['success'] = true;

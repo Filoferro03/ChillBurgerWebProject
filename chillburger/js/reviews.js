@@ -43,9 +43,6 @@ function generateReviewsHTML(reviews) { // Rinominata per chiarezza
     return result;
 }
 
-// RIMUOVI la vecchia funzione generatePagination
-/* function generatePagination(totalPages) { ... } */
-
 /**
  * Carica le recensioni dalla API e le visualizza, usando il componente di paginazione.
  */
@@ -73,7 +70,7 @@ async function loadReviews(page = 1) { // Accetta la pagina come argomento
         if (!response.ok) {
             throw new Error(`Errore HTTP: ${response.status}`);
         }
-        const data = await response.json(); // L'API restituisce già { reviews: [], currentPage: X, totalPages: Y }
+        const data = await response.json();
 
         // Verifica la risposta
         if (data && data.reviews && typeof data.currentPage !== 'undefined' && typeof data.totalPages !== 'undefined') {
