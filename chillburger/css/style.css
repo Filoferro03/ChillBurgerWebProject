@@ -311,3 +311,16 @@ html, body {
     }
 }
 
+.img-responsive {
+    width: 20%;
+    height: 20%;
+    object-fit: cover;
+  }
+  
+  @media (min-width: 768px) {
+    .img-responsive {
+      width: 10%;
+      height: 10%;
+    }
+  }
+
