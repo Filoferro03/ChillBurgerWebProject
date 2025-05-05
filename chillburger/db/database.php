@@ -271,4 +271,35 @@ class DatabaseHelper
 
         $stmt->close();
     }
+
+    public function getProduct($idprodotto)
+    {
+        $query = "SELECT * FROM prodotti WHERE idprodotto = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $idprodotto);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $product = $result->fetch_all(MYSQLI_ASSOC);
+        return $product;
+    }
+
+    public function getIngredientsByProduct($idprodotto)
+    {
+        $query = "
+        SELECT i.idingrediente, i.nome, i.sovrapprezzo, i.giacenza, i.image, c.quantita
+        FROM composizioni c
+        INNER JOIN ingredienti i ON c.idingrediente = i.idingrediente
+        WHERE c.idprodotto = ?
+    ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $idprodotto);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $ingredients = $result->fetch_all(MYSQLI_ASSOC);
+
+        $stmt->close();
+        return $ingredients;
+    }
 }
