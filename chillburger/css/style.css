@@ -315,12 +315,23 @@ html, body {
     width: 20%;
     height: 20%;
     object-fit: cover;
-  }
+}
   
   @media (min-width: 768px) {
     .img-responsive {
       width: 10%;
       height: 10%;
     }
+}
+
+.icon {
+    font-size: 1rem; /* default per schermi piccoli */
   }
+
+  @media (min-width: 768px) {
+    .icon {
+      font-size: 2rem; /* per md e oltre */
+    }
+  }
+
 

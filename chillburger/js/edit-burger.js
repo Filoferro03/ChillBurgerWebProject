@@ -34,10 +34,10 @@ function generateIngredients(ingredients) {
                     <p>${ingredients[i]["quantita"]}</p>
                     <div class="d-flex flex-row w-[10%] ">
                         <button type="button" class="btn m-1" aria-label="Sottrai">
-                            <i class="fa-solid fa-circle-minus md:fa-2x"></i>
+                            <i class="fa-solid fa-circle-minus icon"></i>
                         </button>
                         <button type="button" class="btn m-1" aria-label="Aggiungi">
-                            <i class="fa-solid fa-circle-plus md:fa-2x"></i>
+                            <i class="fa-solid fa-circle-plus icon"></i>
                         </button>
                     </div>
                 </div>
