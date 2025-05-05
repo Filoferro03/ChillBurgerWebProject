@@ -254,7 +254,7 @@ class DatabaseHelper
         }
     }
 
-    public function segnaNotificaComeLetta($idnotifica)
+    public function readNotification($idnotifica)
     {
         $query = "UPDATE notifiche SET vista = 1 WHERE idnotifica = ?";
 
@@ -266,11 +266,38 @@ class DatabaseHelper
         $stmt->bind_param("i", $idnotifica);
 
         if (!$stmt->execute()) {
-            throw new Exception("Errore durante l'esecuzione della query: " . $stmt->error);
+            throw new Exception("Errore nell'esecuzione della query: " . $stmt->error);
         }
 
+        $affected = $stmt->affected_rows;
         $stmt->close();
+
+        return $affected > 0;
     }
+
+
+    public function deleteNotification($idnotifica)
+    {
+        $query = "DELETE FROM notifiche WHERE idnotifica = ?";
+
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            throw new Exception("Errore nella preparazione della query: " . $this->db->error);
+        }
+
+        $stmt->bind_param("i", $idnotifica);
+
+        if (!$stmt->execute()) {
+            throw new Exception("Errore nell'esecuzione della query: " . $stmt->error);
+        }
+
+        $affected = $stmt->affected_rows;
+        $stmt->close();
+
+        return $affected > 0;
+    }
+
+
 
     public function getProduct($idprodotto)
     {
