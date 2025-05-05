@@ -310,6 +310,7 @@ class DatabaseHelper
         return $product;
     }
 
+
     public function getIngredientsByProduct($idprodotto)
     {
         $query = "
@@ -328,5 +329,80 @@ class DatabaseHelper
 
         $stmt->close();
         return $ingredients;
+    }
+
+    public function getIngredientsByProduct2($idprodotto)
+    {
+        $query = "
+        SELECT i.idingrediente, i.nome, i.sovrapprezzo, i.giacenza, i.image, m.quantita
+        FROM modifiche_ingredienti m
+        INNER JOIN ingredienti i ON m.idingrediente = i.idingrediente
+        WHERE m.idprodotto = ?
+    ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $idprodotto);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $ingredients = $result->fetch_all(MYSQLI_ASSOC);
+
+        $stmt->close();
+        return $ingredients;
+    }
+
+    /*quando dal carrello decidi di modificare hamburger del menu, crei una nuova istanza di personalizzazioni
+     */
+    public function createNewBurger($idprodotto, $idordine, $prezzo)
+    {
+        $query = "INSERT INTO personalizzazioni (prezzo ,quantita, idprodotto, idordine) VALUES (?, ?, ?, ?)";
+        $stmt = $this->db->prepare($query);
+        $quantita = 1;
+        $stmt->bind_param('iiii', $prezzo, $quantita, $idprodotto, $idordine);
+        $result = $stmt->get_result();
+        $product = $result->fetch_all(MYSQLI_ASSOC);
+        return $product;
+    }
+
+    /* appena creata nuova istanza di personalizzazione del panino standard del menu, chiami questa fun che 
+       ti crea la composizione del panino personalizzato, all'inizio ovviamente sarà uguale al panino standard
+       nel js quindi dovrai avere un array di tutti gli ingredienti del panino standard e delle quantita e tramite un for 
+       chiamare questa funzione runnadola su tutti gli elementi dell'array
+     */
+    public function createNewBurgerComposition($idpersonalizzazione, $idingrediente, $quantita)
+    {
+        $query = "INSERT INTO modifiche_ingredienti (idpersonalizzazione, idingrediente, quantita) VALUES (?, ?, ?)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('iii', $idpersonalizzazione, $idingrediente, $quantita);
+        try {
+            $success = $stmt->execute();
+            $affectedRows = $stmt->affected_rows;
+            $stmt->close();
+
+            // Verifica che l'esecuzione sia andata a buon fine e che almeno una riga sia stata inserita
+            return $success && $affectedRows > 0;
+        } catch (mysqli_sql_exception $e) {
+            return false;
+        }
+    }
+
+    /*ogni volta che clicchi + o - su un ingrediente, aggiorni la composizione del panino personalizzato
+     */
+    public function updateModifiedBurgerIngredientsQuantity($idpersonalizzazione, $idingrediente, $quantita)
+    {
+        $query = "UPDATE modifiche_ingredienti SET quantita = ? WHERE idpersonalizzazione = ? AND idingrediente = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('iii', $quantita, $idpersonalizzazione, $idingrediente);
+
+        try {
+            $success = $stmt->execute();
+            $affectedRows = $stmt->affected_rows;
+            $stmt->close();
+
+            // Verifica che l'esecuzione sia andata a buon fine e che almeno una riga sia stata aggiornata
+            return $success && $affectedRows > 0;
+        } catch (mysqli_sql_exception $e) {
+            return false;
+        }
     }
 }
