@@ -405,4 +405,28 @@ class DatabaseHelper
             return false;
         }
     }
+
+    public function getAllIngredients()
+    {
+        $query = "SELECT * FROM ingredienti";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $ingredients = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $ingredients;
+    }
+
+    public function getAllProducts()
+    {
+        $query = "SELECT * FROM prodotti";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $products = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $products;
+    }
 }
