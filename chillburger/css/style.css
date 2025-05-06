@@ -324,6 +324,22 @@ html, body {
     }
 }
 
+.menu-img-responsive {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+    object-fit: cover;
+}
+  
+  @media (min-width: 768px) {
+    .menu-img-responsive {
+      width: 80%;
+      height: auto;
+      max-height: 300px;
+      object-fit: cover;
+    }
+}
+
 .icon {
     font-size: 1rem; /* default per schermi piccoli */
   }
@@ -344,5 +360,6 @@ html, body {
     /* Nessuno stile definito */
     display: flex;
 }
+
 
 
