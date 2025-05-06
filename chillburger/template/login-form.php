@@ -15,7 +15,7 @@
                         <div class="d-flex flex-row">
                             <input type="password" id="loginpassword" name="loginpassword" class="form-control m-1">
                             <button type="button" id="loginshow" class="btn m-1">
-                                <i class="fa-solid fa-eye"></i>
+                                <span class="fa-solid fa-eye"></>
                             </button>
                         </div>
 
@@ -49,7 +49,7 @@
                         <div class="d-flex flex-row">
                             <input type="password" id="registerpassword" name="registerpassword" class="form-control m-1">
                             <button type="button" id="registerpasswordshow" class="btn m-1">
-                                <i class="fa-solid fa-eye"></i>
+                                <span class="fa-solid fa-eye"></span>
                             </button>
                         </div>
 
@@ -57,7 +57,7 @@
                         <div class="d-flex flex-row">
                             <input type="password" id="confirmpassword" name="confirmpassword" class="form-control m-1">
                             <button type="button" id="registerconfirmpasswordshow" class="btn m-1">
-                                <i class="fa-solid fa-eye"></i>
+                                <span class="fa-solid fa-eye"></span>
                             </button>
                         </div>
 
