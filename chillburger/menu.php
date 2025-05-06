@@ -1,14 +1,8 @@
 <?php
 require_once "bootstrap.php";
 
-$templateParams = [
-    "titolo" => "ChillBurger – Menu",
-    "nome"   => "template/menu_main.php",
-    "css"    => [
-        "css/style.css",
-        "css/menu_style.css"],
-    "js"     => ["js/menu_filter.js"]
-];
+$templateParams["nome"] = "template/menu-main.php";
+$templateParams["titolo"] = "ChillBurger - Menu";
+$templateParams["js"] = array("js/menu.js");
 
 require "template/base.php";
-?>
