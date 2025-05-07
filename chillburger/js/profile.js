@@ -47,13 +47,13 @@ function generateOrdersHTML(orders) {
     let result = "";
     orders.forEach(order => {
         result += `
-            <div class="list-group-item mb-3 ms-4 d-flex justify-content-between align-items-center">
+            <div class="list-group-item mb-3 ms-1 d-flex justify-content-between align-items-center">
                 <div>
                     <h4> Ordine #${order.idordine}</h4>
                     <small>${(order.data)} - ${order.ora}</small><br>
                 </div>
                 <p><strong>Stato:</strong> TODO<p><br>
-                <button type="button" class="btn btn-dark btn-sm">Dettagli Ordine</button>
+                <button type="button" class="order-button btn" >Dettagli Ordine</button>
             </div>`;
     });
     return result;
@@ -126,8 +126,6 @@ async function loadUserOrders(page = 1) {
     }
 }
 
-
-// --- Funzione Logout (invariata) ---
 async function logout() {
     const url = "api/api-login.php";
     const formData = new FormData();
@@ -147,7 +145,7 @@ async function logout() {
 document.addEventListener('DOMContentLoaded', async function() {
     await loadProfileData(); // Carica profilo e prima pagina ordini
 
-    const logoutButton = document.getElementById('logout-button');
+    const logoutButton = document.getElementById('confirm-button');
     if (logoutButton) {
         logoutButton.addEventListener('click', logout);
     } else {

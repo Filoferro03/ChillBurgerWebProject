@@ -1,0 +1,29 @@
+.card {
+    background-color: #e6ccb2;
+    color: #7f5539;
+}
+
+.order-button {
+    background-color: #7f5539;
+    color: white;
+}
+
+.order-button:hover {
+    background-color: #7f5539;
+    opacity: 0.8;
+    color: white;
+}
+
+.modal-content {
+    background-color: #e6ccb2;
+}
+
+@media (max-width: 768px) {
+    #profile-container {
+        flex-direction: column !important;
+    }
+
+    .card {
+        width: 100% !important;
+    }
+}
