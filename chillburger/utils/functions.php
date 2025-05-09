@@ -22,3 +22,16 @@ function logout()
     unset($_SESSION["nome"]);
     unset($_SESSION["cognome"]);
 }
+
+function calculateTotalPrice($custom, $stock) {
+    $total_price = 0;
+    foreach ($custom as $item) {
+        $total_price += $item["prezzo"] * $item["quantita"];
+    }
+    foreach ($stock as $item) {
+        $total_price += $item["prezzo"] * $item["quantita"];
+    }
+    return $total_price;
+}
+
+?>

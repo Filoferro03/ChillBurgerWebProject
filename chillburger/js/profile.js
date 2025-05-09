@@ -13,13 +13,11 @@ async function fetchData(url, formData) {
 
 // --- Funzione per caricare i dati profilo e la prima pagina ordini ---
 async function loadProfileData() { 
-    console.log("Caricamento profilo...");
     const url = "api/api-profile.php";
     const formData = new FormData();
     const json = await fetchData(url, formData);
 
     if (json && json.success && json.userData) {
-        console.log("Dati profilo ricevuti:", json.userData);
         displayProfileData(json.userData);
         // Carica la PRIMA PAGINA degli ordini dopo aver caricato il profilo
         await loadUserOrders(1);
@@ -53,7 +51,7 @@ function generateOrdersHTML(orders) {
                     <small>${(order.data)} - ${order.ora}</small><br>
                 </div>
                 <p><strong>Stato:</strong> TODO<p><br>
-                <button type="button" class="order-button btn" >Dettagli Ordine</button>
+                <a href="order-view.php?idordine=${order.idordine}" class="order-button btn">Dettagli Ordine</a>
             </div>`;
     });
     return result;
