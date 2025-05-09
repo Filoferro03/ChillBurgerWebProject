@@ -429,4 +429,39 @@ class DatabaseHelper
         $stmt->close();
         return $products;
     }
+
+    public function getOrderDetails($idordine) {
+        $query = "SELECT p.nome AS nomeprodotto, pe.prezzo, pe.quantita, i.nome AS nomeingrediente, m.azione
+                  FROM ordini o, personalizzazioni pe, modifiche_ingredienti m, ingredienti i, prodotti p
+                  WHERE o.idordine = ?
+                  AND o.idordine = pe.idordine
+                  AND pe.idpersonalizzazione = m.idpersonalizzazione
+                  AND m.idingrediente = i.idingrediente
+                  AND pe.idprodotto = p.idprodotto";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('i', $idordine);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $orderCustom = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+
+        $query =    "SELECT p.nome, p.prezzo, c.quantita
+                    FROM ordini o, carrelli_prodotti c, prodotti p
+                    WHERE o.idordine = ?
+                    AND o.idordine = c.idordine
+                    AND c.idprodotto = p.idprodotto";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('i', $idordine);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $orderStock = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return [
+            'orderCustom' => $orderCustom,
+            'orderStock' => $orderStock,
+            'totalPrice' => calculateTotalPrice($orderCustom, $orderStock)
+        ];
+    }
 }

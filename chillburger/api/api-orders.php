@@ -29,6 +29,14 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
         // Includi tutti i dati restituiti dal metodo (orders, currentPage, totalPages)
         $response['data'] = $paginatedData;
 
+    } else if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
+        $idOrdine = null;
+        if (isset($_GET['idordine'])) {
+            $idOrdine = $_GET['idordine'];
+        }
+        $allOrders = $dbh->getOrderDetails($idOrdine);
+        $response['success'] = true;
+        $response['data'] = $allOrders;
     } else {
         http_response_code(400); // Bad Request
         $response = ['success' => false, 'error' => 'Azione non specificata o non valida'];
