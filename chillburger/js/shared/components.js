@@ -1,5 +1,3 @@
-// js/components.js
-
 /**
  * Crea e restituisce l'elemento DOM del componente di paginazione con logica ellissi.
  * @param {number} currentPage - La pagina attualmente attiva (basata su 1).

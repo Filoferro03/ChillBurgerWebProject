@@ -142,7 +142,9 @@
         </div>
     </footer>
 
-    <script src="js/components.js"></script>
+    <script src="js/shared/components.js"></script>
+    <script src="js/shared/utils.js"></script>
+
 
     <?php
     if (isset($templateParams["css"])):

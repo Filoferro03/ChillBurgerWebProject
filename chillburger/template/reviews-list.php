@@ -5,7 +5,7 @@
     </h2>
 
     <div class="card reviews-card-fluid">
-        <div class="card-header">
+        <div class="card-header my-3">
             <h2 class="animate-underline">Leggi le recensioni dei nostri clienti e scopri cosa pensano di noi!</h2>
         </div>
         <div id="reviewsList" class="list-group list-group-flush">
