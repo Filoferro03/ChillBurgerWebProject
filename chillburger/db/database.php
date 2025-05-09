@@ -429,4 +429,41 @@ class DatabaseHelper
         $stmt->close();
         return $products;
     }
+
+    public function getBurgerWithIngredients($idprodotto)
+    {
+        $query = "
+        SELECT 
+            p.nome,
+            p.image,
+            i.nome AS nome_ingrediente
+        FROM 
+            prodotti p
+        JOIN 
+            composizioni c ON p.idprodotto = c.idprodotto
+        JOIN 
+            ingredienti i ON c.idingrediente = i.idingrediente
+        WHERE 
+            p.idprodotto = ?
+    ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('i', $idprodotto);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $data = $result->fetch_all(MYSQLI_ASSOC);
+
+        if (empty($data)) {
+            return null;
+        }
+
+        $panino = [
+            'nome' => $data[0]['nome'],               // nome del panino
+            'image' => $data[0]['image'],             // immagine del panino
+            'ingredienti' => array_column($data, 'nome_ingrediente') // lista ingredienti
+        ];
+
+        return $panino;
+    }
 }

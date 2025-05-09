@@ -24,10 +24,13 @@ function generateProducts(products, idcategoria) {
         const imgSrc = products[i]["image"] ?? "./resources/menu/stock.jpg";
         const prezzo = products[i]["prezzo"] ?? "Prezzo mancante";
         const altText = nome;
+        const idProdotto = products[i]["idprodotto"];
 
-        // Se categoria = 1, wrappo immagine in <a>
+        // Se categoria = 1, wrappo immagine in <a> con ID
         const imgTag = idcategoria === 1
-            ? `<a href="#"><img src="${imgSrc}" class="menu-img-responsive" alt="${altText}"></a>`
+            ? `<a href="./burger-details.php?id=${idProdotto}">
+                   <img src="${imgSrc}" class="menu-img-responsive" alt="${altText}">
+               </a>`
             : `<img src="${imgSrc}" class="menu-img-responsive" alt="${altText}">`;
 
         let product = `
