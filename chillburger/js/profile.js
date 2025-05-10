@@ -45,12 +45,12 @@ function generateOrdersHTML(orders) {
     let result = "";
     orders.forEach(order => {
         result += `
-            <div class="list-group-item mb-3 ms-1 d-flex justify-content-between align-items-center">
+            <div class="list-group-item mb-3 mt-2 d-flex justify-content-between align-items-center">
                 <div>
                     <h4> Ordine #${order.idordine}</h4>
-                    <small>${(order.data)} - ${order.ora}</small><br>
+                    <small>${(order.data)} - ${formatTime(order.ora)}</small><br>
                 </div>
-                <p><strong>Stato:</strong> TODO<p><br>
+                <p><strong>Stato:</strong><br> Confermato<p>
                 <a href="order-view.php?idordine=${order.idordine}" class="order-button btn">Dettagli Ordine</a>
             </div>`;
     });

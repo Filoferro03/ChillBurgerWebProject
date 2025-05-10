@@ -84,7 +84,6 @@ function displayOrderDetails(data) {
     }
 
     // ---- SEZIONE PRODOTTI STANDARD ----
-    result += `<h3 class="mt-4 mb-3">Prodotti Standard</h3>`;
     if (data.orderStock && data.orderStock.length > 0) {
         data.orderStock.forEach(stockElement => {
             const productName = stockElement.nome || 'Nome Prodotto N/D';
@@ -93,19 +92,17 @@ function displayOrderDetails(data) {
 
             result += `
                 <div class="card mb-3 shadow-sm">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
                         <h5 class="card-title">${productName}</h5>
                         <p class="card-text mb-1">
                             <strong>Quantità:</strong> ${quantity}
                         </p>
                         <p class="card-text">
-                            <strong>Prezzo:</strong> €${price}
+                            € ${price}
                         </p>
                     </div>
                 </div>`;
         });
-    } else {
-        result += '<p class="text-muted">Nessun prodotto standard in questo ordine.</p>';
     }
 
     // ---- PREZZO TOTALE ----
@@ -113,7 +110,7 @@ function displayOrderDetails(data) {
         const totalPriceFormatted = parseFloat(data.totalPrice).toFixed(2);
         result += `
             <div class="text-end mt-4">
-                <h4><strong>Prezzo Totale Ordine: €${totalPriceFormatted}</strong></h4>
+                <h4><strong>Totale Ordine: €${totalPriceFormatted}</strong></h4>
             </div>`;
     } else {
         result += '<p class="text-muted mt-4 text-end">Prezzo totale non disponibile.</p>';

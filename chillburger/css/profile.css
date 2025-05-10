@@ -18,6 +18,10 @@
         flex-direction: column !important;
     }
 
+    #order-history-area {
+        padding: 6px 4px !important;
+    }
+
     .card {
         width: 100% !important;
     }

@@ -6,7 +6,7 @@
 
     <div class="card reviews-card-fluid">
         <div class="card-header my-3">
-            <h2 class="animate-underline">Leggi le recensioni dei nostri clienti e scopri cosa pensano di noi!</h2>
+            <h2 class="animate-underline">Leggi le recensioni dei nostri clienti!</h2>
         </div>
         <div id="reviewsList" class="list-group list-group-flush">
             <!-- Le recensioni verranno generate dinamicamente da JavaScript -->

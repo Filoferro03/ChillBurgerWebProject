@@ -20,11 +20,6 @@
     border-bottom: none;
 }
 
-.reviews-card .card-footer {
-    background-color: #f8f9fa;
-    border-top: 1px solid rgba(0,0,0,0.125);
-    padding: 1rem;
-}
 
 .star-rating i {
     color: #9C6644;

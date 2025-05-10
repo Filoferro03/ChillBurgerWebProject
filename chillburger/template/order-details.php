@@ -8,7 +8,7 @@
                 <p class="text-center">Caricamento dettagli ordine...</p>
             </div>
             <div class="card-footer text-center">
-                 <a href="profile.php" class="btn btn-primary">Torna al Profilo</a>
+                <a href="profile.php" class="btn">Torna al Profilo</a>
             </div>
         </div>
     </div>

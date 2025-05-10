@@ -22,7 +22,7 @@
         <!--Navbar for mobile-->
         <nav class="mobile navbar py-4">
             <div class="container-fluid">
-                <button class="navbar-toggler mx-3" type="button" data-bs-toggle="offcanvas"
+                <button class="navbar-toggler mx-2" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
