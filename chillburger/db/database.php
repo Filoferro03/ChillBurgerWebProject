@@ -57,9 +57,9 @@ class DatabaseHelper
         $countStmt->close();
 
         // Poi ottieni le recensioni paginate
-        $query = "SELECT titolo, voto, commento, data, ora
+        $query = "SELECT titolo, voto, commento, timestamp_recensione
                   FROM chillburgerdb.recensioni 
-                  ORDER BY data DESC, ora DESC
+                  ORDER BY timestamp_recensione DESC
                   LIMIT ? OFFSET ?";
 
         $stmt = $this->db->prepare($query);
@@ -137,10 +137,10 @@ class DatabaseHelper
         $totalPages = ceil($totalOrders / $perPage);
 
         // Query per recuperare gli ordini paginati
-        $query = "SELECT idordine, data, ora
+        $query = "SELECT idordine, timestamp_ordine
                   FROM ordini
                   WHERE idutente = ?
-                  ORDER BY data DESC, ora DESC
+                  ORDER BY timestamp_ordine DESC
                   LIMIT ? OFFSET ?";
         $stmt = $this->db->prepare($query);
         if (!$stmt) {

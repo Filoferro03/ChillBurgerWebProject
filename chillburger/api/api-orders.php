@@ -2,6 +2,8 @@
 
 require_once '../bootstrap.php'; // Assicurati che il percorso sia corretto
 
+error_log("api-orders.php Dati POST: " . print_r($_POST, true));
+error_log("api-orders.php Dati GET: " . print_r($_GET, true));
 $response = [];
 
 // 1. Verifica se l'utente è loggato e recupera l'ID utente
