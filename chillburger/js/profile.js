@@ -50,7 +50,7 @@ function generateOrdersHTML(orders) {
                     <h4> Ordine #${order.idordine}</h4>
                     <small>${formatDateFromTimestamp(order.timestamp_ordine)} - ${formatTimeFromTimestamp(order.timestamp_ordine)}</small><br>
                 </div>
-                <p><strong>Stato:</strong><br> Confermato<p>
+                <p><strong>Stato:</strong><br> ${order.stato}<p>
                 <a href="order-view.php?idordine=${order.idordine}" class="order-button btn">Dettagli Ordine</a>
             </div>`;
     });

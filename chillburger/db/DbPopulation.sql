@@ -140,6 +140,7 @@ INSERT INTO chillburgerdb.ordini (timestamp_ordine, idutente) VALUES
 ('2024-05-10 19:00:00', (SELECT idutente FROM utenti WHERE username = 'anna.verdi')),
 ('2024-05-11 13:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli')),
 ('2024-05-11 20:00:00', (SELECT idutente FROM utenti WHERE username = 'laura.bruni')),
+('2024-05-12 19:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli')),
 ('2024-05-12 12:00:00', (SELECT idutente FROM utenti WHERE username = 'mario.rossi'));
 
 -- Esempio di popolamento manuale di modifiche_stato
@@ -177,10 +178,14 @@ INSERT INTO chillburgerdb.modifiche_ingredienti (idpersonalizzazione, idingredie
 (2, (SELECT idingrediente FROM ingredienti WHERE nome = 'cheddar'), 'aggiunto'),
 (2, (SELECT idingrediente FROM ingredienti WHERE nome = 'Cipolla caramellata'), 'aggiunto');
 
--- Insert Recensioni
+
 INSERT INTO chillburgerdb.recensioni (idordine, titolo, voto, commento, timestamp_recensione) VALUES
-(1, 'Delizioso!', 5, 'Il Bacon Cheeseburger era fantastico! Consegnato in tempo.', '2024-05-10 13:30:00'),
-(3, 'Saporito ma un po caro', 4, 'Gli Smoky Burger erano ottimi, ma il totale un po alto.', '2024-05-11 14:00:00');
+(1, 'Delizioso e Veloce!', 5, 'Il Bacon Cheeseburger era fantastico come sempre e la consegna è stata super rapida!', '2025-05-10 13:30:00'),
+(2, 'Buono ma migliorabile', 3, 'Il Chicken Deluxe era buono, gli ingredienti sembravano freschi, ma il pollo era un po asciutto.', '2025-05-10 20:15:00'),
+(3, 'Ottimo burger!', 5, 'Senza dubbio il miglior burger che abbia mai mangiato in città! Carne succosa e pane artigianale top.', '2025-05-11 18:30:00'),
+(4, 'Servizio da rivedere', 3, 'Il burger (Smoky) era buono, ma abbiamo aspettato un po troppo e le patatine erano tiepide.', '2025-05-11 19:45:00'),
+(5, 'Veggie Burger Sorprendente!', 5, 'Non mangio carne e trovare un Veggie Burger così saporito è una gioia. Consigliatissimo!', '2025-05-12 14:00:00'),
+(6, 'Perfetto per una serata chill!', 4, 'Tutto ottimo, dall''antipasto al dolce. La Piadina era farcita abbondantemente. Atmosfera rilassante.', '2025-05-12 20:45:00');
 
 -- Esempio di Notifiche
 INSERT INTO chillburgerdb.notifiche (titolo, testo, tipo, idutente, idingrediente, timestamp_notifica) VALUES

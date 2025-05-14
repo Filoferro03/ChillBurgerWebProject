@@ -137,9 +137,15 @@ class DatabaseHelper
         $totalPages = ceil($totalOrders / $perPage);
 
         // Query per recuperare gli ordini paginati
-        $query = "SELECT idordine, timestamp_ordine
-                  FROM ordini
+        $query = "SELECT o.idordine, o.timestamp_ordine, so.descrizione AS stato 
+                  FROM ordini o, stati_ordine so, modifiche_stato ms
                   WHERE idutente = ?
+                  AND o.idordine = ms.idordine
+                  AND ms.idstato = so.idstato
+                  AND ms.timestamp_modifica = (
+                      SELECT MAX(timestamp_modifica) FROM modifiche_stato ms2
+                      WHERE ms2.idordine = o.idordine
+                  )
                   ORDER BY timestamp_ordine DESC
                   LIMIT ? OFFSET ?";
         $stmt = $this->db->prepare($query);
@@ -467,39 +473,87 @@ class DatabaseHelper
         return $panino;
     }
 
-    public function getOrderDetails($idordine)
+public function getOrderDetails($idordine)
     {
-        $query = "SELECT p.nome AS nomeprodotto, pe.prezzo, pe.quantita, i.nome AS nomeingrediente, m.azione
-                  FROM ordini o, personalizzazioni pe, modifiche_ingredienti m, ingredienti i, prodotti p
-                  WHERE o.idordine = ?
-                  AND o.idordine = pe.idordine
-                  AND pe.idpersonalizzazione = m.idpersonalizzazione
-                  AND m.idingrediente = i.idingrediente
-                  AND pe.idprodotto = p.idprodotto";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param('i', $idordine);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $orderCustom = $result->fetch_all(MYSQLI_ASSOC);
-        $result->free();
-        $stmt->close();
+        $orderCustom = [];
+        $orderStock = [];
+        $totalPrice = 0;
 
-        $query =    "SELECT p.nome, p.prezzo, c.quantita
-                    FROM ordini o, carrelli_prodotti c, prodotti p
-                    WHERE o.idordine = ?
-                    AND o.idordine = c.idordine
-                    AND c.idprodotto = p.idprodotto";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param('i', $idordine);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $orderStock = $result->fetch_all(MYSQLI_ASSOC);
-        $result->free();
-        $stmt->close();
+        // Recupera i prodotti personalizzati con le loro modifiche di ingredienti
+        $queryCustom = "SELECT pe.idpersonalizzazione, p.nome AS nomeprodotto, 
+                               pe.prezzo, pe.quantita, 
+                               i.nome AS nomeingrediente, m.azione
+                        FROM ordini o
+                        JOIN personalizzazioni pe ON o.idordine = pe.idordine
+                        JOIN modifiche_ingredienti m ON pe.idpersonalizzazione = m.idpersonalizzazione
+                        JOIN ingredienti i ON m.idingrediente = i.idingrediente
+                        JOIN prodotti p ON pe.idprodotto = p.idprodotto
+                        WHERE o.idordine = ?
+                        ORDER BY pe.idpersonalizzazione";
+        
+        $stmtCustom = $this->db->prepare($queryCustom);
+        if ($stmtCustom) {
+            $stmtCustom->bind_param('i', $idordine);
+            $stmtCustom->execute();
+            $resultCustom = $stmtCustom->get_result();
+            $orderCustom = $resultCustom->fetch_all(MYSQLI_ASSOC); // Questo conterrà più righe per personalizzazione se ci sono più modifiche
+            $resultCustom->free();
+            $stmtCustom->close();
+        } else {
+            // Gestisci errore di preparazione, es:
+            error_log("Errore preparazione queryCustom in getOrderDetails: " . $this->db->error);
+        }
+
+        // Recupera i prodotti standard (non personalizzati)
+        $queryStock = "SELECT p.nome, p.prezzo, cp.quantita, p.idcategoria
+                       FROM ordini o
+                       JOIN carrelli_prodotti cp ON o.idordine = cp.idordine
+                       JOIN prodotti p ON cp.idprodotto = p.idprodotto
+                       WHERE o.idordine = ?
+                       ORDER BY p.idcategoria";
+        
+        $stmtStock = $this->db->prepare($queryStock);
+        if ($stmtStock) {
+            $stmtStock->bind_param('i', $idordine);
+            $stmtStock->execute();
+            $resultStock = $stmtStock->get_result();
+            $orderStock = $resultStock->fetch_all(MYSQLI_ASSOC);
+            $resultStock->free();
+            $stmtStock->close();
+        } else {
+            // Gestisci errore di preparazione
+            error_log("Errore preparazione queryStock in getOrderDetails: " . $this->db->error);
+        }
+
+        // Calcolo del prezzo totale corretto
+        $processed_personalizations = []; // Per tenere traccia degli idpersonalizzazione già sommati
+
+        if (!empty($orderCustom)) { // Verifica che $orderCustom non sia vuoto
+            foreach ($orderCustom as $item) {
+                // Assicurati che gli indici esistano
+                if (isset($item['idpersonalizzazione'], $item['prezzo'], $item['quantita'])) {
+                    if (!in_array($item['idpersonalizzazione'], $processed_personalizations)) {
+                        // $item['prezzo'] è il prezzo della singola personalizzazione (calcolato dai trigger DB)
+                        // $item['quantita'] è la quantità di QUEL prodotto personalizzato ordinata
+                        $totalPrice += floatval($item['prezzo']) * intval($item['quantita']);
+                        $processed_personalizations[] = $item['idpersonalizzazione'];
+                    }
+                }
+            }
+        }
+
+        if (!empty($orderStock)) { // Verifica che $orderStock non sia vuoto
+            foreach ($orderStock as $item) {
+                // Assicurati che gli indici esistano
+                if (isset($item['prezzo'], $item['quantita'])) {
+                    $totalPrice += floatval($item['prezzo']) * intval($item['quantita']);
+                }
+            }
+        }
+
         return [
-            'orderCustom' => $orderCustom,
+            'orderCustom' => $orderCustom, // L'array non raggruppato, per essere processato da JavaScript
             'orderStock' => $orderStock,
-            'totalPrice' => calculateTotalPrice($orderCustom, $orderStock)
+            'totalPrice' => $totalPrice
         ];
-    }
-}
+    }}
