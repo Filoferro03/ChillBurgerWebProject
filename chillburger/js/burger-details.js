@@ -30,13 +30,13 @@ function generateBurgerDetails(product) {
     }
 
     result += `
-    <div class= "m-3 p-3">
+    <div class= " d-flex flex-column align-items-center m-3 p-3">
         <h1>${product.nome}</h1>
         <img src="${product.image}" alt="Panino Generico"
             class="img-product-details rounded-4 mt-5 w-100">
 
-        <div id="details-container" class="m-3 p-3">
-            <p><strong>INGREDIENTI:</strong><br>${ingredientiText}</p>
+        <div id="details-container" class="d-flex flex-column align-items-center m-3 p-3">
+            <p class="text-center"><strong>INGREDIENTI:</strong><br>${ingredientiText}</p>
         </div>
     </div>`;
 
