@@ -16,8 +16,11 @@
                                 <p class="fs-3">Prezzo</p>
                             </div>
                         </div>
-                        <div class=" d-flex ">
+                        <div class=" d-flex flex-column">
                             <p>Ingredienti Panino</p>
+                            <div>
+                                <button class="btn bg-white w-10">Modifica</button>
+                            </div>
                         </div>
                     </div>
                     <div class=" d-flex justify-content-end pb-3">
