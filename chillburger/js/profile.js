@@ -48,9 +48,9 @@ function generateOrdersHTML(orders) {
             <div class="list-group-item mb-3 mt-2 d-flex justify-content-between align-items-center">
                 <div>
                     <h4> Ordine #${order.idordine}</h4>
-                    <small>${(order.data)} - ${formatTime(order.ora)}</small><br>
+                    <small>${formatDateFromTimestamp(order.timestamp_ordine)} - ${formatTimeFromTimestamp(order.timestamp_ordine)}</small><br>
                 </div>
-                <p><strong>Stato:</strong><br> Confermato<p>
+                <p><strong>Stato:</strong><br> ${order.stato}<p>
                 <a href="order-view.php?idordine=${order.idordine}" class="order-button btn">Dettagli Ordine</a>
             </div>`;
     });

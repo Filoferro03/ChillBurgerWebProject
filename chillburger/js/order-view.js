@@ -47,40 +47,73 @@ function displayOrderDetails(data) {
     let result = "";
 
     // ---- SEZIONE PRODOTTI PERSONALIZZATI ----
-    result += `<h3 class="mb-3">Prodotti Personalizzati</h3>`;
     if (data.orderCustom && data.orderCustom.length > 0) {
-        // Nota: La query SQL per 'orderCustom' come discussa precedentemente,
-        // restituirà una riga per ogni *modifica di ingrediente* all'interno di un prodotto personalizzato.
-        // Se un prodotto personalizzato ha più modifiche, apparirà più volte con dettagli diversi per ciascuna modifica.
-        // Per un raggruppamento più avanzato (mostrare un prodotto personalizzato una volta con tutte le sue modifiche),
-        // sarebbe necessario un pre-processing dei dati 'data.orderCustom' qui in JavaScript.
-        // La versione seguente mostra una riga per ogni voce ricevuta da 'orderCustom'.
+        // 1. Raggruppa le modifiche per idpersonalizzazione (che idealmente identifica un prodotto personalizzato unico nell'ordine)
+        const customProductsMap = new Map();
 
-        data.orderCustom.forEach(customElement => {
-            const productName = customElement.nome_prodotto || 'Nome Prodotto N/D';
-            const ingredientName = customElement.nome_ingrediente || 'Ingrediente N/D';
-            const action = customElement.azione || 'Azione N/D'; // es. 'aggiunto', 'rimosso'
-            const productQuantity = customElement.quantita !== undefined ? customElement.quantita : 'N/D';
-            const productPrice = customElement.prezzo !== undefined ? parseFloat(customElement.prezzo).toFixed(2) : 'N/D';
+        data.orderCustom.forEach(item => {
+
+            if (!customProductsMap.has(item.idpersonalizzazione)) {
+                customProductsMap.set(item.idpersonalizzazione, {
+                    idpersonalizzazione: item.idpersonalizzazione,
+                    productName: item.nomeprodotto || 'Nome Prodotto N/D',
+                    productQuantity: item.quantita !== undefined ? item.quantita : 'N/D', // Quantità del prodotto personalizzato
+                    productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D', // Prezzo totale della personalizzazione
+                    modifiche: [] // Array per le modifiche ingredienti
+                });
+            }
+            // Aggiungi la modifica specifica a questo prodotto personalizzato
+            customProductsMap.get(item.idpersonalizzazione).modifiche.push({
+                ingredientName: item.nomeingrediente || 'Ingrediente N/D',
+                action: item.azione || 'Azione N/D'
+            });
+        });
+
+        // 2. Itera sulla mappa dei prodotti personalizzati raggruppati e genera l'HTML
+        customProductsMap.forEach(customProduct => {
+            result += `
+                <div class="card shadow-sm">
+                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
+                        <div class="d-flex flex-column w-25">
+                        <h5 class="card-title">${customProduct.productName}</h5>
+                        <ul class="list-unstyled ms-3">`;
+
+            if (customProduct.modifiche.length > 0) {
+                customProduct.modifiche.forEach(mod => {
+                    let prefix = '';
+                    let actionText = mod.action; // Testo dell'azione da visualizzare (es. 'aggiunto', 'rimosso')
+
+                    if (mod.action === 'aggiunto') {
+                        prefix = '+ ';
+                        // Potresti voler rendere il testo più user-friendly, es:
+                        // actionText = 'Aggiunto'; 
+                    } else if (mod.action === 'rimosso') {
+                        prefix = '- ';
+                        // actionText = 'Rimosso';
+                    }
+                    // Se ci fossero altre azioni, potresti aggiungere altri else if
+
+                    // Visualizza il prefisso, il nome dell'ingrediente e l'azione originale tra parentesi
+                    // Oppure solo prefisso e nome ingrediente se preferisci non ripetere l'azione
+                    result += `<li>${prefix}${mod.ingredientName}</li>`;
+                    // Se vuoi anche il testo dell'azione (es. "+ Bacon (aggiunto)"):
+                    // result += `<li>${prefix}${mod.ingredientName} (${actionText})</li>`;
+                });
+            } 
 
             result += `
-                <div class="card mb-3 shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">${productName} (Personalizzato)</h5>
-                        <p class="card-text mb-1">
-                            <strong>Modifica:</strong> ${ingredientName} (${action})
-                        </p>
-                        <p class="card-text mb-1">
-                            <strong>Quantità del Prodotto Base:</strong> ${productQuantity}
+                        </ul>
+                        </div>
+                        <p class="card-text m-0">
+                            <strong>Quantità:</strong> ${customProduct.productQuantity}
                         </p>
                         <p class="card-text">
-                            <strong>Prezzo (per questo prodotto personalizzato):</strong> €${productPrice}
+                            €${customProduct.productPrice}
                         </p>
                     </div>
                 </div>`;
         });
-    } else {
-        result += '<p class="text-muted">Nessun prodotto personalizzato in questo ordine.</p>';
+
     }
 
     // ---- SEZIONE PRODOTTI STANDARD ----
@@ -91,9 +124,9 @@ function displayOrderDetails(data) {
             const price = stockElement.prezzo !== undefined ? parseFloat(stockElement.prezzo).toFixed(2) : 'N/D';
 
             result += `
-                <div class="card mb-3 shadow-sm">
+                <div class="card shadow-sm">
                     <div class="card-body d-flex flex-row justify-content-between align-items-center">
-                        <h5 class="card-title">${productName}</h5>
+                        <h5 class="card-title w-25">${productName}</h5>
                         <p class="card-text mb-1">
                             <strong>Quantità:</strong> ${quantity}
                         </p>
@@ -110,7 +143,7 @@ function displayOrderDetails(data) {
         const totalPriceFormatted = parseFloat(data.totalPrice).toFixed(2);
         result += `
             <div class="text-end mt-4">
-                <h4><strong>Totale Ordine: €${totalPriceFormatted}</strong></h4>
+                <h4><strong>Totale: €${totalPriceFormatted}</strong></h4>
             </div>`;
     } else {
         result += '<p class="text-muted mt-4 text-end">Prezzo totale non disponibile.</p>';

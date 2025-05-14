@@ -37,7 +37,7 @@ function generateReviewsHTML(reviews) { // Rinominata per chiarezza
                 <h3>${review.titolo || 'Recensione'}</h3>
                 <p class="star-rating">${generateStarRating(review.voto)}</p>
                 <p>${review.commento || ''}</p>
-                <small class="text-muted">${review.data || 'N/D'} - ${formatTime(review.ora)}</small>
+                <small class="text-muted">${formatDateFromTimestamp(review.timestamp_recensione) || 'N/D'} - ${formatTimeFromTimestamp(review.timestamp_recensione)}</small>
             </div>`;
     });
     return result;
