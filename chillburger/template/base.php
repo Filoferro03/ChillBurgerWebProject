@@ -102,8 +102,8 @@
                         <a href="notifications.php" class="text-decoration-none mx-4">
                             <i class="fa-regular fa-bell text-black fs-2"></i>
                         </a>
-                        <a href="cart.php" class="text-decoration-none mx-4">
-                            <i class="fa-solid fa-cart-shopping"></i>
+                        <a href="cart.php" class="text-decoration-none">
+                            <i class="fa-solid fa-cart-shopping text-black fs-2"></i>
                         </a>
                     <?php else: ?>
                         <!-- Mostra il link per il login se l'utente non è loggato -->
