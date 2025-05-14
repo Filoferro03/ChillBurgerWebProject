@@ -337,38 +337,34 @@ class DatabaseHelper
         return $ingredients;
     }
 
-    public function getIngredientsByProduct2($idprodotto)
+    public function createEmptyPersonalization($idprodotto, $prezzo, $idordine)
     {
         $query = "
-        SELECT i.idingrediente, i.nome, i.sovrapprezzo, i.giacenza, i.image, m.quantita
-        FROM modifiche_ingredienti m
-        INNER JOIN ingredienti i ON m.idingrediente = i.idingrediente
-        WHERE m.idprodotto = ?
+        INSERT INTO personalizzazioni (prezzo, quantita, idordine, idprodotto)
+        VALUES (?, ?, ?, ?)
     ";
 
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("i", $idprodotto);
-        $stmt->execute();
+        if (!$stmt) {
+            // Gestione errore di preparazione
+            return false;
+        }
 
-        $result = $stmt->get_result();
-        $ingredients = $result->fetch_all(MYSQLI_ASSOC);
+        $quantita = 1; // Valore predefinito per una personalizzazione "vuota"
 
-        $stmt->close();
-        return $ingredients;
+        $stmt->bind_param("diii", $prezzo, $quantita, $idordine, $idprodotto);
+        $success = $stmt->execute();
+
+        if ($success) {
+            $lastId = $this->db->insert_id;
+            $stmt->close();
+            return $lastId; // restituisci l'id della personalizzazione creata
+        } else {
+            $stmt->close();
+            return false;
+        }
     }
 
-    /*quando dal carrello decidi di modificare hamburger del menu, crei una nuova istanza di personalizzazioni
-     */
-    public function createNewBurger($idprodotto, $idordine, $prezzo)
-    {
-        $query = "INSERT INTO personalizzazioni (prezzo ,quantita, idprodotto, idordine) VALUES (?, ?, ?, ?)";
-        $stmt = $this->db->prepare($query);
-        $quantita = 1;
-        $stmt->bind_param('iiii', $prezzo, $quantita, $idprodotto, $idordine);
-        $result = $stmt->get_result();
-        $product = $result->fetch_all(MYSQLI_ASSOC);
-        return $product;
-    }
 
     /* appena creata nuova istanza di personalizzazione del panino standard del menu, chiami questa fun che 
        ti crea la composizione del panino personalizzato, all'inizio ovviamente sarà uguale al panino standard
@@ -473,7 +469,7 @@ class DatabaseHelper
         return $panino;
     }
 
-public function getOrderDetails($idordine)
+    public function getOrderDetails($idordine)
     {
         $orderCustom = [];
         $orderStock = [];
@@ -490,7 +486,7 @@ public function getOrderDetails($idordine)
                         JOIN prodotti p ON pe.idprodotto = p.idprodotto
                         WHERE o.idordine = ?
                         ORDER BY pe.idpersonalizzazione";
-        
+
         $stmtCustom = $this->db->prepare($queryCustom);
         if ($stmtCustom) {
             $stmtCustom->bind_param('i', $idordine);
@@ -511,7 +507,7 @@ public function getOrderDetails($idordine)
                        JOIN prodotti p ON cp.idprodotto = p.idprodotto
                        WHERE o.idordine = ?
                        ORDER BY p.idcategoria";
-        
+
         $stmtStock = $this->db->prepare($queryStock);
         if ($stmtStock) {
             $stmtStock->bind_param('i', $idordine);
@@ -556,4 +552,5 @@ public function getOrderDetails($idordine)
             'orderStock' => $orderStock,
             'totalPrice' => $totalPrice
         ];
-    }}
+    }
+}
