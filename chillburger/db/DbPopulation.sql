@@ -164,20 +164,11 @@ INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VAL
 INSERT INTO chillburgerdb.personalizzazioni (idordine, idprodotto, quantita) VALUES
 (4, (SELECT idprodotto FROM prodotti WHERE nome = 'Chicken Deluxe'), 1);
 
-INSERT INTO chillburgerdb.modifiche_ingredienti (idpersonalizzazione, idingrediente, azione) VALUES
-(1, (SELECT idingrediente FROM ingredienti WHERE nome = 'bacon'), 'aggiunto'),
-(1, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 'rimosso'),
-(1, (SELECT idingrediente FROM ingredienti WHERE nome = 'salsa barbecue'), 'aggiunto');
 
 INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
 (5, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 1);
 INSERT INTO chillburgerdb.personalizzazioni (idordine, idprodotto, quantita) VALUES
 (5, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 1);
-
-INSERT INTO chillburgerdb.modifiche_ingredienti (idpersonalizzazione, idingrediente,azione) VALUES
-(2, (SELECT idingrediente FROM ingredienti WHERE nome = 'cheddar'), 'aggiunto'),
-(2, (SELECT idingrediente FROM ingredienti WHERE nome = 'Cipolla caramellata'), 'aggiunto');
-
 
 INSERT INTO chillburgerdb.recensioni (idordine, titolo, voto, commento, timestamp_recensione) VALUES
 (1, 'Delizioso e Veloce!', 5, 'Il Bacon Cheeseburger era fantastico come sempre e la consegna è stata super rapida!', '2025-05-10 13:30:00'),
