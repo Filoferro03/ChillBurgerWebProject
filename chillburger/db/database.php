@@ -680,4 +680,16 @@ class DatabaseHelper
 
         return $success;
     }
+
+    public function getAllCategories()
+    {
+        $query = " SELECT * FROM Categorie";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $categories = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $categories;
+    }
 }
