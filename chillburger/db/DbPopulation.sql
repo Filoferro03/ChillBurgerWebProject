@@ -37,7 +37,6 @@ INSERT INTO chillburgerdb.ingredienti (nome, sovrapprezzo, giacenza, image) VALU
 
 -- Insert Categorie
 INSERT INTO chillburgerdb.categorie (descrizione) VALUES
-('Antipasti'),
 ('Panini'),
 ('Fritti'),
 ('Bevande'),
@@ -56,20 +55,16 @@ INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, im
 ('Patatine Fritte', 3.50, 50, 2, 'patatine-fritte.png'),
 ('Alette di Pollo BBQ', 6.00, 25, 2, 'alette-pollo-bbq.png'),
 
--- Categoria: antipasti (idcategoria = 3)
-('Bruschette Miste', 5.00, 20, 3, 'bruschette-miste.png'),
-('Mozzarelline Fritte', 5.50, 25, 3, 'mozzarelline-fritte.png'),
+-- Categoria: bevande (idcategoria = 3)
+('Coca Cola', 3.00, 100, 3, 'coca-cola.png'),
+('Fanta', 3.00, 100, 3, 'fanta.png'),
+('Acqua Naturale', 1.50, 150, 3, 'acqua-naturale.png'),
+('Acqua Frizzante', 1.50, 150, 3, 'acqua-frizzante.png'),
+('Birra Artigianale Bionda', 5.00, 50, 3, 'birra-bionda.png'),
 
--- Categoria: bevande (idcategoria = 4)
-('Coca Cola', 3.00, 100, 4, 'coca-cola.png'),
-('Fanta', 3.00, 100, 4, 'fanta.png'),
-('Acqua Naturale', 1.50, 150, 4, 'acqua-naturale.png'),
-('Acqua Frizzante', 1.50, 150, 4, 'acqua-frizzante.png'),
-('Birra Artigianale Bionda', 5.00, 50, 4, 'birra-bionda.png'),
-
--- Categoria: dolci (idcategoria = 5)
-('Tiramisù', 5.00, 15, 5, 'tiramisu.png'),
-('Cheesecake ai Frutti di Bosco', 5.50, 15, 5, 'cheesecake-frutti-di-bosco.png');
+-- Categoria: dolci (idcategoria = 4)
+('Tiramisù', 5.00, 15, 4, 'tiramisu.png'),
+('Cheesecake ai Frutti di Bosco', 5.50, 15, 4, 'cheesecake-frutti-di-bosco.png');
 
 -- Insert Composizioni
 -- Composizione del Bacon Cheeseburger (idprodotto = 1)
