@@ -20,6 +20,11 @@ function isUserLoggedIn()
     return !empty($_SESSION['username']);
 }
 
+function isUserClient()
+{
+    return $_SESSION["tipo"] === "cliente";
+}
+
 function logout()
 {
     session_unset();

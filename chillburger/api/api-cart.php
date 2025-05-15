@@ -7,9 +7,9 @@ if (isset($_POST["action"]) && $_POST["action"] == "getProducts") {
         $products[$i]["image"] = RESOURCES_DIR . "products/" . $products[$i]["image"];
     }
     $result = $products;
-} else if ($_POST["action"] == "addProducts") {
+} else if (isset($_POST["action"]) && $_POST["action"] == "addProducts") {
     //add a product to the cart
-} else if ($_POST["action"] == "removeProd") {
+} else if (isset($_POST["action"]) && $_POST["action"] == "removeProd") {
     //removed a product from the cart
 } else if (isset($_POST['action']) && $_POST['action'] === 'createCart') {
     if (isset($_SESSION["idutente"])) {

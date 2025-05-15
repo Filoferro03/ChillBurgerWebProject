@@ -8,16 +8,19 @@ async function fetchData(url, formData) {
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
+        console.log("tutto ok");
         return await response.json();
     } catch (error) {
         console.log(error.message);
+        console.log("sbagliato");
+
     }
 }
 
 async function getProductsInCart() {
-    const url = 'api/api-cart.php';
+    const url = "api/api-cart.php";
     const formData = new FormData();
-    formData.append('action', 'getProducts');
+    formData.append("action", "getProducts");
 
     const products = await fetchData(url, formData);
     console.log(products);
@@ -45,14 +48,15 @@ async function getProductsInCart() {
                                     <p class="fs-3">${product.prezzo}€</p>
                                 </div>
                             </div>
-                            <div class="d-flex flex-column">
-                                <p>Ingredienti Panino</p>
-                                <div>
-                                    <a href="./edit-burger.php?id=${product.idprodotto}">
-                                        <button class="btn bg-white w-10">Modifica</button>
-                                    </a>
-                                </div>
-                            </div>
+                            ${product.idcategoria == 1 ? `
+                                <div class="d-flex flex-column">
+                                    <p>Ingredienti Panino</p>
+                                    <div>
+                                        <a href="./edit-burger.php?id=${product.idprodotto}">
+                                            <button class="btn bg-white w-10">Modifica</button>
+                                        </a>
+                                    </div>
+                                </div>` : ""}
                         </div>
                         <div class="d-flex justify-content-end pb-3">
                             <button class="btn btn-danger" data-id="${product.idprodotto}">Rimuovi</button>
@@ -93,7 +97,7 @@ async function getProductsInCart() {
 
 
 async function init() {
-    getProductsInCart();
+    await getProductsInCart();
     
     
 }
