@@ -98,7 +98,7 @@ CREATE TABLE modifiche_stato (
 CREATE TABLE modifiche_ingredienti (
      idpersonalizzazione INT NOT NULL,
      idingrediente INT NOT NULL,
-     quantita INT NOT NULL,
+     azione ENUM('rimosso','aggiunto') NOT NULL,
      PRIMARY KEY (idpersonalizzazione, idingrediente, quantita)
 );
 
