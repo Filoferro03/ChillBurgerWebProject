@@ -83,7 +83,7 @@ CREATE TABLE composizioni (
      idprodotto INT NOT NULL,
      idingrediente INT NOT NULL,
      quantita INT NOT NULL,
-     essenziale BOOLEAN DEFAULT TRUE,
+     essenziale BOOLEAN DEFAULT FALSE,
      PRIMARY KEY (idprodotto, idingrediente)
 );
 
@@ -98,8 +98,8 @@ CREATE TABLE modifiche_stato (
 CREATE TABLE modifiche_ingredienti (
      idpersonalizzazione INT NOT NULL,
      idingrediente INT NOT NULL,
-     quantita INT NOT NULL,
-     PRIMARY KEY (idpersonalizzazione, idingrediente, quantita)
+     azione ENUM ('rimosso', 'aggiunto') NOT NULL,
+     PRIMARY KEY (idpersonalizzazione, idingrediente)
 );
 
 CREATE TABLE recensioni (
