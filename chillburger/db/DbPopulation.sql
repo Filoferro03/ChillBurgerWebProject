@@ -110,11 +110,17 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita) VAL
 (4, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1);
 
 -- Composizione Piadina Crudo e Squacquerone
-INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita) VALUES
-((SELECT idprodotto FROM prodotti WHERE nome = 'Piadina Crudo e Squacquerone'), (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1),
-((SELECT idprodotto FROM prodotti WHERE nome = 'Piadina Crudo e Squacquerone'), (SELECT idingrediente FROM ingredienti WHERE nome = 'squaquerone'), 1),
-((SELECT idprodotto FROM prodotti WHERE nome = 'Piadina Crudo e Squacquerone'), (SELECT idingrediente FROM ingredienti WHERE nome = 'pancetta'), 2);
+-- Recupera l'ID del prodotto 'Piadina Crudo e Squacquerone'
+SET @id_piadina_crudo_squacquerone = (SELECT idprodotto FROM prodotti WHERE nome = 'Piadina Crudo e Squacquerone');
+SET @id_ingrediente_pane = (SELECT idingrediente FROM ingredienti WHERE nome = 'pane');
+SET @id_ingrediente_squaquerone = (SELECT idingrediente FROM ingredienti WHERE nome = 'squaquerone');
+SET @id_ingrediente_pancetta = (SELECT idingrediente FROM ingredienti WHERE nome = 'pancetta');
 
+-- Composizione Piadina Crudo e Squacquerone usando le variabili
+INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita) VALUES
+(@id_piadina_crudo_squacquerone, @id_ingrediente_pane, 1),
+(@id_piadina_crudo_squacquerone, @id_ingrediente_squaquerone, 1),
+(@id_piadina_crudo_squacquerone, @id_ingrediente_pancetta, 2);
 -- Insert Stati Ordine
 INSERT INTO chillburgerdb.stati_ordine (descrizione) VALUES
 ('In attesa'),

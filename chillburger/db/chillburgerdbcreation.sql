@@ -49,6 +49,7 @@ CREATE TABLE ordini (
      idordine INT AUTO_INCREMENT NOT NULL,
      idutente INT NOT NULL,
      timestamp_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+     completato BOOLEAN DEFAULT FALSE,
      PRIMARY KEY (idordine)
 );
 
@@ -82,6 +83,7 @@ CREATE TABLE composizioni (
      idprodotto INT NOT NULL,
      idingrediente INT NOT NULL,
      quantita INT NOT NULL,
+     essenziale BOOLEAN DEFAULT TRUE,
      PRIMARY KEY (idprodotto, idingrediente)
 );
 
@@ -254,13 +256,7 @@ CREATE INDEX idx_recensioni_timestamp ON recensioni (timestamp_recensione);
 
 DELIMITER //
 
-CREATE TRIGGER trg_after_order_insert_ts
-AFTER INSERT ON ordini
-FOR EACH ROW
-BEGIN
-    INSERT INTO modifiche_stato (idordine, idstato) -- timestamp_modifica userà DEFAULT CURRENT_TIMESTAMP
-    VALUES (NEW.idordine, 1); -- Assumendo idstato = 1 sia 'in attesa'
-END; //
+
 
 CREATE TRIGGER trg_before_personalizzazione_insert_set_base_price
 BEFORE INSERT ON personalizzazioni
@@ -324,5 +320,139 @@ BEGIN
     SET prezzo = product_base_price + ingredients_surcharge_sum
     WHERE idpersonalizzazione = current_personalizzazione_id;
 END; //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER trg_after_order_update_set_completed_status
+AFTER UPDATE ON ordini
+FOR EACH ROW
+BEGIN
+    IF NEW.completato = TRUE AND OLD.completato = FALSE THEN
+        INSERT INTO modifiche_stato (idordine, idstato) -- timestamp_modifica userà DEFAULT CURRENT_TIMESTAMP
+        VALUES (NEW.idordine, 1); -- Cambia '3' se l'ID per 'Completato' è diverso
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Stored Procedure per aggiornare la disponibilità di un prodotto
+DELIMITER //
+
+CREATE PROCEDURE SP_UpdateProductAvailability(IN p_idprodotto INT)
+BEGIN
+    DECLARE calculated_availability INT;
+    DECLARE is_composite BOOLEAN DEFAULT FALSE;
+
+    -- Verifica se il prodotto è effettivamente composto da ingredienti
+    SELECT COUNT(*) > 0 INTO is_composite
+    FROM composizioni
+    WHERE idprodotto = p_idprodotto;
+
+    IF is_composite THEN
+        -- Calcola la disponibilità basata sul minimo producibile con gli ingredienti attuali.
+        -- Se un ingrediente ha una quantità richiesta (c.quantita) pari a 0, viene ignorato
+        -- per prevenire divisioni per zero. Se tutti gli ingredienti hanno c.quantita = 0
+        -- o se non ci sono ingredienti validi, calculated_availability sarà NULL.
+        SELECT MIN(FLOOR(i.giacenza / c.quantita))
+        INTO calculated_availability
+        FROM composizioni c
+        JOIN ingredienti i ON c.idingrediente = i.idingrediente
+        WHERE c.idprodotto = p_idprodotto AND c.quantita > 0;
+
+        -- Aggiorna la disponibilità del prodotto.
+        -- Se calculated_availability è NULL (es. nessun ingrediente valido per il calcolo),
+        -- la disponibilità viene impostata a 0.
+        UPDATE prodotti
+        SET disponibilita = COALESCE(calculated_availability, 0)
+        WHERE idprodotto = p_idprodotto;
+    -- ELSE
+        -- Se il prodotto non è (o non è più) definito in 'composizioni',
+        -- la sua disponibilità non viene gestita da questa logica.
+        -- Si potrebbe voler impostare la disponibilità a 0 o un valore di default
+        -- per i prodotti che erano compositi ma ora non lo sono più.
+        -- Ad esempio:
+        -- UPDATE prodotti SET disponibilita = 0 WHERE idprodotto = p_idprodotto;
+        -- Per ora, se il prodotto non è composito, la sua disponibilità non viene alterata da questa procedura.
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Trigger sulla tabella `ingredienti` per aggiornare la disponibilità dei prodotti
+DELIMITER //
+
+CREATE TRIGGER trg_after_ingredient_update_manage_availability
+AFTER UPDATE ON ingredienti
+FOR EACH ROW
+BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE current_idprodotto INT;
+    -- Cursore per selezionare tutti i prodotti che contengono l'ingrediente la cui giacenza è stata modificata
+    DECLARE cur_affected_products CURSOR FOR
+        SELECT DISTINCT c.idprodotto
+        FROM composizioni c
+        WHERE c.idingrediente = NEW.idingrediente;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- Se la giacenza dell'ingrediente è effettivamente cambiata
+    IF OLD.giacenza <> NEW.giacenza THEN
+        OPEN cur_affected_products;
+        product_loop: LOOP
+            FETCH cur_affected_products INTO current_idprodotto;
+            IF done THEN
+                LEAVE product_loop;
+            END IF;
+            -- Chiama la stored procedure per aggiornare la disponibilità del prodotto specifico
+            CALL SP_UpdateProductAvailability(current_idprodotto);
+        END LOOP product_loop;
+        CLOSE cur_affected_products;
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Trigger sulla tabella `composizioni` dopo l'inserimento di una nuova composizione
+DELIMITER //
+
+CREATE TRIGGER trg_after_composition_insert_manage_availability
+AFTER INSERT ON composizioni
+FOR EACH ROW
+BEGIN
+    CALL SP_UpdateProductAvailability(NEW.idprodotto);
+END //
+
+DELIMITER ;
+
+-- Trigger sulla tabella `composizioni` dopo l'aggiornamento di una composizione
+DELIMITER //
+
+CREATE TRIGGER trg_after_composition_update_manage_availability
+AFTER UPDATE ON composizioni
+FOR EACH ROW
+BEGIN
+    -- Se l'idprodotto della composizione è cambiato (scenario meno comune dato che è parte della PK)
+    -- Questo gestisce il caso in cui la chiave primaria stessa venga aggiornata, il che di solito
+    -- è un DELETE seguito da un INSERT, ma per completezza lo includiamo.
+    IF OLD.idprodotto <> NEW.idprodotto THEN
+        CALL SP_UpdateProductAvailability(OLD.idprodotto);
+    END IF;
+    -- Aggiorna sempre la disponibilità per il prodotto coinvolto nella riga aggiornata
+    -- (NEW.idprodotto), che sia per cambio di quantità o di ingrediente.
+    CALL SP_UpdateProductAvailability(NEW.idprodotto);
+END //
+
+DELIMITER ;
+
+-- Trigger sulla tabella `composizioni` dopo la cancellazione di una composizione
+DELIMITER //
+
+CREATE TRIGGER trg_after_composition_delete_manage_availability
+AFTER DELETE ON composizioni
+FOR EACH ROW
+BEGIN
+    CALL SP_UpdateProductAvailability(OLD.idprodotto);
+END //
 
 DELIMITER ;
