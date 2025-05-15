@@ -529,8 +529,6 @@ class DatabaseHelper
                 // Assicurati che gli indici esistano
                 if (isset($item['idpersonalizzazione'], $item['prezzo'], $item['quantita'])) {
                     if (!in_array($item['idpersonalizzazione'], $processed_personalizations)) {
-                        // $item['prezzo'] è il prezzo della singola personalizzazione (calcolato dai trigger DB)
-                        // $item['quantita'] è la quantità di QUEL prodotto personalizzato ordinata
                         $totalPrice += floatval($item['prezzo']) * intval($item['quantita']);
                         $processed_personalizations[] = $item['idpersonalizzazione'];
                     }
@@ -552,5 +550,9 @@ class DatabaseHelper
             'orderStock' => $orderStock,
             'totalPrice' => $totalPrice
         ];
+    }
+
+    public function updateStatusToConfirmed($idutente) {
+
     }
 }
