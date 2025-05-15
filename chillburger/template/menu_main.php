@@ -58,6 +58,7 @@
 
         foreach ($prodotti as $p): ?>
             <div class="col-6 col-md-4 col-lg-3 menu-item" data-category="<?= $p['cat']; ?>">
+                <!-- TODO -->
                 <div class="card h-100 text-center shadow-sm hover-up">
                     <img src="<?= $p['img']; ?>" class="card-img-top" alt="<?= $p['nome']; ?>">
                     <div class="card-body">
