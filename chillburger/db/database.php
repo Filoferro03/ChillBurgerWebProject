@@ -669,4 +669,15 @@ class DatabaseHelper
         $stmt->close();
         return $products;
     }
+
+    public function removeProductFromCart($idprodotto, $idordine)
+    {
+        $query = "DELETE FROM carrelli_prodotti WHERE idprodotto = ? AND idordine = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("ii", $idprodotto, $idordine);
+        $success = $stmt->execute();
+        $stmt->close();
+
+        return $success;
+    }
 }

@@ -85,7 +85,7 @@ async function getProductsInCart() {
                 </div>
 
                 <div class="d-flex flex-column align-items-center mt-5">
-                    <button class="btn btn-lg bg-white">Paga</button>
+                    <button class="btn btn-lg bg-white">Vai al Checkout</button>
                 </div>
             </div>
             `;
@@ -98,7 +98,17 @@ async function getProductsInCart() {
 
 async function init() {
     await getProductsInCart();
-    
+    document.querySelectorAll('.btn-danger').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const url = 'api/api-cart.php';
+            const formData = new FormData();
+            formData.append('action', 'removeProd');
+            formData.append('idprodotto', btn.getAttribute("data-id"));
+            fetchData(url, formData);
+            init();
+            window.location.reload();
+        });
+    });
     
 }
 

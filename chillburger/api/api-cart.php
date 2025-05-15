@@ -10,7 +10,7 @@ if (isset($_POST["action"]) && $_POST["action"] == "getProducts") {
 } else if (isset($_POST["action"]) && $_POST["action"] == "addProducts") {
     //add a product to the cart
 } else if (isset($_POST["action"]) && $_POST["action"] == "removeProd") {
-    //removed a product from the cart
+    $dbh->removeProductFromCart($_POST["idprodotto"], $_SESSION["idordine"]);
 } else if (isset($_POST['action']) && $_POST['action'] === 'createCart') {
     if (isset($_SESSION["idutente"])) {
         if ($dbh->hasUncompletedOrder($_SESSION["idutente"])) {
