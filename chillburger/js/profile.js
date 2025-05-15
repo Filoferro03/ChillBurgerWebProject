@@ -148,8 +148,8 @@ async function logout() {
 async function updateOrderStatus(idOrdine) {
     const url = "api/api-orders.php";
     const formData = new FormData();
-    formData.append('idordine', idOrdine);
     formData.append('action', 'confirm');
+    formData.append('idordine', idOrdine);
     const json = await fetchData(url, formData); 
 
     if (json && json.success) {
@@ -158,8 +158,6 @@ async function updateOrderStatus(idOrdine) {
     } else {
         console.error("Aggiornamento stato ordine fallito");
     }
-
-    console.log("ID ordine:", idOrdine);
 }
 
 

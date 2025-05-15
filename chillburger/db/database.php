@@ -552,7 +552,28 @@ class DatabaseHelper
         ];
     }
 
-    public function updateStatusToConfirmed($idutente) {
+    public function updateStatusToConfirmed($orderId) { 
 
+        $insertQuery = "INSERT INTO modifiche_stato (idordine, idstato)
+                    VALUES (?, (SELECT idstato FROM stati_ordine WHERE descrizione = 'Confermato'))";
+        $stmt = $this->db->prepare($insertQuery);
+
+        if (!$stmt) {
+            error_log("Errore preparazione statement (insertQuery) in updateStatusToConfirmed per ordine ID $orderId: " . $this->db->error);
+            return false;
+        }
+
+        $stmt->bind_param('i', $orderId);
+
+        if (!$stmt->execute()) {
+            error_log("Errore esecuzione statement (insertQuery) in updateStatusToConfirmed per ordine ID $orderId: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+
+        $affectedRows = $stmt->affected_rows;
+        $stmt->close();
+
+        return $affectedRows > 0;
     }
 }
