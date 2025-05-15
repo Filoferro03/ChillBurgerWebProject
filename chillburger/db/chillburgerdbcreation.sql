@@ -99,7 +99,7 @@ CREATE TABLE modifiche_ingredienti (
      idpersonalizzazione INT NOT NULL,
      idingrediente INT NOT NULL,
      azione ENUM('rimosso','aggiunto') NOT NULL,
-     PRIMARY KEY (idpersonalizzazione, idingrediente, quantita)
+     PRIMARY KEY (idpersonalizzazione, idingrediente, azione)
 );
 
 CREATE TABLE recensioni (
