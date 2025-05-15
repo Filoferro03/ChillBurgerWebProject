@@ -152,35 +152,6 @@ function displayOrderDetails(data) {
     return result;
 }
 
-// Assicurati che la funzione fetchData e loadOrderDetails siano definite come discusso precedentemente.
-// Esempio di come `loadOrderDetails` dovrebbe essere (come da suggerimento precedente):
-
-async function fetchData(url, formData) { // formData è opzionale se non è una POST con body
-    try {
-        const options = formData ? { method: "POST", body: formData } : { method: "GET" };
-        const response = await fetch(url, options);
-        if (!response.ok) {
-            // Prova a leggere un messaggio di errore JSON dal corpo della risposta, se presente
-            let errorMsg = `Response status: ${response.status}`;
-            try {
-                const errorData = await response.json();
-                if (errorData && errorData.error) {
-                    errorMsg = errorData.error;
-                }
-            } catch (e) {
-                // Nessun corpo JSON o non è JSON, usa il messaggio di stato
-            }
-            throw new Error(errorMsg);
-        }
-        return await response.json();
-    } catch (error) {
-        console.error("Errore fetchData:", error.message); // Logga l'errore
-        // Restituisci un oggetto che simula una risposta fallita dall'API per una gestione più semplice
-        return { success: false, error: error.message, data: null };
-    }
-}
-
-
 async function loadOrderDetails() {
     const orderDetailsContainer = document.getElementById('orderDetailsContainer');
     if (!orderDetailsContainer) {

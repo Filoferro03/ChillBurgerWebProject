@@ -529,8 +529,6 @@ class DatabaseHelper
                 // Assicurati che gli indici esistano
                 if (isset($item['idpersonalizzazione'], $item['prezzo'], $item['quantita'])) {
                     if (!in_array($item['idpersonalizzazione'], $processed_personalizations)) {
-                        // $item['prezzo'] è il prezzo della singola personalizzazione (calcolato dai trigger DB)
-                        // $item['quantita'] è la quantità di QUEL prodotto personalizzato ordinata
                         $totalPrice += floatval($item['prezzo']) * intval($item['quantita']);
                         $processed_personalizations[] = $item['idpersonalizzazione'];
                     }
@@ -552,6 +550,32 @@ class DatabaseHelper
             'orderStock' => $orderStock,
             'totalPrice' => $totalPrice
         ];
+    }
+
+    public function updateStatusToConfirmed($orderId)
+    {
+
+        $insertQuery = "INSERT INTO modifiche_stato (idordine, idstato)
+                    VALUES (?, (SELECT idstato FROM stati_ordine WHERE descrizione = 'Confermato'))";
+        $stmt = $this->db->prepare($insertQuery);
+
+        if (!$stmt) {
+            error_log("Errore preparazione statement (insertQuery) in updateStatusToConfirmed per ordine ID $orderId: " . $this->db->error);
+            return false;
+        }
+
+        $stmt->bind_param('i', $orderId);
+
+        if (!$stmt->execute()) {
+            error_log("Errore esecuzione statement (insertQuery) in updateStatusToConfirmed per ordine ID $orderId: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+
+        $affectedRows = $stmt->affected_rows;
+        $stmt->close();
+
+        return $affectedRows > 0;
     }
 
     public function hasUncompletedOrder($idutente)

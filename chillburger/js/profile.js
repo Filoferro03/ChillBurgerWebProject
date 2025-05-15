@@ -1,3 +1,5 @@
+let currentOrderIdToConfirm = null;
+
 async function fetchData(url, formData) {
     try {
         const response = await fetch(url, { method: "POST", body: formData });
@@ -51,8 +53,13 @@ function generateOrdersHTML(orders) {
                     <small>${formatDateFromTimestamp(order.timestamp_ordine)} - ${formatTimeFromTimestamp(order.timestamp_ordine)}</small><br>
                 </div>
                 <p><strong>Stato:</strong><br> ${order.stato}<p>
-                <a href="order-view.php?idordine=${order.idordine}" class="order-button btn">Dettagli Ordine</a>
-            </div>`;
+                <a href="order-view.php?idordine=${order.idordine}" class="order-button btn">Dettagli Ordine</a>`;
+            if (order.stato == "Consegnato") {
+                result += `
+                    <button type="button" id="${order.idordine}" class="btn order-button" data-bs-toggle="modal" data-bs-target="#stateModal">Conferma Consegna</button>
+                `;
+            }
+            result += '</div>';
     });
     return result;
 }
@@ -138,6 +145,21 @@ async function logout() {
     }
 }
 
+async function updateOrderStatus(idOrdine) {
+    const url = "api/api-orders.php";
+    const formData = new FormData();
+    formData.append('action', 'confirm');
+    formData.append('idordine', idOrdine);
+    const json = await fetchData(url, formData); 
+
+    if (json && json.success) {
+        console.log("Stato dell'ordine aggiornato con successo");
+        location.reload(); // Ricarica la pagina per riflettere le modifiche
+    } else {
+        console.error("Aggiornamento stato ordine fallito");
+    }
+}
+
 
 // --- Listener DOMContentLoaded (Chiama loadProfileData all'avvio) ---
 document.addEventListener('DOMContentLoaded', async function() {
@@ -148,5 +170,29 @@ document.addEventListener('DOMContentLoaded', async function() {
         logoutButton.addEventListener('click', logout);
     } else {
          console.warn("Bottone logout non trovato.");
+    }
+
+    const ordersListContainer = document.getElementById('orders-list');
+
+    if (ordersListContainer) {
+        ordersListContainer.addEventListener('click', function(event) {
+            const targetButton = event.target.closest('button[data-bs-toggle="modal"][data-bs-target="#stateModal"]');
+            if (targetButton) {
+                currentOrderIdToConfirm = targetButton.getAttribute('id');
+            }
+        });
+    }
+
+    // Gestione del click sul bottone di conferma DENTRO il modale #stateModal
+    const confirmStateButton = document.getElementById('confirm-state-button');
+    if (confirmStateButton) {
+        confirmStateButton.addEventListener('click', () => {
+            if (currentOrderIdToConfirm) {
+                updateOrderStatus(currentOrderIdToConfirm);
+                currentOrderIdToConfirm = null; // Resetta l'ID dopo l'uso
+            } else {
+                console.error("Nessun ID ordine da confermare trovato.");
+            }
+        });
     }
 });

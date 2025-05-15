@@ -11,7 +11,7 @@
         <p class="list-group-item mb-3"><strong>Username:</strong> <span id="profile-username">Caricamento...</span></p>
         </div>
 
-        <button type="button" id="logout-button" class="btn btn-danger m-auto" data-bs-toggle="modal" data-bs-target="#confirmationModal">Logout</button>
+        <button type="button" id="logout-button" class="btn btn-danger m-auto" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button>
     </div>
 
     <div id="order-history-area" class="card w-50 m-auto mt-4 p-3">
@@ -25,7 +25,7 @@
     </div>
 
     <!-- Modal -->
-<div class="modal overlay" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel">
+<div class="modal overlay" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content w-75 mx-auto">
       <div class="modal-header">
@@ -41,4 +41,22 @@
     </div>
   </div>
 </div>
+
+<div class="modal overlay" id="stateModal" tabindex="-1" aria-labelledby="stateModalLabel">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content w-75 mx-auto">
+      <div class="modal-header">
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Confermi di aver ricevuto l'ordine correttamente?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+        <button type="button" class="btn order-button" data-bs-dismiss="modal" id="confirm-state-button">Conferma</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </section>

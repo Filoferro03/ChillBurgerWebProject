@@ -2,33 +2,24 @@
 
 require_once '../bootstrap.php'; // Assicurati che il percorso sia corretto
 
-error_log("api-orders.php Dati POST: " . print_r($_POST, true));
-error_log("api-orders.php Dati GET: " . print_r($_GET, true));
 $response = [];
 
-// 1. Verifica se l'utente è loggato e recupera l'ID utente
 if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
     http_response_code(401); // Unauthorized
     $response = ['success' => false, 'error' => 'Utente non autenticato o sessione non valida'];
 } else {
     $idutente = $_SESSION['idutente'];
 
-    // 2. Controlla l'azione (se usi ancora l'approccio con 'action')
     if (isset($_POST['action']) && $_POST['action'] == 'getByUser') {
 
-        // 3. Ottieni il numero di pagina dalla richiesta POST (default a 1)
         $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
         if ($page < 1) {
             $page = 1;
         }
 
-        // 4. Recupera gli ordini paginati usando il nuovo metodo
-        // Il terzo argomento è il numero di ordini per pagina (es. 5)
         $paginatedData = $dbh->getUserOrdersByUserPaginated($idutente, $page);
 
-        // 5. Prepara la risposta
         $response['success'] = true;
-        // Includi tutti i dati restituiti dal metodo (orders, currentPage, totalPages)
         $response['data'] = $paginatedData;
 
     } else if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
@@ -39,6 +30,15 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
         $allOrders = $dbh->getOrderDetails($idOrdine);
         $response['success'] = true;
         $response['data'] = $allOrders;
+    } else if(isset($_POST['action']) && $_POST['action'] == 'confirm') {
+        $idordine = $_POST['idordine'];
+        $result = $dbh->updateStatusToConfirmed($idordine);
+        if(!$result){
+            http_response_code(500); // Internal Server Error
+            $response = ['success' => false, 'error' => 'Errore durante la conferma dell\'ordine'];
+        }else{
+            $response['success'] = true;
+        }
     } else {
         http_response_code(400); // Bad Request
         $response = ['success' => false, 'error' => 'Azione non specificata o non valida'];
