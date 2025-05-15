@@ -128,13 +128,13 @@ INSERT INTO chillburgerdb.utenti (nome, cognome, username, password, tipo) VALUE
 ('Marco', 'Gallo', 'marco.gallo', 'hashed_password7', 'cliente');
 
 -- Insert Ordini (timestamp_ordine è 'YYYY-MM-DD HH:MM:SS')
-INSERT INTO chillburgerdb.ordini (timestamp_ordine, idutente) VALUES
-('2024-05-10 12:30:00', (SELECT idutente FROM utenti WHERE username = 'mario.rossi')),
-('2024-05-10 19:00:00', (SELECT idutente FROM utenti WHERE username = 'anna.verdi')),
-('2024-05-11 13:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli')),
-('2024-05-11 20:00:00', (SELECT idutente FROM utenti WHERE username = 'laura.bruni')),
-('2024-05-12 19:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli')),
-('2024-05-12 12:00:00', (SELECT idutente FROM utenti WHERE username = 'mario.rossi'));
+INSERT INTO chillburgerdb.ordini (timestamp_ordine, idutente, completato) VALUES
+('2024-05-10 12:30:00', (SELECT idutente FROM utenti WHERE username = 'mario.rossi'), true),
+('2024-05-10 19:00:00', (SELECT idutente FROM utenti WHERE username = 'anna.verdi'), true),
+('2024-05-11 13:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), true),
+('2024-05-11 20:00:00', (SELECT idutente FROM utenti WHERE username = 'laura.bruni'), true),
+('2024-05-12 19:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), true),
+('2024-05-12 12:00:00', (SELECT idutente FROM utenti WHERE username = 'mario.rossi'), true);
 
 -- Esempio di popolamento manuale di modifiche_stato
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (1, 2, '2024-05-10 12:35:00');
