@@ -553,4 +553,96 @@ class DatabaseHelper
             'totalPrice' => $totalPrice
         ];
     }
+
+    public function hasUncompletedOrder($idutente)
+    {
+        $query = "
+        SELECT idordine
+        FROM ordini
+        WHERE idutente = ? AND completato = FALSE
+        LIMIT 1
+    ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('i', $idutente);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $exists = $result->num_rows > 0;
+
+        $stmt->close();
+        return $exists;
+    }
+
+    public function createEmptyOrder($idutente)
+    {
+        $query = "
+        INSERT INTO ordini (idutente, completato)
+        VALUES (?, FALSE)
+    ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('i', $idutente);
+        $success = $stmt->execute();
+
+        if ($success) {
+            $newOrderId = $this->db->insert_id;
+            $stmt->close();
+            return $newOrderId;
+        } else {
+            $stmt->close();
+            return false;
+        }
+    }
+
+    public function getUncompletedOrder($idutente)
+    {
+        $query = "
+        SELECT *
+        FROM ordini
+        WHERE idutente = ? AND completato = FALSE
+        LIMIT 1
+    ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param('i', $idutente);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $orders = $result->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
+
+        if (!empty($orders)) {
+            return $orders[0]; // Restituisce il primo ordine non completato
+        } else {
+            return null; // Nessun ordine trovato
+        }
+    }
+
+    public function getProductsInCart($idordine)
+    {
+        $query = "
+        SELECT 
+            cp.idprodotto,
+            cp.idordine,
+            cp.quantita,
+            p.idcategoria,
+            p.nome,
+            p.prezzo,
+            p.image
+        FROM carrelli_prodotti cp
+        JOIN prodotti p ON cp.idprodotto = p.idprodotto
+        WHERE cp.idordine = ?
+    ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $idordine);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $products = $result->fetch_all(MYSQLI_ASSOC);
+
+        $stmt->close();
+        return $products;
+    }
 }

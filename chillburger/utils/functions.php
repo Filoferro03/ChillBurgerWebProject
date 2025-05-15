@@ -10,6 +10,11 @@ function registerLogin($user)
     $_SESSION["idutente"] = $user["idutente"];
 }
 
+function setUserCart($idordine)
+{
+    $_SESSION["idordine"] = $idordine;
+}
+
 function isUserLoggedIn()
 {
     return !empty($_SESSION['username']);
@@ -17,10 +22,5 @@ function isUserLoggedIn()
 
 function logout()
 {
-    unset($_SESSION["username"]);
-    unset($_SESSION["tipo"]);
-    unset($_SESSION["nome"]);
-    unset($_SESSION["cognome"]);
+    session_unset();
 }
-
-?>
