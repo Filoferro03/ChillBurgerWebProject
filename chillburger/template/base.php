@@ -28,7 +28,6 @@
                 </button>
                 <div class="d-flex align-items-center">
                     <a class="navbar-brand me-2 d-flex" href="index.php">
-                        <img src="./resources/ChillBurgerLogoMobile.png" alt="ChillBurger Logo" class="logo me-2" />
                         <h1 class="chill-burger-title m-0">ChillBurger</h1>
                     </a>
 
@@ -42,6 +41,9 @@
                         </a>
                         <a href="notifications.php" class="text-decoration-none mx-4">
                             <i class="fa-regular fa-bell text-black fs-2"></i>
+                        </a>
+                        <a href="cart.php" class="text-decoration-none">
+                            <i class="fa-solid fa-cart-shopping text-black fs-2"></i>
                         </a>
                     <?php else: ?>
                         <!-- Mostra il link per il login se l'utente non è loggato -->

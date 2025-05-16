@@ -53,7 +53,7 @@ function generateOrdersHTML(orders) {
                     <small>${formatDateFromTimestamp(order.timestamp_ordine)} - ${formatTimeFromTimestamp(order.timestamp_ordine)}</small><br>
                 </div>
                 <p><strong>Stato:</strong><br> ${order.stato}<p>
-                <a href="order-view.php?idordine=${order.idordine}" class="order-button btn">Dettagli Ordine</a>`;
+                <a href="order-view.php?idordine=${order.idordine}" class="order-button btn">Dettagli</a>`;
             if (order.stato == "Consegnato") {
                 result += `
                     <button type="button" id="${order.idordine}" class="btn order-button" data-bs-toggle="modal" data-bs-target="#stateModal">Conferma Consegna</button>

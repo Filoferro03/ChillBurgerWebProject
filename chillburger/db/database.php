@@ -546,14 +546,13 @@ class DatabaseHelper
         }
 
         return [
-            'orderCustom' => $orderCustom, // L'array non raggruppato, per essere processato da JavaScript
+            'orderCustom' => $orderCustom,
             'orderStock' => $orderStock,
             'totalPrice' => $totalPrice
         ];
     }
 
     public function updateStatusToConfirmed($orderId) { 
-
         $insertQuery = "INSERT INTO modifiche_stato (idordine, idstato)
                     VALUES (?, (SELECT idstato FROM stati_ordine WHERE descrizione = 'Confermato'))";
         $stmt = $this->db->prepare($insertQuery);
