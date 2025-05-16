@@ -3,6 +3,8 @@
 require_once '../bootstrap.php'; // Assicurati che il percorso sia corretto
 
 $response = [];
+error_log("api-orders.php - Azione richiesta: " . $_POST['action']);
+
 
 if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
     http_response_code(401); // Unauthorized
@@ -30,6 +32,7 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
         $allOrders = $dbh->getOrderDetails($idOrdine);
         $response['success'] = true;
         $response['data'] = $allOrders;
+        
     } else if(isset($_POST['action']) && $_POST['action'] == 'confirm') {
         $idordine = $_POST['idordine'];
         $result = $dbh->updateStatusToConfirmed($idordine);

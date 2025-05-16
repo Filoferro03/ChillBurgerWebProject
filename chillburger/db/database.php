@@ -106,67 +106,78 @@ class DatabaseHelper
         return $userData; // Ritorna l'array associativo dei dati o null se l'utente non esiste
     }
 
-    /**
-     * Recupera una pagina specifica di ordini per un utente.
-     * @param int $idutente L'idutente dell'utente.
-     * @param int $page La pagina richiesta (inizia da 1).
-     * @param int $perPage Quanti ordini per pagina.
-     * @return array Ritorna un array con 'orders', 'currentPage', 'totalPages'.
-     */
-    public function getUserOrdersByUserPaginated($idutente, $page = 1, $perPage = 5) // Rinominato e parametri aggiunti
-    {
-        if ($page < 1) {
-            $page = 1;
-        }
-        $offset = ($page - 1) * $perPage;
 
-        // Query per contare il totale degli ordini dell'utente
-        $countQuery = "SELECT COUNT(*) AS totalOrders FROM ordini WHERE idutente = ?";
-        $countStmt = $this->db->prepare($countQuery);
-        if (!$countStmt) {
-            error_log("Errore preparazione count statement getUserOrdersByUserIdPaginated: " . $this->db->error);
-            return ['orders' => [], 'currentPage' => $page, 'totalPages' => 0];
-        }
-        $countStmt->bind_param('i', $idutente);
-        $countStmt->execute();
-        $countResult = $countStmt->get_result();
-        $totalOrders = $countResult->fetch_assoc()['totalOrders'];
-        $countResult->free();
-        $countStmt->close();
+public function getUserOrdersByUserPaginated($idutente, $page = 1, $perPage = 5)
+{
+    if ($page < 1) {
+        $page = 1;
+    }
+    $offset = ($page - 1) * $perPage;
 
+    $countQuery = "SELECT COUNT(*) AS totalOrders
+                   FROM ordini o
+                   WHERE o.idutente = ? AND o.completato = TRUE";
+
+    $countStmt = $this->db->prepare($countQuery);
+    if (!$countStmt) {
+        error_log("Errore preparazione count statement getUserOrdersByUserPaginated: " . $this->db->error);
+        return ['orders' => [], 'currentPage' => $page, 'totalPages' => 0];
+    }
+    $countStmt->bind_param('i', $idutente);
+    $countStmt->execute();
+    $countResult = $countStmt->get_result();
+    $totalOrdersRow = $countResult->fetch_assoc();
+    $totalOrders = $totalOrdersRow ? $totalOrdersRow['totalOrders'] : 0;
+    $countResult->free();
+    $countStmt->close();
+
+    $totalPages = 0;
+    if ($perPage > 0 && $totalOrders > 0) {
         $totalPages = ceil($totalOrders / $perPage);
+    } elseif ($totalOrders == 0) {
+        $totalPages = 1; 
+    }
 
-        // Query per recuperare gli ordini paginati
-        $query = "SELECT o.idordine, o.timestamp_ordine, so.descrizione AS stato 
-                  FROM ordini o, stati_ordine so, modifiche_stato ms
-                  WHERE idutente = ?
-                  AND o.idordine = ms.idordine
-                  AND ms.idstato = so.idstato
-                  AND ms.timestamp_modifica = (
-                      SELECT MAX(timestamp_modifica) FROM modifiche_stato ms2
-                      WHERE ms2.idordine = o.idordine
-                  )
-                  ORDER BY timestamp_ordine DESC
+
+    $orders = [];
+    if ($totalOrders > 0 && $page <= $totalPages) {
+        $query = "SELECT
+                    o.idordine,
+                    o.timestamp_ordine,
+                    COALESCE(so.descrizione, 'Non disponibile') AS stato
+                  FROM ordini o
+                  LEFT JOIN (
+                      modifiche_stato ms
+                      JOIN (
+                          SELECT idordine, MAX(timestamp_modifica) AS max_timestamp
+                          FROM modifiche_stato
+                          GROUP BY idordine
+                      ) ms_max ON ms.idordine = ms_max.idordine AND ms.timestamp_modifica = ms_max.max_timestamp
+                  ) ON o.idordine = ms.idordine
+                  LEFT JOIN stati_ordine so ON ms.idstato = so.idstato
+                  WHERE o.idutente = ? AND o.completato = TRUE
+                  ORDER BY o.timestamp_ordine DESC
                   LIMIT ? OFFSET ?";
+
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
-            error_log("Errore preparazione statement getUserOrdersByUserIdPaginated: " . $this->db->error);
-            return ['orders' => [], 'currentPage' => $page, 'totalPages' => $totalPages];
+            error_log("Errore preparazione statement getUserOrdersByUserPaginated: " . $this->db->error);
+            return ['orders' => [], 'currentPage' => $page, 'totalPages' => $totalPages, 'debug_error' => $this->db->error];
         }
-        // Nota: i tipi sono i, i, i (idutente, limit, offset)
         $stmt->bind_param('iii', $idutente, $perPage, $offset);
         $stmt->execute();
         $result = $stmt->get_result();
         $orders = $result->fetch_all(MYSQLI_ASSOC);
         $result->free();
         $stmt->close();
-
-        return [
-            'orders' => $orders ?: [],
-            'currentPage' => $page,
-            'totalPages' => $totalPages
-        ];
     }
+
+    return [
+        'orders' => $orders,
+        'currentPage' => (int)$page, // Assicura che sia un intero
+        'totalPages' => (int)$totalPages, // Assicura che sia un intero
+    ];
+}
 
     public function updateIngredientQuantity($id, $quantity)
     {
@@ -546,15 +557,13 @@ class DatabaseHelper
         }
 
         return [
-            'orderCustom' => $orderCustom, // L'array non raggruppato, per essere processato da JavaScript
+            'orderCustom' => $orderCustom,
             'orderStock' => $orderStock,
             'totalPrice' => $totalPrice
         ];
     }
 
-    public function updateStatusToConfirmed($orderId)
-    {
-
+    public function updateStatusToConfirmed($orderId) { 
         $insertQuery = "INSERT INTO modifiche_stato (idordine, idstato)
                     VALUES (?, (SELECT idstato FROM stati_ordine WHERE descrizione = 'Confermato'))";
         $stmt = $this->db->prepare($insertQuery);
