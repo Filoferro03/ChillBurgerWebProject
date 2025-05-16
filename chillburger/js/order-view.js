@@ -85,19 +85,10 @@ function displayOrderDetails(data) {
 
                     if (mod.action === 'aggiunto') {
                         prefix = '+ ';
-                        // Potresti voler rendere il testo più user-friendly, es:
-                        // actionText = 'Aggiunto'; 
                     } else if (mod.action === 'rimosso') {
                         prefix = '- ';
-                        // actionText = 'Rimosso';
                     }
-                    // Se ci fossero altre azioni, potresti aggiungere altri else if
-
-                    // Visualizza il prefisso, il nome dell'ingrediente e l'azione originale tra parentesi
-                    // Oppure solo prefisso e nome ingrediente se preferisci non ripetere l'azione
                     result += `<li>${prefix}${mod.ingredientName}</li>`;
-                    // Se vuoi anche il testo dell'azione (es. "+ Bacon (aggiunto)"):
-                    // result += `<li>${prefix}${mod.ingredientName} (${actionText})</li>`;
                 });
             } 
 
