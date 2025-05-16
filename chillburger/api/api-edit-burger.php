@@ -3,17 +3,36 @@ require("../bootstrap.php");
 
 $result = [];
 
-$ingredients = $dbh->getIngredientsByProduct(1);
-$product = $dbh->getProduct(1);
+if (isset($_POST["id"]) && isset($_POST["action"]) && $_POST["action"] === "getIngredients") {
+    $ingredients = $dbh->getIngredientsByProduct($_POST["id"]);
+    $product = $dbh->getProduct($_POST["id"]);
 
-for ($i = 0; $i < count($ingredients); $i++) {
-    $ingredients[$i]["image"] = RESOURCES_DIR . "ingredients/" . $ingredients[$i]["image"];
+    for ($i = 0; $i < count($ingredients); $i++) {
+        $ingredients[$i]["image"] = RESOURCES_DIR . "ingredients/" . $ingredients[$i]["image"];
+    }
+
+    if ($dbh->doesPersonalizationExist($_POST["id"], $_SESSION["idordine"])) {
+        $personalization = $dbh->getPersonalizationWithModifications($_POST["id"], $_SESSION["idordine"]);
+    } else {
+        $idpersonalization = $dbh->createPersonalization($_POST["id"], $_SESSION["idordine"]);
+        $personalization = $dbh->getPersonalizationWithModifications($_POST["id"], $_SESSION["idordine"]);
+    }
+
+    $result = [
+        "ingredients" => $ingredients,
+        "product" => $product,
+        "personalization" => $personalization,
+    ];
+} else if (isset($_POST["action"]) && $_POST["action"] === "modify" && isset($_POST["act"]) && isset($_POST["idpersonalizzazione"]) && isset($_POST["idingrediente"])) {
+    if ($dbh->ingredientModificationExists($_POST["idpersonalizzazione"], $_POST["idingrediente"])) {
+        $dbh->deleteIngredientModification($_POST["idpersonalizzazione"], $_POST["idingrediente"]);
+    }
+    $result = $dbh->addIngredientModification($_POST["idpersonalizzazione"], $_POST["idingrediente"], $_POST["act"]);
+} else if (isset($_POST["action"]) && $_POST["action"] === "deleteIngredient") {
+    $dbh->deleteIngredientModification($_POST["idpersonalizzazione"], $_POST["idingrediente"]);
 }
 
-$result = [
-    "ingredients" => $ingredients,
-    "product" => $product
-];
+
 
 // if (isset($_POST['action']) && $_POST['action'] == 'getingredients' && isset($_POST['idprodotto'])) {
 

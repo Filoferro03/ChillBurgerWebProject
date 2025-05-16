@@ -692,4 +692,87 @@ class DatabaseHelper
         $stmt->close();
         return $categories;
     }
+
+    public function doesPersonalizationExist($idprodotto, $idordine)
+    {
+        $query = "SELECT * FROM personalizzazioni WHERE idprodotto = ? AND idordine = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("ii", $idprodotto, $idordine);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->num_rows > 0;
+    }
+
+    public function doesModificationExist($idpersonalizzazione)
+    {
+        $query = "SELECT * FROM modifiche_ingredienti WHERE idpersonalizzazione = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $idpersonalizzazione);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->num_rows > 0;
+    }
+
+    public function getPersonalizationWithModifications($idprodotto, $idordine)
+    {
+        $query = "
+            SELECT p.*, m.idingrediente, m.azione
+            FROM personalizzazioni p
+            LEFT JOIN modifiche_ingredienti m ON p.idpersonalizzazione = m.idpersonalizzazione
+            WHERE p.idprodotto = ? AND p.idordine = ?
+        ";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("ii", $idprodotto, $idordine);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $data = [];
+        while ($row = $result->fetch_all(MYSQLI_ASSOC)) {
+            $data[] = $row;
+        }
+        return $data;
+    }
+
+    public function createPersonalization($idprodotto, $idordine, $quantita = 1)
+    {
+        $query = "INSERT INTO personalizzazioni (prezzo, quantita, idordine, idprodotto) VALUES (0, ?, ?, ?)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("iii", $quantita, $idordine, $idprodotto);
+        if ($stmt->execute()) {
+            return $this->db->insert_id; // Restituisce l'idpersonalizzazione appena inserito
+        } else {
+            return false; // Inserimento fallito
+        }
+    }
+
+    public function addIngredientModification($idpersonalizzazione, $idingrediente, $azione)
+    {
+        $query = "INSERT INTO modifiche_ingredienti (idpersonalizzazione, idingrediente, azione) VALUES (?, ?, ?)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("iis", $idpersonalizzazione, $idingrediente, $azione);
+        if ($stmt->execute()) {
+            return $this->db->insert_id; // Restituisce l'idpersonalizzazione appena inserito
+        } else {
+            return false; // Inserimento fallito
+        }
+    }
+
+    public function deleteIngredientModification($idpersonalizzazione, $idingrediente)
+    {
+        $query = "DELETE FROM modifiche_ingredienti WHERE idpersonalizzazione = ? AND idingrediente = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("ii", $idpersonalizzazione, $idingrediente);
+        return $stmt->execute(); // Restituisce true se l'eliminazione è avvenuta con successo
+    }
+
+    public function ingredientModificationExists($idpersonalizzazione, $idingrediente)
+    {
+        $query = "SELECT 1 FROM modifiche_ingredienti WHERE idpersonalizzazione = ? AND idingrediente = ? LIMIT 1";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("ii", $idpersonalizzazione, $idingrediente);
+        $stmt->execute();
+        $stmt->store_result();
+
+        return $stmt->num_rows > 0;
+    }
 }

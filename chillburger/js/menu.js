@@ -22,7 +22,7 @@ function generateProducts(products, categories) {
         const idcategoria = currentCategory["idcategoria"];
         const categoriaDescrizione = currentCategory["descrizione"];
 
-        let categorySection = `<div class="mb-4"><h2 class="mb-3 text-center">${categoriaDescrizione}</h2><div class="row">`;
+        let categorySection = `<div class="mb-4"><h2 class="m-3 text-center">${categoriaDescrizione}</h2><div class="row">`;
 
         for (let j = 0; j < products.length; j++) {
             if (products[j]["idcategoria"] !== idcategoria) continue;

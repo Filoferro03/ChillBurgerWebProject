@@ -53,7 +53,7 @@ async function getProductsInCart() {
                                     <p>Ingredienti Panino</p>
                                     <div>
                                         <a href="./edit-burger.php?id=${product.idprodotto}">
-                                            <button class="btn bg-white w-10">Modifica</button>
+                                            <button class="btn btn-success w-10" data-id="${product.idprodotto}">Modifica</button>
                                         </a>
                                     </div>
                                 </div>` : ""}
