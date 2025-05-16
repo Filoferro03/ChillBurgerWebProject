@@ -4,6 +4,7 @@ require("../bootstrap.php");
 $result = [];
 
 $products = $dbh->getAllProducts();
+$categories = $dbh->getAllCategories();
 
 
 for ($i = 0; $i < count($products); $i++) {
@@ -11,7 +12,8 @@ for ($i = 0; $i < count($products); $i++) {
 }
 
 $result = [
-    "products" => $products
+    "products" => $products,
+    "categories" => $categories
 ];
 
 header("Content-Type: application/json");

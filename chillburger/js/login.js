@@ -38,11 +38,22 @@ async function tryLogin(username, password) {
     console.log(json);
 
     if (json?.loginresult) {
+        console.log("qui arrivi");
+        getUserCart();
         window.location.reload();
     } else {
         updateMessage("login-message", json?.loginmsg || "Errore generico durante il login.", false);
     }
 }
+
+async function getUserCart(){
+    const url = 'api/api-cart.php';
+    const formData = new FormData();
+    formData.append('action','createCart');
+    const json = await fetchData(url,formData);
+    console.log(json);
+}
+
 
 async function tryRegistration(name, surname, username, password, confirmpassword) {
     const url = 'api/api-login.php';

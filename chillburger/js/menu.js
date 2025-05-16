@@ -14,37 +14,52 @@ async function fetchData(url, formData) {
 }
 
 
-function generateProducts(products, idcategoria) {
+function generateProducts(products, categories) {
     let result = "";
 
-    for (let i = 0; i < products.length; i++) {
-        if (products[i]["idcategoria"] !== idcategoria) continue;
+    for (let i = 0; i < categories.length; i++) {
+        const currentCategory = categories[i];
+        const idcategoria = currentCategory["idcategoria"];
+        const categoriaDescrizione = currentCategory["descrizione"];
 
-        const nome = products[i]["nome"] ?? "Nome mancante";
-        const imgSrc = products[i]["image"] ?? "./resources/menu/stock.jpg";
-        const prezzo = products[i]["prezzo"] ?? "Prezzo mancante";
-        const altText = nome;
-        const idProdotto = products[i]["idprodotto"];
+        let categorySection = `<div class="mb-4"><h2 class="mb-3 text-center">${categoriaDescrizione}</h2><div class="row">`;
 
-        // Se categoria = 1, wrappo immagine in <a> con ID
-        const imgTag = idcategoria === 1
-            ? `<a href="./burger-details.php?id=${idProdotto}">
-                   <img src="${imgSrc}" class="menu-img-responsive" alt="${altText}">
-               </a>`
-            : `<img src="${imgSrc}" class="menu-img-responsive" alt="${altText}">`;
+        for (let j = 0; j < products.length; j++) {
+            if (products[j]["idcategoria"] !== idcategoria) continue;
 
-        let product = `
-        <div class="col-12 col-md-4 mb-5 d-flex flex-column align-items-center h-auto">
-            ${imgTag}
-            <p>${nome}</p>
-            <p>${prezzo}€</p>
-        </div>`;
+            const nome = products[j]["nome"] ?? "Nome mancante";
+            const imgSrc = products[j]["image"] ?? "./resources/menu/stock.jpg";
+            const prezzo = products[j]["prezzo"] ?? "Prezzo mancante";
+            const altText = nome;
+            const idProdotto = products[j]["idprodotto"];
 
-        result += product;
+            const imgTag = idcategoria === 1
+                ? `<a href="./burger-details.php?id=${idProdotto}">
+                       <img src="${imgSrc}" class="card-img-top" alt="${altText}">
+                   </a>`
+                : `<img src="${imgSrc}" class="card-img-top" alt="${altText}">`;
+
+            categorySection += `
+            <div class="col-12 col-md-4 mb-5 d-flex flex-column menu-item align-items-center h-auto">
+                <div class="card w-100 h-100 text-center hover-up">
+                    ${imgTag}
+                    <div class="card-body">
+                        <p class="card-title">${nome}</p>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <p>${prezzo}€</p>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        categorySection += `</div></div>`; // Chiudi row e div categoria
+        result += categorySection;
     }
 
     return result;
 }
+
 
 
 
@@ -58,26 +73,10 @@ async function getProductsData(){
 
         const json = await response.json();
         console.log("prodotti:", json.products);         
-
-        const appetizersHTML = generateProducts(json.products,3); 
-        const appetizersDiv = document.querySelector("#appetizers");
-        appetizersDiv.innerHTML += appetizersHTML;
-
-        const burgersHTML = generateProducts(json.products,1);
-        const burgersDiv = document.querySelector("#burgers");
-        burgersDiv.innerHTML += burgersHTML;
-
-        const deepFriedHTML = generateProducts(json.products,2);
-        const deepFriedDiv = document.querySelector("#deepFried");
-        deepFriedDiv.innerHTML += deepFriedHTML;
-
-        const drinksHTML = generateProducts(json.products,4);
-        const drinksDiv = document.querySelector("#drinks");
-        drinksDiv.innerHTML += drinksHTML;
-
-        const dessertsHTML = generateProducts(json.products,5);
-        const dessertsDiv = document.querySelector("#desserts");
-        dessertsDiv.innerHTML += dessertsHTML;
+        console.log("categorie:", json.categories);
+        const menuDiv = document.querySelector("#menuDiv");
+        const menu = generateProducts(json.products, json.categories);
+        menuDiv.innerHTML += menu;
 
         
 
