@@ -210,6 +210,50 @@ class DatabaseHelper
         return $ingredients;
     }
 
+    public function hasLowStockIngredients()
+    {
+        $query = "SELECT 1 FROM ingredienti WHERE giacenza <= 2 LIMIT 1"; // Ottimizzato per performance
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $hasLowStock = $result->num_rows > 0;
+
+        $result->free();
+        $stmt->close();
+
+        return $hasLowStock;
+    }
+
+
+    public function getLowStockProducts()
+    {
+        $query = "SELECT * FROM prodotti WHERE giacenza <= 2";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $ingredients = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $ingredients;
+    }
+
+    public function hasLowStockProducts()
+    {
+        $query = "SELECT 1 FROM prodotti WHERE giacenza <= 2 LIMIT 1"; // Ottimizzato per performance
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $hasLowStock = $result->num_rows > 0;
+
+        $result->free();
+        $stmt->close();
+
+        return $hasLowStock;
+    }
+
     public function createLowStockIngredientNotification($idutente, $idingrediente, $nomeIngrediente)
     {
         $dataCorrente = date("Y-m-d");
@@ -234,6 +278,59 @@ class DatabaseHelper
             return false;
         }
     }
+
+    public function createLowStockProductNotification($idutente, $idprodotto, $nomeProdotto)
+    {
+        $dataCorrente = date("Y-m-d");
+        $oraCorrente = date("H:i:s");
+
+        $titolo = "Attenzione: Prodotto quasi finito";
+        $testo = "Il prodotto '$nomeProdotto' sta per finire.";
+
+        $query = "INSERT INTO notifiche (titolo, testo, vista, data, ora, tipo, idutente, idprodotto) 
+              VALUES (?, ?, FALSE, ?, ?, 'prodotto', ?, ?)";
+
+        $stmt = $this->db->prepare($query);
+
+        $stmt->bind_param('ssssis', $titolo, $testo, $dataCorrente, $oraCorrente, $idutente, $idprodotto);
+
+        try {
+            $stmt->execute();
+            $stmt->close();
+            return true;
+        } catch (mysqli_sql_exception $e) {
+            $stmt->close();
+            return false;
+        }
+    }
+
+
+    public function createOrderNotification($idutente, $idordine)
+    {
+        $dataCorrente = date("Y-m-d");
+        $oraCorrente = date("H:i:s");
+
+        $titolo = "Attenzione: Modificato Stato del tuo ordine";
+        $testo = "Lo stato del tuo ordine '$idordine' e' stato cambiato.";
+
+        $query = "INSERT INTO notifiche (titolo, testo, vista, data, ora, tipo, idutente, idordine) 
+              VALUES (?, ?, FALSE, ?, ?, 'prodotto', ?, ?)";
+
+        $stmt = $this->db->prepare($query);
+
+        $stmt->bind_param('ssssis', $titolo, $testo, $dataCorrente, $oraCorrente, $idutente, $idordine);
+
+        try {
+            $stmt->execute();
+            $stmt->close();
+            return true;
+        } catch (mysqli_sql_exception $e) {
+            $stmt->close();
+            return false;
+        }
+    }
+
+
 
     public function getNotificationsByUserId($idutente)
     {

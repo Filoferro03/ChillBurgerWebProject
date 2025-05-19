@@ -1,4 +1,3 @@
-
 async function fetchData(url, formData) {
     try {
         const response = await fetch(url, {
@@ -6,32 +5,39 @@ async function fetchData(url, formData) {
             body: formData
         });
         if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
+            throw new Error(`Errore HTTP: ${response.status}`);
         }
-        return await response.json();
+
+        const json = await response.json();
+
+        if (!json.success) {
+            throw new Error(json.error || "Errore sconosciuto dal server.");
+        }
+
+        return json.data;
     } catch (error) {
-        console.log(error.message);
+        console.error("Errore durante la fetch:", error.message);
+        return null;
     }
 }
 
 function generateNotifications(notes) {
-    let result = "";
+    let result = `<div class="d-flex flex-row justify-content-center mb-4">
+                    <p class="text-black fs-1">Notifiche</p>
+                  </div>`;
 
-    result += `<div class="d-flex fle-row justify-content-center mb-4" ><p class="text-black fs-1">Notifiche</p></div>`
-
-    if (notes.length === 0) {
-    result += `<p class="text-muted text-center">L'utente non ha ricevuto nessuna notifica.</p>`;
-} else {
+    if (!notes || notes.length === 0) {
+        result += `<p class="text-muted text-center">L'utente non ha ricevuto nessuna notifica.</p>`;
+        return result;
+    }
 
     for (let i = 0; i < notes.length; i++) {
         const isFirst = i === 0;
-        const isLast = i === notes.length - 1;
-        
         const borderClass = isFirst ? "border border-dark" : "border border-dark border-top-0";
         const bgClass = notes[i]["vista"] === 0 ? "bg-primary-subtle" : "bg-white";
         const idNotifica = notes[i]["idnotifica"];
 
-        let notification = `
+        result += `
         <div class="${borderClass} ${bgClass}">
             <div class="p-3">
                 <h1 class="text-black">${notes[i]["titolo"] ?? "Titolo mancante"}</h1>
@@ -46,41 +52,40 @@ function generateNotifications(notes) {
                 </div>
             </div>
         </div>`;
-
-        result += notification;
     }
-}
-
 
     return result;
 }
 
-async function tryRead(idnotification){
+async function tryRead(idnotification) {
     const url = 'api/api-notifications.php';
     const formData = new FormData();
     formData.append('action', 'readnotification');
     formData.append('idnotification', idnotification);
 
-    const json = await fetchData(url, formData);
-    if (json) window.location.reload();
+    const response = await fetchData(url, formData);
+    if (response !== null) {
+        window.location.reload();
+    }
 }
 
-async function tryDelete(idnotification){
+async function tryDelete(idnotification) {
     const url = 'api/api-notifications.php';
     const formData = new FormData();
     formData.append('action', 'deletenotification');
     formData.append('idnotification', idnotification);
 
-    const json = await fetchData(url, formData);
-    if (json) window.location.reload();
+    const response = await fetchData(url, formData);
+    if (response !== null) {
+        window.location.reload();
+    }
 }
 
 function addNotificationListeners() {
-
     document.querySelectorAll('.read-notification').forEach(button => {
         button.addEventListener('click', function () {
             const idNotification = this.getAttribute('data-id');
-            tryRead(idNotification); 
+            tryRead(idNotification);
         });
     });
 
@@ -92,23 +97,19 @@ function addNotificationListeners() {
     });
 }
 
-
-
-async function getNotificationsData(){
+async function getNotificationsData() {
     const url = "api/api-notifications.php";
-    try {
-        const response = await fetch(url);
-        if(!response.ok){
-            throw new Error("response status: ",response.status);
-        }
-        const json = await response.json();
-        console.log("lista notifche", json);
-        const notifications = generateNotifications(json);
-        const main = document.querySelector("#notes-container");
-        main.innerHTML = notifications;
+    const formData = new FormData();
+    formData.append("action", "getallnotifications");
+
+    const notifications = await fetchData(url, formData);
+    const container = document.querySelector("#notes-container");
+
+    if (notifications !== null) {
+        container.innerHTML = generateNotifications(notifications);
         addNotificationListeners();
-    } catch(error) {
-        console.log(error.message);
+    } else {
+        container.innerHTML = `<p class="text-danger text-center">Errore nel caricamento delle notifiche.</p>`;
     }
 }
 
