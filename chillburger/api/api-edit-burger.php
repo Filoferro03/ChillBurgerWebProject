@@ -30,6 +30,13 @@ if (isset($_POST["id"]) && isset($_POST["action"]) && $_POST["action"] === "getI
     $result = $dbh->addIngredientModification($_POST["idpersonalizzazione"], $_POST["idingrediente"], $_POST["act"]);
 } else if (isset($_POST["action"]) && $_POST["action"] === "deleteIngredient") {
     $dbh->deleteIngredientModification($_POST["idpersonalizzazione"], $_POST["idingrediente"]);
+} else if (isset($_POST["action"]) && $_POST["action"] === "getPersonalization") {
+    if ($dbh->doesPersonalizationExist($_POST["id"], $_SESSION["idordine"])) {
+        $personalization = $dbh->getPersonalization($_SESSION["idordine"], $_POST["id"]);
+        $result = $personalization;
+    } else {
+        $result = [];
+    }
 }
 
 

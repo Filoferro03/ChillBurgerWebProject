@@ -17,6 +17,8 @@ async function fetchData(url, formData) {
     }
 }
 
+
+
 async function getProductsInCart() {
     const url = "api/api-cart.php";
     const formData = new FormData();
@@ -33,6 +35,12 @@ async function getProductsInCart() {
             let result = "";
             for (let i = 0; i < products.length; i++) {
                 const product = products[i];
+                console.log(getPersonalization(product.idprodotto));
+                let price = 0;
+                console.log("prezzo:", price);
+                if (price === 0) {
+                    price = product.prezzo;
+                }
                 result += `
                 <div class="d-flex flex-row align-items-center justify-content-between col-12 border-bottom border-dark mb-2">
                     <div class="d-flex flex-column align-items-center col-3 m-1">
@@ -45,12 +53,11 @@ async function getProductsInCart() {
                                     <p class="fs-3">${product.nome}</p>
                                 </div>
                                 <div>
-                                    <p class="fs-3">${product.prezzo}€</p>
+                                    <p class="fs-3">${price}€</p>
                                 </div>
                             </div>
                             ${product.idcategoria == 1 ? `
                                 <div class="d-flex flex-column">
-                                    <p>Ingredienti Panino</p>
                                     <div>
                                         <a href="./edit-burger.php?id=${product.idprodotto}">
                                             <button class="btn btn-success w-10" data-id="${product.idprodotto}">Modifica</button>
@@ -76,7 +83,7 @@ async function getProductsInCart() {
 
                 <div class="d-flex justify-content-between border-bottom border-dark mt-2">
                     <p class="fs-3">Spedizione</p>
-                    <p class="fs-3">Prezzo</p>
+                    <p class="fs-3">2,50€</p>
                 </div>
 
                 <div class="d-flex justify-content-between mt-2">
@@ -89,15 +96,28 @@ async function getProductsInCart() {
                 </div>
             </div>
             `;
-
+            console.log("ci arrvia qui");
             div.innerHTML += result;
         }
     }
 }
 
+async function getPersonalization(idprodotto) {
+    const url = "api/api-edit-burger.php";
+    const formData = new FormData();
+    formData.append("action", "getPersonalization");
+    formData.append("id", idprodotto);
+    console.log("idprodotto:", idprodotto);
+    const json = await fetchData(url, formData);
+    console.log(json);
+
+
+}
+
 
 async function init() {
     await getProductsInCart();
+
     document.querySelectorAll('.btn-danger').forEach(btn => {
         btn.addEventListener('click', () => {
             const url = 'api/api-cart.php';
@@ -109,7 +129,7 @@ async function init() {
             window.location.reload();
         });
     });
-    
+
 }
 
 init();
