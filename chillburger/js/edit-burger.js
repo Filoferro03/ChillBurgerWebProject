@@ -1,6 +1,17 @@
+// Array per tracciare le modifiche attive da salvare
 let modifiche = [];
+// Array per tracciare le modifiche da cancellare (ingredienti da rimuovere)
 let modifiche2 = [];
 
+/**
+ * Aggiunge o rimuove un ingrediente dalla lista delle modifiche.
+ * Se è già presente, lo sposta in modifiche2 per indicare la rimozione.
+ * Se non è presente, lo aggiunge alla lista delle modifiche.
+ *
+ * @param {number} idIngrediente - ID dell'ingrediente
+ * @param {number} idPersonalizzazione - ID della personalizzazione
+ * @param {string} azione - Tipo di modifica ("aggiunto" o "rimosso")
+ */
 function modifyIngredientQuantity(idIngrediente, idPersonalizzazione, azione) {
     const index = modifiche.findIndex(m =>
         m.idpersonalizzazione === idPersonalizzazione &&
@@ -8,12 +19,14 @@ function modifyIngredientQuantity(idIngrediente, idPersonalizzazione, azione) {
     );
 
     if (index !== -1) {
+        // Sposta in modifiche2 per futura rimozione dal DB
         modifiche2.push({
             idpersonalizzazione: idPersonalizzazione,
             idingrediente: idIngrediente,
         });
         modifiche.splice(index, 1);
     } else {
+        // Aggiunge alla lista di modifiche
         modifiche.push({
             idpersonalizzazione: idPersonalizzazione,
             idingrediente: idIngrediente,
@@ -24,6 +37,14 @@ function modifyIngredientQuantity(idIngrediente, idPersonalizzazione, azione) {
     console.log("Modifiche aggiornate:", modifiche);
 }
 
+/**
+ * Verifica se un ingrediente è già presente nella personalizzazione.
+ * Serve per determinare se va mostrato come già aggiunto o meno.
+ *
+ * @param {number} idingrediente - ID dell'ingrediente
+ * @param {Array} personalization - Lista delle personalizzazioni
+ * @returns {boolean}
+ */
 function checkQuantityState(idingrediente, personalization) {
     const list = personalization?.[0] || [];
     for (let i = 0; i < list.length; i++) {
@@ -34,6 +55,13 @@ function checkQuantityState(idingrediente, personalization) {
     return false;
 }
 
+/**
+ * Restituisce l'azione associata a un ingrediente nella personalizzazione ("aggiunto" o "rimosso")
+ *
+ * @param {number} idingrediente
+ * @param {Array} personalization
+ * @returns {string}
+ */
 function setQuantity(idingrediente, personalization) {
     const list = personalization?.[0] || [];
     for (let i = 0; i < list.length; i++) {
@@ -44,6 +72,13 @@ function setQuantity(idingrediente, personalization) {
     return "";
 }
 
+/**
+ * Esegue una richiesta POST e restituisce i dati JSON.
+ *
+ * @param {string} url - Endpoint API
+ * @param {FormData} formData - Dati da inviare
+ * @returns {Promise<any>}
+ */
 async function fetchData(url, formData) {
     try {
         const response = await fetch(url, {
@@ -68,15 +103,26 @@ async function fetchData(url, formData) {
     }
 }
 
+/**
+ * Genera l’HTML per la lista degli ingredienti e i pulsanti di modifica quantità.
+ *
+ * @param {Array} ingredients - Lista degli ingredienti del prodotto
+ * @param {Array} product - Dati del prodotto (nome, ecc.)
+ * @param {Array} personalization - Dati di personalizzazione già esistenti
+ * @returns {string} - HTML da inserire nella pagina
+ */
 function generateIngredients(ingredients, product, personalization) {
     let result = "";
 
+    // Se la personalizzazione esiste, carica le modifiche iniziali
     if (Array.isArray(personalization?.[0]) && personalization[0].length > 0) {
         modifiche = personalization[0];
         console.log("Modifiche iniziali:", modifiche);
     }
 
     const idPersonalization = personalization?.[0]?.[0]?.idpersonalizzazione || 0;
+
+    // Intestazione prodotto
     result += `<div class="d-flex flex-row justify-content-center m-5"><p class="text-black fs-1">${product?.[0]?.nome || "Prodotto"}</p></div>`;
 
     if (!Array.isArray(ingredients) || ingredients.length === 0) {
@@ -84,6 +130,7 @@ function generateIngredients(ingredients, product, personalization) {
         return result;
     }
 
+    // Ciclo su ogni ingrediente
     for (let i = 0; i < ingredients.length; i++) {
         const ing = ingredients[i];
         const isFirst = i === 0;
@@ -92,11 +139,13 @@ function generateIngredients(ingredients, product, personalization) {
         let quantita = ing.quantita;
         let azione;
 
+        // Verifica stato dell’ingrediente nella personalizzazione
         if (checkQuantityState(idIngrediente, personalization)) {
             azione = setQuantity(idIngrediente, personalization);
             quantita = azione === "rimosso" ? 0 : 2;
         }
 
+        // HTML per ogni ingrediente con bottoni di incremento/decremento
         result += `
         <div class="${borderClass}">
             <div class="d-flex flex-row justify-content-between align-items-center p-2 md:p-3">
@@ -142,6 +191,7 @@ function generateIngredients(ingredients, product, personalization) {
         </div>`;
     }
 
+    // Pulsante per salvare le modifiche
     result += `
         <div class="w-100 d-flex justify-content-center mt-3 p-2">
             <button class="btn btn-secondary fs-5" onclick="sendModifiche(modifiche).then(() => { window.location.href = 'cart.php'; });">Salva</button>
@@ -151,11 +201,21 @@ function generateIngredients(ingredients, product, personalization) {
     return result;
 }
 
+/**
+ * Estrae l’ID del prodotto dagli URL parameters (GET).
+ * @returns {string|null}
+ */
 function getProductID() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('id');
 }
 
+/**
+ * Richiama l’API per rimuovere un ingrediente da una personalizzazione nel DB.
+ *
+ * @param {number} idpersonalizzazione
+ * @param {number} idingrediente
+ */
 async function deleteIngredient(idpersonalizzazione, idingrediente) {
     const url = "api/api-edit-burger.php";
     const formData = new FormData();
@@ -165,6 +225,11 @@ async function deleteIngredient(idpersonalizzazione, idingrediente) {
     await fetchData(url, formData);
 }
 
+/**
+ * Salva tutte le modifiche e rimuove gli ingredienti marcati per la cancellazione.
+ *
+ * @param {Array} modifiche - Lista modifiche da salvare
+ */
 async function sendModifiche(modifiche) {
     const url = "api/api-edit-burger.php";
     console.log("Salvataggio modifiche:", modifiche);
@@ -186,6 +251,10 @@ async function sendModifiche(modifiche) {
     }
 }
 
+/**
+ * Carica dal server i dati del prodotto selezionato (ingredienti, personalizzazione, ecc.)
+ * e genera l’HTML da inserire nella pagina.
+ */
 async function getIngredientsData() {
     const url = "api/api-edit-burger.php";
     const formData = new FormData();
@@ -203,4 +272,5 @@ async function getIngredientsData() {
     }
 }
 
+// Esegue il caricamento iniziale all'avvio della pagina
 getIngredientsData();
