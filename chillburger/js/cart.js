@@ -8,11 +8,11 @@ async function fetchData(url, formData) {
         if (!response.ok) {
             throw new Error(`Response status: ${response.status}`);
         }
-        console.log("tutto ok");
+        console.log("fetch completato correttamente");
         return await response.json();
     } catch (error) {
         console.log(error.message);
-        console.log("sbagliato");
+        console.log("errore nel fetch");
 
     }
 }
@@ -26,7 +26,7 @@ async function getProductsInCart() {
 
     const products = await fetchData(url, formData);
     console.log(products);
-
+    let subTotal = 0;
     if (products) {
         let div = document.querySelector("#cart-elements");
         if (products.length === 0) {
@@ -35,12 +35,15 @@ async function getProductsInCart() {
             let result = "";
             for (let i = 0; i < products.length; i++) {
                 const product = products[i];
-                console.log(getPersonalization(product.idprodotto));
+                const personalization = await getPersonalization(product.idprodotto);
+                console.log("la mia personalizzazione:",personalization);
                 let price = 0;
-                console.log("prezzo:", price);
-                if (price === 0) {
+                if (product["idcategoria"] === 1) {
+                    price = personalization[0].prezzo;
+                }else{
                     price = product.prezzo;
                 }
+                subTotal += Number(price);
                 result += `
                 <div class="d-flex flex-row align-items-center justify-content-between col-12 border-bottom border-dark mb-2">
                     <div class="d-flex flex-column align-items-center col-3 m-1">
@@ -78,7 +81,7 @@ async function getProductsInCart() {
             <div class="d-flex flex-column w-100 mt-5">
                 <div class="d-flex justify-content-between">
                     <p class="fs-3">SubTotale</p>
-                    <p class="fs-3">Prezzo</p>
+                    <p class="fs-3">${Number(subTotal).toFixed(2)}€</p>
                 </div>
 
                 <div class="d-flex justify-content-between border-bottom border-dark mt-2">
@@ -88,7 +91,7 @@ async function getProductsInCart() {
 
                 <div class="d-flex justify-content-between mt-2">
                     <p class="fs-3">Totale</p>
-                    <p class="fs-3">Prezzo</p>
+                    <p class="fs-3">${(Number(subTotal) + 2.50).toFixed(2)}€</p>
                 </div>
 
                 <div class="d-flex flex-column align-items-center mt-5">
@@ -96,7 +99,6 @@ async function getProductsInCart() {
                 </div>
             </div>
             `;
-            console.log("ci arrvia qui");
             div.innerHTML += result;
         }
     }
@@ -110,6 +112,7 @@ async function getPersonalization(idprodotto) {
     console.log("idprodotto:", idprodotto);
     const json = await fetchData(url, formData);
     console.log(json);
+    return json;
 
 
 }
