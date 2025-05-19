@@ -109,8 +109,7 @@ INSERT INTO chillburgerdb.stati_ordine (descrizione) VALUES
 ('In preparazione'),
 ('In consegna'),
 ('Consegnato'),
-('Confermato'),
-('Annullato');
+('Confermato');
 
 -- Insert Utenti
 INSERT INTO chillburgerdb.utenti (nome, cognome, username, password, tipo) VALUES
@@ -129,20 +128,37 @@ INSERT INTO chillburgerdb.ordini (timestamp_ordine, idutente, completato) VALUES
 ('2024-05-11 13:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), true),
 ('2024-05-11 20:00:00', (SELECT idutente FROM utenti WHERE username = 'laura.bruni'), true),
 ('2024-05-12 19:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), true),
+('2025-05-12 21:15:00', (SELECT idutente FROM utenti WHERE username = 'laura.bruni'), true),
+('2025-05-15 19:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), true),
 ('2024-05-12 12:00:00', (SELECT idutente FROM utenti WHERE username = 'mario.rossi'), true);
 
 -- Esempio di popolamento manuale di modifiche_stato
-INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (1, 2, '2024-05-10 12:35:00');
-INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (1, 3, '2024-05-10 12:55:00');
-INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (1, 4, '2024-05-10 13:15:00');
-INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (2, 2, '2024-05-10 19:05:00');
-INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (2, 6, '2024-05-10 19:10:00');
+INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (1, 5, '2024-05-10 13:35:00');
+INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (2, 5, '2024-05-10 20:55:00');
+INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (3, 5, '2024-05-11 13:45:00');
+INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (4, 5, '2024-05-11 21:05:00');
+INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (5, 5, '2024-05-12 19:50:00');
+INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (6, 5, '2025-05-12 22:15:00');
+INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (7, 5, '2025-05-15 19:55:00');
+INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (8, 5, '2024-05-12 13:10:00');
 
 -- Insert Carrelli Prodotti
 INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
 (1, (SELECT idprodotto FROM prodotti WHERE nome = 'Bacon Cheeseburger'), 1),
 (1, (SELECT idprodotto FROM prodotti WHERE nome = 'Patatine Fritte'), 1),
 (1, (SELECT idprodotto FROM prodotti WHERE nome = 'Coca Cola'), 2);
+insert into chillburgerdb.personalizzazioni(idordine, idprodotto, quantita)
+values (1, (select idprodotto from prodotti where nome = 'Bacon Cheeseburger'), 1);
+SET @id_personalizzazione_ordine_1 = LAST_INSERT_ID();
+insert into chillburgerdb.modifiche_ingredienti (idpersonalizzazione, idingrediente, azione)
+values (@id_personalizzazione_ordine_1, (select idingrediente from ingredienti where nome = 'bacon'), 'Aggiunto'),
+(@id_personalizzazione_ordine_1, (select idingrediente from ingredienti where nome = 'maionese'), 'Rimosso');
+
+INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
+(2, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 2),
+(2, (SELECT idprodotto FROM prodotti WHERE nome = 'Patatine Fritte'), 2),
+(2, (SELECT idprodotto FROM prodotti WHERE nome = 'Acqua Naturale'), 2);
+
 INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
 (3, (SELECT idprodotto FROM prodotti WHERE nome = 'Smoky Burger'), 2),
 (3, (SELECT idprodotto FROM prodotti WHERE nome = 'Onion Rings'), 1),
@@ -156,7 +172,43 @@ INSERT INTO chillburgerdb.personalizzazioni (idordine, idprodotto, quantita) VAL
 INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
 (5, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 1);
 INSERT INTO chillburgerdb.personalizzazioni (idordine, idprodotto, quantita) VALUES
-(5, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 1);
+(5, (SELECT idprodotto FROM prodotti WHERE nome = 'Bacon Cheeseburger'), 1);
+SET @id_personalizzazione_ordine_5 = LAST_INSERT_ID();
+insert into chillburgerdb.modifiche_ingredienti (idpersonalizzazione, idingrediente, azione)
+values (@id_personalizzazione_ordine_5,(select idingrediente from ingredienti where nome = 'cheddar'), 'Aggiunto');
+
+
+INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
+(6, (SELECT idprodotto FROM prodotti WHERE nome = 'Acqua Naturale'), 1),
+(6, (SELECT idprodotto FROM prodotti WHERE nome = 'Tiramisù'), 2),
+(6, (SELECT idprodotto FROM prodotti WHERE nome = 'Acqua Frizzante'), 1);
+insert into chillburgerdb.personalizzazioni(idordine, idprodotto, quantita)
+values (6, (select idprodotto from prodotti where nome = 'Chicken Deluxe'), 2);
+SET @id_personalizzazione_ordine_6 = LAST_INSERT_ID();
+insert into chillburgerdb.modifiche_ingredienti (idpersonalizzazione, idingrediente, azione)
+values (@id_personalizzazione_ordine_6,(select idingrediente from ingredienti where nome = 'cheddar'), 'Aggiunto'),
+(@id_personalizzazione_ordine_6, (select idingrediente from ingredienti where nome = 'petto di pollo'), 'Aggiunto'),
+(@id_personalizzazione_ordine_6, (select idingrediente from ingredienti where nome = 'insalata'), 'Rimosso');
+
+INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
+(7, (SELECT idprodotto FROM prodotti WHERE nome = 'Alette di Pollo BBQ'), 1),
+(7, (SELECT idprodotto FROM prodotti WHERE nome = 'Fanta'), 2),
+(7, (SELECT idprodotto FROM prodotti WHERE nome = 'Onion Rings'), 1);
+insert into chillburgerdb.personalizzazioni(idordine, idprodotto, quantita)
+values (7, (select idprodotto from prodotti where nome = 'Smoky Burger'), 2);
+SET @id_personalizzazione_ordine_7 = LAST_INSERT_ID();
+insert into chillburgerdb.modifiche_ingredienti (idpersonalizzazione, idingrediente, azione)
+values (@id_personalizzazione_ordine_7, (select idingrediente from ingredienti where nome = 'scamorza affumicata'), 'Aggiunto'),
+(@id_personalizzazione_ordine_7, (select idingrediente from ingredienti where nome = 'bacon'), 'Aggiunto'),
+(@id_personalizzazione_ordine_7, (select idingrediente from ingredienti where nome = 'pomodori'), 'Rimosso');
+
+
+INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
+(8, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 1);
+INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
+(8, (SELECT idprodotto FROM prodotti WHERE nome = 'Patatine Fritte'), 1),
+(8, (SELECT idprodotto FROM prodotti WHERE nome = 'Cheesecake ai Frutti di Bosco'), 1);
+
 
 INSERT INTO chillburgerdb.recensioni (idordine, titolo, voto, commento, timestamp_recensione) VALUES
 (1, 'Delizioso e Veloce!', 5, 'Il Bacon Cheeseburger era fantastico come sempre e la consegna è stata super rapida!', '2025-05-10 13:30:00'),

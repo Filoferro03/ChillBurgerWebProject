@@ -1,7 +1,16 @@
-// js/reviews.js
-
-// Mantieni la variabile per la pagina corrente delle recensioni
 let currentReviewsPage = 1;
+
+async function fetchData(url, formData) {
+    try {
+        const response = await fetch(url, { method: "POST", body: formData });
+        if (!response.ok) { throw new Error(`Response status: ${response.status}`); }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Errore fetchData:", error.message);
+        return null;
+    }
+}
 
 /**
  * Genera HTML per la visualizzazione delle stelle di valutazione
@@ -48,7 +57,6 @@ function generateReviewsHTML(reviews) { // Rinominata per chiarezza
  */
 async function loadReviews(page = 1) { // Accetta la pagina come argomento
     currentReviewsPage = page; // Aggiorna la pagina corrente
-    console.log(`Caricamento recensioni - Pagina: ${page}`);
 
     // Seleziona i contenitori nel DOM
     const reviewsListContainer = document.getElementById('reviewsList');
@@ -64,13 +72,16 @@ async function loadReviews(page = 1) { // Accetta la pagina come argomento
     paginationContainer.innerHTML = ''; // Pulisci paginazione durante il caricamento
 
     try {
-        // Chiama l'API per ottenere le recensioni per la pagina specificata
-        // Nota: l'API get-reviews.php usa GET, non serve fetchData qui
-        const response = await fetch(`api/get-reviews.php?page=${page}`);
-        if (!response.ok) {
-            throw new Error(`Errore HTTP: ${response.status}`);
+        const url = 'api/api-reviews.php';
+        const formData = new FormData();
+        formData.append('action', 'getall');
+        formData.append('page', page); // Passa la pagina come parametro
+        const json = await fetchData(url, formData);
+        const data = json.data;
+
+        if (!data) {
+            throw new Error("Risposta API non valida.");
         }
-        const data = await response.json();
 
         // Verifica la risposta
         if (data && data.reviews && typeof data.currentPage !== 'undefined' && typeof data.totalPages !== 'undefined') {

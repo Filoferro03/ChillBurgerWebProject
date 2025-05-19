@@ -786,6 +786,50 @@ class DatabaseHelper
         return $stmt->num_rows > 0;
     }
 
+    public function insertReview($idordine, $titolo, $voto, $commento)
+    {
+        $query = "INSERT INTO recensioni (idordine, titolo, voto, commento) 
+                  VALUES (?, ?, ?, ?)";
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            error_log("Error preparing statement for insertReview: " . $this->db->error);
+            return false;
+        }
+        $stmt->bind_param('isis', $idordine, $titolo, $voto, $commento);
+
+        try {
+            $success = $stmt->execute();
+            $affectedRows = $stmt->affected_rows;
+            $stmt->close();
+            return $success && $affectedRows > 0;
+        } catch (mysqli_sql_exception $e) {
+            // Check for duplicate entry error (MySQL error code 1062 for ER_DUP_ENTRY)
+            if ($e->getCode() == 1062) {
+                error_log("Attempt to insert duplicate review for order ID $idordine. Error: " . $e->getMessage());
+            } else {
+                error_log("SQL Exception during insertReview for order ID $idordine: " . $e->getMessage());
+            }
+            $stmt->close();
+            return false;
+        }
+    }
+
+    public function hasReviewForOrder($idordine)
+    {
+        $query = "SELECT 1 FROM recensioni WHERE idordine = ? LIMIT 1";
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            error_log("Error preparing statement for hasReviewForOrder: " . $this->db->error);
+            return false; // Or throw an exception
+        }
+        $stmt->bind_param('i', $idordine);
+        $stmt->execute();
+        $stmt->store_result();
+        $exists = $stmt->num_rows > 0;
+        $stmt->close();
+        return $exists;
+    }
+
     public function getPersonalization($idordine, $idprodotto)
     {
         $query = "
