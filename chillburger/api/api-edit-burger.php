@@ -3,69 +3,85 @@ require("../bootstrap.php");
 
 $result = [];
 
-if (isset($_POST["id"]) && isset($_POST["action"]) && $_POST["action"] === "getIngredients") {
-    $ingredients = $dbh->getIngredientsByProduct($_POST["id"]);
-    $product = $dbh->getProduct($_POST["id"]);
+try {
+    if (isset($_POST["id"]) && isset($_POST["action"]) && $_POST["action"] === "getIngredients") {
+        $idProdotto = $_POST["id"];
+        $idOrdine = $_SESSION["idordine"];
 
-    for ($i = 0; $i < count($ingredients); $i++) {
-        $ingredients[$i]["image"] = RESOURCES_DIR . "ingredients/" . $ingredients[$i]["image"];
-    }
+        $ingredients = $dbh->getIngredientsByProduct($idProdotto);
+        $product = $dbh->getProduct($idProdotto);
 
-    if ($dbh->doesPersonalizationExist($_POST["id"], $_SESSION["idordine"])) {
-        $personalization = $dbh->getPersonalizationWithModifications($_POST["id"], $_SESSION["idordine"]);
-    } else {
-        $idpersonalization = $dbh->createPersonalization($_POST["id"], $_SESSION["idordine"]);
-        $personalization = $dbh->getPersonalizationWithModifications($_POST["id"], $_SESSION["idordine"]);
-    }
+        if (!$ingredients || !$product) {
+            throw new Exception("Impossibile recuperare ingredienti o prodotto.");
+        }
 
-    $result = [
-        "ingredients" => $ingredients,
-        "product" => $product,
-        "personalization" => $personalization,
-    ];
-} else if (isset($_POST["action"]) && $_POST["action"] === "modify" && isset($_POST["act"]) && isset($_POST["idpersonalizzazione"]) && isset($_POST["idingrediente"])) {
-    if ($dbh->ingredientModificationExists($_POST["idpersonalizzazione"], $_POST["idingrediente"])) {
+        for ($i = 0; $i < count($ingredients); $i++) {
+            $ingredients[$i]["image"] = RESOURCES_DIR . "ingredients/" . $ingredients[$i]["image"];
+        }
+
+        if ($dbh->doesPersonalizationExist($idProdotto, $idOrdine)) {
+            $personalization = $dbh->getPersonalizationWithModifications($idProdotto, $idOrdine);
+        } else {
+            $created = $dbh->createPersonalization($idProdotto, $idOrdine);
+            if (!$created) {
+                throw new Exception("Errore nella creazione della personalizzazione.");
+            }
+            $personalization = $dbh->getPersonalizationWithModifications($idProdotto, $idOrdine);
+        }
+
+        if ($personalization === null) {
+            throw new Exception("Errore nel recupero della personalizzazione.");
+        }
+
+        $result = [
+            "ingredients" => $ingredients,
+            "product" => $product,
+            "personalization" => $personalization,
+        ];
+    } else if (
+        isset($_POST["action"]) && $_POST["action"] === "modify" &&
+        isset($_POST["act"], $_POST["idpersonalizzazione"], $_POST["idingrediente"])
+    ) {
+
+        $idPersonalizzazione = $_POST["idpersonalizzazione"];
+        $idIngrediente = $_POST["idingrediente"];
+        $azione = $_POST["act"];
+
+        if ($dbh->ingredientModificationExists($idPersonalizzazione, $idIngrediente)) {
+            $dbh->deleteIngredientModification($idPersonalizzazione, $idIngrediente);
+        }
+
+        $modifica = $dbh->addIngredientModification($idPersonalizzazione, $idIngrediente, $azione);
+        if (!$modifica) {
+            throw new Exception("Errore nell'aggiunta della modifica ingrediente.");
+        }
+        $result = $modifica;
+    } else if (isset($_POST["action"]) && $_POST["action"] === "deleteIngredient") {
+        if (!isset($_POST["idpersonalizzazione"], $_POST["idingrediente"])) {
+            throw new Exception("Parametri mancanti per eliminazione ingrediente.");
+        }
         $dbh->deleteIngredientModification($_POST["idpersonalizzazione"], $_POST["idingrediente"]);
-    }
-    $result = $dbh->addIngredientModification($_POST["idpersonalizzazione"], $_POST["idingrediente"], $_POST["act"]);
-} else if (isset($_POST["action"]) && $_POST["action"] === "deleteIngredient") {
-    $dbh->deleteIngredientModification($_POST["idpersonalizzazione"], $_POST["idingrediente"]);
-} else if (isset($_POST["action"]) && $_POST["action"] === "getPersonalization") {
-    if ($dbh->doesPersonalizationExist($_POST["id"], $_SESSION["idordine"])) {
-        $personalization = $dbh->getPersonalization($_SESSION["idordine"], $_POST["id"]);
-        $result = $personalization;
+        $result = ["success" => true];
+    } else if (isset($_POST["action"]) && $_POST["action"] === "getPersonalization") {
+        if (!isset($_POST["id"], $_SESSION["idordine"])) {
+            throw new Exception("Parametri mancanti per recupero personalizzazione.");
+        }
+
+        if ($dbh->doesPersonalizationExist($_POST["id"], $_SESSION["idordine"])) {
+            $personalization = $dbh->getPersonalization($_SESSION["idordine"], $_POST["id"]);
+            if ($personalization === null) {
+                throw new Exception("Errore nel recupero della personalizzazione.");
+            }
+            $result = $personalization;
+        } else {
+            $result = [];
+        }
     } else {
-        $result = [];
+        $result = ["error" => "Azione non riconosciuta o parametri mancanti."];
     }
+} catch (Exception $e) {
+    $result = ["error" => $e->getMessage()];
 }
-
-
-
-// if (isset($_POST['action']) && $_POST['action'] == 'getingredients' && isset($_POST['idprodotto'])) {
-
-//     $ingredients = $dbh->getIngredientsByProduct($_POST['idprodotto']);
-//     $product = $dbh->getProduct($_POST['idprodotto']);
-
-//     for ($i = 0; $i < count($ingredients); $i++) {
-//         $ingredients[$i]["image"] = RESOURCES_DIR . "ingredients/" . $ingredients[$i]["image"];
-//     }
-
-//     $result = [
-//         "ingredients" => $ingredients,
-//         "product" => $product
-//     ];
-// } else if (isset($_POST['action']) && $_POST['action'] == 'createpersonalization' && isset($_POST['idprodotto']) && isset($_POST['prezzo']) && isset($_POST['idordine'])) {
-
-//     $burger = $dbh->createEmptyPersonalization($_POST['idprodotto'], $_POST['prezzo'], $_POST['idordine']);
-//     $result = ["idpanino" => $burger];
-// } else if (isset($_POST['action']) && $_POST['action'] == 'modifyburger' && isset($_POST['idpersonalizzazione']) && isset($_POST['idingrediente']) && isset($_POST['quantita'])) {
-
-//     $result = $dbh->createNewBurgerComposition($_POST['idpersonalizzazione'], $_POST['idingrediente'], $_POST['quantita']);
-// } else {
-//     $result = "Api Non e andata a buon fine";
-// }
-
-
 
 header("Content-Type: application/json");
 echo json_encode($result);
