@@ -691,6 +691,17 @@ class DatabaseHelper
         return $success;
     }
 
+    public function addProductToCart($idprodotto, $idordine)
+    {
+        $query = "INSERT INTO carrelli_prodotti (idprodotto, idordine, quantita) VALUES (?, ?, 1)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("ii", $idprodotto, $idordine);
+        $success = $stmt->execute();
+        $stmt->close();
+
+        return $success;
+    }
+
     public function getAllCategories()
     {
         $query = " SELECT * FROM Categorie";

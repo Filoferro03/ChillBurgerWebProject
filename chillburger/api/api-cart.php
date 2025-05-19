@@ -1,33 +1,65 @@
 <?php
 require_once("../bootstrap.php");
 $result = [];
-if (isset($_POST["action"]) && $_POST["action"] == "getProducts") {
-    $products = $dbh->getProductsInCart($_SESSION["idordine"]);
-    for ($i = 0; $i < count($products); $i++) {
-        $products[$i]["image"] = RESOURCES_DIR . "products/" . $products[$i]["image"];
+
+if (isset($_POST["action"])) {
+    switch ($_POST["action"]) {
+        case "getProducts":
+            $products = $dbh->getProductsInCart($_SESSION["idordine"]);
+            for ($i = 0; $i < count($products); $i++) {
+                $products[$i]["image"] = RESOURCES_DIR . "products/" . $products[$i]["image"];
+            }
+            $result = $products;
+            break;
+
+        case "addProd":
+            if (isset($_POST["idprodotto"])) {
+                $dbh->addProductToCart($_POST["idprodotto"], $_SESSION["idordine"]);
+                $result['success'] = true;
+            } else {
+                $result['success'] = false;
+                $result['error'] = "ID prodotto mancante";
+            }
+            break;
+
+        case "removeProd":
+            if (isset($_POST["idprodotto"])) {
+                $dbh->removeProductFromCart($_POST["idprodotto"], $_SESSION["idordine"]);
+                $result['success'] = true;
+            } else {
+                $result['success'] = false;
+                $result['error'] = "ID prodotto mancante";
+            }
+            break;
+
+        case "createCart":
+            if (isset($_SESSION["idutente"])) {
+                if ($dbh->hasUncompletedOrder($_SESSION["idutente"])) {
+                    $cart = $dbh->getUncompletedOrder($_SESSION["idutente"]);
+                    $result['createCart'] = true;
+                    $result['idordine'] = $cart["idordine"];
+                    setUserCart($result['idordine']);
+                } else {
+                    $idcart = $dbh->createEmptyOrder($_SESSION["idutente"]);
+                    $result['createCart'] = true;
+                    $result['idordine'] = $idcart;
+                    setUserCart($result['idordine']);
+                }
+            } else {
+                $result['createCart'] = false;
+                $result['message'] = "Utente non loggato";
+            }
+            break;
+
+        default:
+            $result['success'] = false;
+            $result['error'] = "Azione non riconosciuta";
+            break;
     }
-    $result = $products;
-} else if (isset($_POST["action"]) && $_POST["action"] == "addProducts") {
-    //add a product to the cart
-} else if (isset($_POST["action"]) && $_POST["action"] == "removeProd") {
-    $dbh->removeProductFromCart($_POST["idprodotto"], $_SESSION["idordine"]);
-} else if (isset($_POST['action']) && $_POST['action'] === 'createCart') {
-    if (isset($_SESSION["idutente"])) {
-        if ($dbh->hasUncompletedOrder($_SESSION["idutente"])) {
-            $cart = $dbh->getUncompletedOrder($_SESSION["idutente"]);
-            $result['createCart'] = true;
-            $result['idordine'] = $cart["idordine"];
-            setUserCart($result['idordine']);
-        } else {
-            $idcart = $dbh->createEmptyOrder($_SESSION["idutente"]);
-            $result['createCart'] = true;
-            $result['idordine'] = $idcart;
-            setUserCart($result['idordine']);
-        }
-    } else {
-        $result['createCart'] = false;
-        $result['message'] = "Utente non loggato";
-    }
+} else {
+    $result['success'] = false;
+    $result['error'] = "Nessuna azione specificata";
 }
+
 header("Content-type: application/json");
 echo json_encode($result);
