@@ -24,8 +24,13 @@ if (isset($_POST["action"])) {
 
         case "removeProd":
             if (isset($_POST["idprodotto"])) {
-                $dbh->removeProductFromCart($_POST["idprodotto"], $_SESSION["idordine"]);
-                $result['success'] = true;
+                $success = $dbh->removeProductFromCart($_POST["idprodotto"], $_SESSION["idordine"]);
+                if ($success) {
+                    $result['success'] = true;
+                } else {
+                    $result['success'] = false;
+                    $result['error'] = "Errore durante la rimozione del prodotto dal carrello";
+                }
             } else {
                 $result['success'] = false;
                 $result['error'] = "ID prodotto mancante";

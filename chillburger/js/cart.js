@@ -43,16 +43,20 @@ async function getProductsInCart() {
     for (let i = 0; i < products.length; i++) {
         const product = products[i];
 
-        // getPersonalization ha già gestione errori interna, quindi la uso così
-        const personalization = await getPersonalization(product.idprodotto);
-        console.log("la mia personalizzazione:", personalization);
-
         let price = 0;
-        if (product["idcategoria"] === 1 && personalization && personalization.length > 0) {
-            price = personalization[0].prezzo;
+        if (product["idcategoria"] === 1) {
+            const personalization = await getPersonalization(product.idprodotto);
+            console.log("la mia personalizzazione:", personalization);
+
+            if (personalization && personalization.length > 0) {
+                price = personalization[0].prezzo;
+            } else {
+                price = product.prezzo;
+            }
         } else {
             price = product.prezzo;
         }
+
         subTotal += Number(price);
 
         result += `
@@ -112,6 +116,7 @@ async function getProductsInCart() {
 
     div.innerHTML = result;
 }
+
 
 
 async function getPersonalization(idprodotto) {
