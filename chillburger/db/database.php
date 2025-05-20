@@ -428,7 +428,7 @@ class DatabaseHelper
     public function getIngredientsByProduct($idprodotto)
     {
         $query = "
-        SELECT i.idingrediente, i.nome, i.sovrapprezzo, i.giacenza, i.image, c.quantita
+        SELECT i.idingrediente, i.nome, i.sovrapprezzo, i.giacenza, i.image, c.quantita, c.essenziale
         FROM composizioni c
         INNER JOIN ingredienti i ON c.idingrediente = i.idingrediente
         WHERE c.idprodotto = ?
@@ -777,6 +777,34 @@ class DatabaseHelper
         return $products;
     }
 
+    /*public function getProductsInCart($id)
+    {
+        $query = "
+        SELECT 
+            cp.id
+            cp.idprodotto,
+            cp.idordine,
+            cp.quantita,
+            p.idcategoria,
+            p.nome,
+            p.prezzo,
+            p.image
+        FROM carrelli_prodotti cp
+        JOIN prodotti p ON cp.idprodotto = p.idprodotto
+        WHERE cp.id = ?
+    ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $products = $result->fetch_all(MYSQLI_ASSOC);
+
+        $stmt->close();
+        return $products;
+    } */
+
     public function removeProductFromCart($idprodotto, $idordine)
     {
         $query = "DELETE FROM carrelli_prodotti WHERE idprodotto = ? AND idordine = ?";
@@ -788,6 +816,17 @@ class DatabaseHelper
         return $success;
     }
 
+    /*public function removeProductFromCart($id)
+    {
+        $query = "DELETE FROM carrelli_prodotti WHERE id = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $id);
+        $success = $stmt->execute();
+        $stmt->close();
+
+        return $success;
+    } */
+
     public function addProductToCart($idprodotto, $idordine)
     {
         $query = "INSERT INTO carrelli_prodotti (idprodotto, idordine, quantita) VALUES (?, ?, 1)";
@@ -798,6 +837,17 @@ class DatabaseHelper
 
         return $success;
     }
+
+    /*public function addProductToCart($idprodotto, $idordine,$id)
+    {
+        $query = "INSERT INTO carrelli_prodotti (id,idprodotto, idordine, quantita) VALUES (?, ?, 1)";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("iii",$id, $idprodotto, $idordine);
+        $success = $stmt->execute();
+        $stmt->close();
+
+        return $success;
+    } */
 
     public function getAllCategories()
     {

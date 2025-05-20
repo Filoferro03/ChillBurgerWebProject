@@ -114,7 +114,6 @@ async function fetchData(url, formData) {
 function generateIngredients(ingredients, product, personalization) {
     let result = "";
 
-    // Se la personalizzazione esiste, carica le modifiche iniziali
     if (Array.isArray(personalization?.[0]) && personalization[0].length > 0) {
         modifiche = personalization[0];
         console.log("Modifiche iniziali:", modifiche);
@@ -122,7 +121,6 @@ function generateIngredients(ingredients, product, personalization) {
 
     const idPersonalization = personalization?.[0]?.[0]?.idpersonalizzazione || 0;
 
-    // Intestazione prodotto
     result += `<div class="d-flex flex-row justify-content-center m-5"><p class="text-black fs-1">${product?.[0]?.nome || "Prodotto"}</p></div>`;
 
     if (!Array.isArray(ingredients) || ingredients.length === 0) {
@@ -130,59 +128,68 @@ function generateIngredients(ingredients, product, personalization) {
         return result;
     }
 
-    // Ciclo su ogni ingrediente
     for (let i = 0; i < ingredients.length; i++) {
         const ing = ingredients[i];
+        const essenziale = ing["essenziale"];
+        console.log(essenziale);
         const isFirst = i === 0;
         const borderClass = isFirst ? "border border-dark" : "border border-dark border-top-0";
         const idIngrediente = ing.idingrediente;
         let quantita = ing.quantita;
         let azione;
 
-        // Verifica stato dell’ingrediente nella personalizzazione
         if (checkQuantityState(idIngrediente, personalization)) {
             azione = setQuantity(idIngrediente, personalization);
             quantita = azione === "rimosso" ? 0 : 2;
         }
 
-        // HTML per ogni ingrediente con bottoni di incremento/decremento
+        // Se è essenziale, disabilitiamo i bottoni e aggiungiamo tooltip
+        const disabledAttr = essenziale ? "disabled" : "";
+        const tooltip = essenziale ? "title='Ingrediente essenziale, non modificabile'" : "";
+
         result += `
-        <div class="${borderClass}">
-            <div class="d-flex flex-row justify-content-between align-items-center p-2 md:p-3">
+        <div class="col-12 ${borderClass}">
+            <div class="d-flex flex-row justify-content-between align-items-center p-2 md:p-3" ${tooltip}>
                 <img src="${ing.image}" alt="${ing.nome}" class="img-responsive">
-                <p>${ing.nome ?? "Nome mancante"}</p>
+                <p class="fs-5" style="max-width: 100px; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${ing.nome ?? "Nome mancante"}</p>
                 <p>${ing.sovrapprezzo}€</p>
                 <p class="quantita m-2">${quantita}</p>
-                <div class="d-flex flex-row w-[10%]">
-                    <button type="button" class="btn m-1"
+                <div class="d-flex flex-row">
+                    <button type="button" class="btn p-1 p-md-3 md:m-1" 
                         onclick="
-                            let p = this.parentNode.parentNode.querySelector('.quantita');
-                            let plus = this.parentNode.querySelector('.btn-plus');
-                            let val = parseInt(p.innerText);
-                            if (val > 0) {
-                                p.innerText = val - 1;
-                                plus.disabled = false;
+                            if(!this.disabled){
+                                let p = this.parentNode.parentNode.querySelector('.quantita');
+                                let plus = this.parentNode.querySelector('.btn-plus');
+                                let val = parseInt(p.innerText);
+                                if (val > 0) {
+                                    p.innerText = val - 1;
+                                    plus.disabled = false;
+                                }
+                                if (parseInt(p.innerText) === 0) this.disabled = true;
+                                modifyIngredientQuantity(${idIngrediente}, ${idPersonalization}, 'rimosso');
                             }
-                            if (parseInt(p.innerText) === 0) this.disabled = true;
-                            modifyIngredientQuantity(${idIngrediente}, ${idPersonalization}, 'rimosso');
                         "
-                        ${quantita === 0 ? 'disabled' : ''}
+                        ${quantita === 0 ? 'disabled' : ''} ${disabledAttr}
+                        ${tooltip}
                     >
                         <i class="fa-solid fa-circle-minus icon"></i>
                     </button>
-                    <button type="button" class="btn m-1 btn-plus"
+                    <button type="button" class="btn p-1 p-md-3 md:m-1 btn-plus" 
                         onclick="
-                            let p = this.parentNode.parentNode.querySelector('.quantita');
-                            let minus = this.parentNode.querySelector('button:not(.btn-plus)');
-                            let val = parseInt(p.innerText);
-                            if (val < 2) {
-                                p.innerText = val + 1;
-                                minus.disabled = false;
+                            if(!this.disabled){
+                                let p = this.parentNode.parentNode.querySelector('.quantita');
+                                let minus = this.parentNode.querySelector('button:not(.btn-plus)');
+                                let val = parseInt(p.innerText);
+                                if (val < 2) {
+                                    p.innerText = val + 1;
+                                    minus.disabled = false;
+                                }
+                                if (parseInt(p.innerText) === 2) this.disabled = true;
+                                modifyIngredientQuantity(${idIngrediente}, ${idPersonalization}, 'aggiunto');
                             }
-                            if (parseInt(p.innerText) === 2) this.disabled = true;
-                            modifyIngredientQuantity(${idIngrediente}, ${idPersonalization}, 'aggiunto');
                         "
-                        ${quantita === 2 ? 'disabled' : ''}
+                        ${quantita === 2 ? 'disabled' : ''} ${disabledAttr}
+                        ${tooltip}
                     >
                         <i class="fa-solid fa-circle-plus icon"></i>
                     </button>
@@ -191,7 +198,6 @@ function generateIngredients(ingredients, product, personalization) {
         </div>`;
     }
 
-    // Pulsante per salvare le modifiche
     result += `
         <div class="w-100 d-flex justify-content-center mt-3 p-2">
             <button class="btn btn-secondary fs-5" onclick="sendModifiche(modifiche).then(() => { window.location.href = 'cart.php'; });">Salva</button>
@@ -200,6 +206,7 @@ function generateIngredients(ingredients, product, personalization) {
 
     return result;
 }
+
 
 /**
  * Estrae l’ID del prodotto dagli URL parameters (GET).
@@ -262,6 +269,7 @@ async function getIngredientsData() {
     formData.append("action", "getIngredients");
 
     const json = await fetchData(url, formData);
+    console.log(json);
 
     if (json && json.ingredients && json.product && json.personalization) {
         const html = generateIngredients(json.ingredients, json.product, json.personalization);
