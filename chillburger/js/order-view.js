@@ -1,3 +1,5 @@
+let currentOrderIdToReview = null;
+
 async function fetchData(url, formData) {
     try {
         const response = await fetch(url, {
@@ -13,29 +15,6 @@ async function fetchData(url, formData) {
     }
 }
 
-async function loadOrderDetails() {
-    const orderDetailsContainer = document.getElementById('orderDetailsContainer');
-    const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get('idordine');
-
-    if (!orderId) {
-        orderDetailsContainer.innerHTML = "<p class='text-center text-danger'>ID ordine non trovato nell'URL.</p>";
-        return;
-    }
-
-    // L'action viene mandata via POST con formData, idordine via GET nell'URL
-    const apiUrl = `api/api-orders.php?idordine=${orderId}`;
-    const formData = new FormData();
-    formData.append('action', 'getDetails');
-
-    const json = await fetchData(apiUrl, formData); // fetchData invia formData come body della POST
-    if (json && json.success && json.data) {
-        const orderData = json.data;
-        orderDetailsContainer.innerHTML = displayOrderDetails(orderData);
-    } else {
-        orderDetailsContainer.innerHTML = `<p class='text-center text-danger'>Errore nel caricamento dei dettagli dell'ordine: ${json?.error || 'Dati non disponibili.'}</p>`;
-    }
-}
 
 /**
  * Genera l'HTML per visualizzare i dettagli di un ordine.
@@ -153,6 +132,8 @@ async function loadOrderDetails() {
     const urlParams = new URLSearchParams(window.location.search);
     const orderId = urlParams.get('idordine');
 
+    currentOrderIdToReview = orderId;
+
     if (!orderId) {
         orderDetailsContainer.innerHTML = "<p class='text-center text-danger'>ID ordine non trovato nell'URL.</p>";
         return;
@@ -174,7 +155,161 @@ async function loadOrderDetails() {
         const errorMessage = json && json.error ? json.error : 'Dati non disponibili o si è verificato un errore.';
         orderDetailsContainer.innerHTML = `<p class='text-center text-danger'>Errore nel caricamento dei dettagli dell'ordine: ${errorMessage}</p>`;
     }
+
+    await getReview(orderId);
+}
+
+async function getReview(orderid) {
+    const url = "api/api-reviews.php";
+    const formData = new FormData();
+    formData.append('action', 'getbyorder');
+    formData.append('idordine', orderid);
+
+    const json = await fetchData(url, formData);
+
+    const reviewContainer = document.getElementById('reviewContainer');
+
+    if (json.success) {
+        const reviewData = json.data[0];
+        reviewContainer.innerHTML += `<div class = "d-flex justify-content-between mt-2 ms-3 me-5"> 
+                        <h3 class="card-title">${reviewData.titolo}</h3>
+                        <p class="star-rating">${generateStarRating(reviewData.voto)}</p> 
+                    </div>
+                    <p class="card-text mt-2 d-flex justify-content-start ps-3">${reviewData.commento}</p>
+                    <div class= "d-flex justify-content-evenly w-50 m-auto">
+                    <button class="btn order-button my-2 mx-auto">Modifica</button>
+                    <button class="btn btn-danger my-2 mx-auto" id="cancelReviewButton" data-bs-toggle="modal" data-bs-target="#deleteModal">Elimina</button>
+                    </div>`;
+    } else {
+        reviewContainer.innerHTML += `<p class="text-center mt-2">Non hai ancora lasciato nessuna recensione per         questo ordine...</p>
+        <button class="btn order-button my-2 mx-auto" id="addReviewButton" data-bs-toggle="modal" data-bs-target="#reviewModal">Lascia una Recensione</button>`;
+    }
+
+} 
+
+async function submitReview(orderId, title, rating, comment) {
+    const url = "api/api-reviews.php";
+    const formData = new FormData();
+    formData.append('action', 'submit');
+    formData.append('idordine', orderId);
+    formData.append('review_title', title);
+    formData.append('review_rating', rating);
+    formData.append('review_comment', comment);
+
+    try {
+        const json = await fetchData(url, formData);
+
+        if (json && json.success) {
+            const reviewModalElement = document.getElementById('reviewModal');
+            const reviewModal = bootstrap.Modal.getInstance(reviewModalElement);
+            if (reviewModal) {
+                reviewModal.hide();
+            }
+            document.getElementById('reviewForm').reset(); // Reset form fields
+            window.location.reload(); // Ricarica la pagina dopo aver inviato la recensione
+        } else {
+            alert("Errore nell'invio della recensione: " + (result.error || "Dettagli non disponibili."));
+        }
+    } catch (error) {
+        console.error("Errore invio recensione:", error);
+        alert("Errore durante l'invio della recensione.");
+    } 
+}
+
+function validateReviewForm() {
+    let isValid = true;
+    const titleInput = document.getElementById('review-title');
+    const ratingInput = document.getElementById('review-rating');
+    // const commentInput = document.getElementById('review-textarea'); // Se necessario
+
+    const titleError = document.getElementById('review-title-error');
+    const ratingError = document.getElementById('review-rating-error');
+
+    // Reset stati di errore
+    titleInput.classList.remove('is-invalid');
+    ratingInput.classList.remove('is-invalid');
+    titleError.textContent = '';
+    ratingError.textContent = '';
+
+    // Validazione Titolo
+    if (!titleInput.value.trim()) {
+        titleInput.classList.add('is-invalid');
+        titleError.textContent = 'Il titolo è obbligatorio.';
+        isValid = false;
+    }
+
+    // Validazione Voto
+    const ratingValue = parseInt(ratingInput.value, 10);
+    if (!ratingInput.value || isNaN(ratingValue) || ratingValue < 1 || ratingValue > 5) {
+        ratingInput.classList.add('is-invalid');
+        ratingError.textContent = 'Il voto deve essere un numero tra 1 e 5.';
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+async function deleteReview (orderId) {
+    const api = "api/api-reviews.php";
+    const formData = new FormData();
+    formData.append('action', 'delete');
+    formData.append('idordine', orderId);
+
+    try {
+        const json = await fetchData(api, formData);
+        if (json && json.success) {
+            window.location.reload(); // Ricarica la pagina dopo aver cancellato la recensione
+        } else {
+            alert("Errore nella cancellazione della recensione: " + (result.error || "Dettagli non disponibili."));
+        }
+    } catch (error) {
+        console.error("Errore nella cancellazione della recensione:", error);
+        alert("Errore durante la cancellazione della recensione.");
+    }
+
 }
 
 // Chiamata per caricare i dettagli dell'ordine quando il DOM è pronto
-document.addEventListener('DOMContentLoaded', loadOrderDetails);
+document.addEventListener('DOMContentLoaded', async function () {
+    await loadOrderDetails(); // Carica i dettagli dell'ordine quando il DOM è pronto
+
+    const confirmReviewButton = document.getElementById('confirm-review-button');
+    if (confirmReviewButton) {
+        confirmReviewButton.addEventListener('click', () => {
+            if (!currentOrderIdToReview) {
+                alert("Errore: ID ordine non specificato per la recensione."); // Questo è un errore di sistema
+                return;
+            }
+
+            if (validateReviewForm()) { // Chiama la funzione di validazione
+                // Se la validazione passa, prendi i valori e invia
+                const title = document.getElementById('review-title').value.trim();
+                const rating = document.getElementById('review-rating').value;
+                const comment = document.getElementById('review-textarea').value.trim();
+                submitReview(currentOrderIdToReview, title, rating, comment);
+            }
+        });
+    }
+
+    const cancelReviewButton = document.getElementById('cancel-review-button');
+    if (cancelReviewButton) {
+        cancelReviewButton.addEventListener('click', async () => {
+            await loadOrderDetails();
+            // Assicurati che i campi di errore siano puliti quando il modale viene chiuso con "No, grazie"
+            document.getElementById('reviewForm').reset();
+            document.getElementById('review-title').classList.remove('is-invalid');
+            document.getElementById('review-rating').classList.remove('is-invalid');
+            document.getElementById('review-title-error').textContent = '';
+            document.getElementById('review-rating-error').textContent = '';
+        });
+    } 
+
+    const deleteButton = document.getElementById('delete-button');
+    if (deleteButton) {
+        deleteButton.addEventListener('click', async () => {
+            deleteReview(currentOrderIdToReview);
+        }
+    )};
+});
+
+ 

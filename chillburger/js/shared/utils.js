@@ -20,3 +20,24 @@ function formatTimeFromTimestamp(timestampStr) {
     // const seconds = String(dateObj.getSeconds()).padStart(2, '0');
     return `${hours}:${minutes}`;
 }
+
+/**
+ * Genera HTML per la visualizzazione delle stelle di valutazione
+ * @param {number} rating - Valutazione da 0 a 5
+ * @returns {string} HTML delle stelle
+ */
+function generateStarRating(rating) {
+    const fullStar = '<i class="fas fa-star"></i>';
+    const emptyStar = '<i class="far fa-star"></i>';
+    let stars = '';
+    const maxStars = 5;
+    const fullStarsCount = Math.round(rating); // Arrotonda per gestire mezzi voti se necessario
+    for (let i = 0; i < fullStarsCount; i++) {
+        stars += fullStar;
+    }
+    const emptyStarsCount = maxStars - fullStarsCount;
+    for (let i = 0; i < emptyStarsCount; i++) {
+        stars += emptyStar;
+    }
+    return stars;
+}

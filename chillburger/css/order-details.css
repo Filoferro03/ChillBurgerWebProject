@@ -1,9 +1,9 @@
-.btn {
+.order-button {
     background-color: #7f5539;
     color: white;
 }
 
-.btn:hover {
+.order-button:hover {
     background-color: #7f5539;
     color: white;
     opacity: 0.8;
