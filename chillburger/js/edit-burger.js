@@ -46,7 +46,7 @@ function modifyIngredientQuantity(idIngrediente, idPersonalizzazione, azione) {
  * @returns {boolean}
  */
 function checkQuantityState(idingrediente, personalization) {
-    const list = personalization?.[0] || [];
+    const list = personalization;
     for (let i = 0; i < list.length; i++) {
         if (list[i]?.idingrediente === idingrediente) {
             return true;
@@ -63,7 +63,7 @@ function checkQuantityState(idingrediente, personalization) {
  * @returns {string}
  */
 function setQuantity(idingrediente, personalization) {
-    const list = personalization?.[0] || [];
+    const list = personalization;
     for (let i = 0; i < list.length; i++) {
         if (list[i]?.idingrediente === idingrediente) {
             return list[i]["azione"];
@@ -113,13 +113,9 @@ async function fetchData(url, formData) {
  */
 function generateIngredients(ingredients, product, personalization) {
     let result = "";
-
-    if (Array.isArray(personalization?.[0]) && personalization[0].length > 0) {
-        modifiche = personalization[0];
-        console.log("Modifiche iniziali:", modifiche);
-    }
-
-    const idPersonalization = personalization?.[0]?.[0]?.idpersonalizzazione || 0;
+    modifiche = personalization;
+    console.log("stato iniziale modifiche: ", modifiche);
+    const idPersonalization = getPersonalizationID();
 
     result += `<div class="d-flex flex-row justify-content-center m-5"><p class="text-black fs-1">${product?.[0]?.nome || "Prodotto"}</p></div>`;
 
@@ -131,7 +127,6 @@ function generateIngredients(ingredients, product, personalization) {
     for (let i = 0; i < ingredients.length; i++) {
         const ing = ingredients[i];
         const essenziale = ing["essenziale"];
-        console.log(essenziale);
         const isFirst = i === 0;
         const borderClass = isFirst ? "border border-dark" : "border border-dark border-top-0";
         const idIngrediente = ing.idingrediente;
@@ -212,7 +207,7 @@ function generateIngredients(ingredients, product, personalization) {
  * Estrae l’ID del prodotto dagli URL parameters (GET).
  * @returns {string|null}
  */
-function getProductID() {
+function getPersonalizationID() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('id');
 }
@@ -245,7 +240,7 @@ async function sendModifiche(modifiche) {
         const mod = modifiche[i];
         const formData = new FormData();
         formData.append("action", "modify");
-        formData.append("idpersonalizzazione", mod.idpersonalizzazione);
+        formData.append("idpersonalizzazione", getPersonalizationID());
         formData.append("idingrediente", mod.idingrediente);
         formData.append("act", mod.azione);
 
@@ -263,13 +258,14 @@ async function sendModifiche(modifiche) {
  * e genera l’HTML da inserire nella pagina.
  */
 async function getIngredientsData() {
+    console.log("idpersonalizzazione: ",getPersonalizationID());
     const url = "api/api-edit-burger.php";
     const formData = new FormData();
-    formData.append("id", getProductID());
+    formData.append("id", getPersonalizationID());
     formData.append("action", "getIngredients");
 
     const json = await fetchData(url, formData);
-    console.log(json);
+    console.log("il mio json: ",json);
 
     if (json && json.ingredients && json.product && json.personalization) {
         const html = generateIngredients(json.ingredients, json.product, json.personalization);

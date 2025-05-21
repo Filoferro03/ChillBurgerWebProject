@@ -6,7 +6,8 @@ $result = []; // Variabile che conterrà il risultato della richiesta, da restit
 try {
     // Caso 1: Richiesta per ottenere gli ingredienti e la personalizzazione di un prodotto
     if (isset($_POST["id"]) && isset($_POST["action"]) && $_POST["action"] === "getIngredients") {
-        $idProdotto = $_POST["id"];
+        $idPersonalizzazione = $dbh->getPersonalizationByID($_POST["id"]);
+        $idProdotto = $idPersonalizzazione[0]["idprodotto"];
         $idOrdine = $_SESSION["idordine"]; // Recupera l'ID dell'ordine dalla sessione
 
         $ingredients = $dbh->getIngredientsByProduct($idProdotto); // Ingredienti base del prodotto
@@ -21,19 +22,9 @@ try {
             $ingredients[$i]["image"] = RESOURCES_DIR . "ingredients/" . $ingredients[$i]["image"];
         }
 
-        // Verifica se esiste già una personalizzazione per questo prodotto in questo ordine
-        if ($dbh->doesPersonalizationExist($idProdotto, $idOrdine)) {
-            $personalization = $dbh->getPersonalizationWithModifications($idProdotto, $idOrdine);
-        } else {
-            // Se non esiste, la crea
-            $created = $dbh->createPersonalization($idProdotto, $idOrdine);
-            if (!$created) {
-                throw new Exception("Errore nella creazione della personalizzazione.");
-            }
-            $personalization = $dbh->getPersonalizationWithModifications($idProdotto, $idOrdine);
-        }
+        $personalizationmodified = $dbh->getPersonalizationWithModifications($_POST["id"]);
 
-        if ($personalization === null) {
+        if ($personalizationmodified === null) {
             throw new Exception("Errore nel recupero della personalizzazione.");
         }
 
@@ -41,7 +32,7 @@ try {
         $result = [
             "ingredients" => $ingredients,
             "product" => $product,
-            "personalization" => $personalization,
+            "personalization" => $personalizationmodified,
         ];
 
         // Caso 2: Richiesta per modificare un ingrediente (aggiunto/rimosso)

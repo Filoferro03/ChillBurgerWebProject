@@ -777,12 +777,46 @@ class DatabaseHelper
         return $products;
     }
 
+    public function getPersonalizationsInCart($idordine)
+    {
+        $query = "SELECT pe.*, p.nome AS nomeprodotto, p.image
+              FROM personalizzazioni pe
+              JOIN prodotti p ON pe.idprodotto = p.idprodotto
+              WHERE pe.idordine = ?";
+
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            error_log("Errore preparazione query getPersonalizationsInCart: " . $this->db->error);
+            return [];
+        }
+
+        $stmt->bind_param("i", $idordine);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $personalizations = $result->fetch_all(MYSQLI_ASSOC);
+
+        $stmt->close();
+        return $personalizations;
+    }
+
+
 
     public function removeProductFromCart($idprodotto, $idordine)
     {
         $query = "DELETE FROM carrelli_prodotti WHERE idprodotto = ? AND idordine = ?";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("ii", $idprodotto, $idordine);
+        $success = $stmt->execute();
+        $stmt->close();
+
+        return $success;
+    }
+
+    public function removePersonalizationFromCart($idpersonalizzazione, $idordine)
+    {
+        $query = "DELETE FROM personalizzazioni WHERE idpersonalizzazione = ? AND idordine = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("ii", $idpersonalizzazione, $idordine);
         $success = $stmt->execute();
         $stmt->close();
 
@@ -833,25 +867,23 @@ class DatabaseHelper
         return $result->num_rows > 0;
     }
 
-    public function getPersonalizationWithModifications($idprodotto, $idordine)
+    public function getPersonalizationWithModifications($idpersonalizzazione)
     {
         $query = "
-            SELECT p.*, m.idingrediente, m.azione
-            FROM personalizzazioni p
-            LEFT JOIN modifiche_ingredienti m ON p.idpersonalizzazione = m.idpersonalizzazione
-            WHERE p.idprodotto = ? AND p.idordine = ?
-        ";
+        SELECT p.*, m.idingrediente, m.azione
+        FROM personalizzazioni p
+        LEFT JOIN modifiche_ingredienti m ON p.idpersonalizzazione = m.idpersonalizzazione
+        WHERE p.idpersonalizzazione = ?
+    ";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("ii", $idprodotto, $idordine);
+        $stmt->bind_param("i", $idpersonalizzazione);
         $stmt->execute();
         $result = $stmt->get_result();
 
-        $data = [];
-        while ($row = $result->fetch_all(MYSQLI_ASSOC)) {
-            $data[] = $row;
-        }
+        $data = $result->fetch_all(MYSQLI_ASSOC);
         return $data;
     }
+
 
     public function createPersonalization($idprodotto, $idordine, $quantita = 1)
     {
@@ -960,7 +992,28 @@ class DatabaseHelper
         return $data;
     }
 
-    public function getReviewByOrder($idordine) {
+    public function getPersonalizationByID($idpersonalizzazione)
+    {
+        $query = "
+        SELECT *
+        FROM personalizzazioni
+        WHERE idpersonalizzazione = ?
+    ";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $idpersonalizzazione);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $data = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+
+        return $data;
+    }
+
+    public function getReviewByOrder($idordine)
+    {
         $query = "SELECT r.titolo, r.voto, r.commento
         FROM recensioni r
         WHERE r.idordine = ?";
@@ -985,7 +1038,8 @@ class DatabaseHelper
         return $stmt->execute();
     }
 
-    public function updateReview($idordine, $titolo, $voto, $commento) {
+    public function updateReview($idordine, $titolo, $voto, $commento)
+    {
         $query = "UPDATE recensioni SET titolo = ?, voto = ?, commento = ? WHERE idordine = ?";
         $stmt = $this->db->prepare($query);
         if (!$stmt) {

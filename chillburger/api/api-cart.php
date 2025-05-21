@@ -6,10 +6,17 @@ if (isset($_POST["action"])) {
     switch ($_POST["action"]) {
         case "getProducts":
             $products = $dbh->getProductsInCart($_SESSION["idordine"]);
+            $personalizations = $dbh->getPersonalizationsInCart($_SESSION["idordine"]);
             for ($i = 0; $i < count($products); $i++) {
                 $products[$i]["image"] = RESOURCES_DIR . "products/" . $products[$i]["image"];
             }
-            $result = $products;
+
+            for ($i = 0; $i < count($personalizations); $i++) {
+                $personalizations[$i]["image"] = RESOURCES_DIR . "products/" . $personalizations[$i]["image"];
+            }
+
+            $result["products"] = $products;
+            $result["personalizations"] = $personalizations;
             break;
 
         case "addProd":
@@ -22,10 +29,34 @@ if (isset($_POST["action"])) {
             }
             break;
 
+        case "addPers":
+            if (isset($_POST["idpersonalizzazione"])) {
+                $dbh->createPersonalization($_POST["idprodotto"], $_SESSION["idordine"], $_POST["quantita"]);
+                $result['success'] = true;
+            } else {
+                $result['success'] = false;
+                $result['error'] = "ID prodotto mancante";
+            }
+            break;
+
         case "removeProd":
             if (isset($_POST["idprodotto"])) {
                 $success = $dbh->removeProductFromCart($_POST["idprodotto"], $_SESSION["idordine"]);
-                //$success = $dbh->removeProductFromCart($_POST["id"],$_POST["idprodotto"], $_SESSION["idordine"]);
+                if ($success) {
+                    $result['success'] = true;
+                } else {
+                    $result['success'] = false;
+                    $result['error'] = "Errore durante la rimozione del prodotto dal carrello";
+                }
+            } else {
+                $result['success'] = false;
+                $result['error'] = "ID prodotto mancante";
+            }
+            break;
+
+        case "removePers":
+            if (isset($_POST["idpersonalizzazione"])) {
+                $success = $dbh->removePersonalizationFromCart($_POST["idpersonalizzazione"], $_SESSION["idordine"]);
                 if ($success) {
                     $result['success'] = true;
                 } else {
