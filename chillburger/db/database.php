@@ -992,7 +992,7 @@ class DatabaseHelper
             error_log("Error preparing statement for updateReview: " . $this->db->error);
             return false;
         }
-        $stmt->bind_param('issi', $titolo, $voto, $commento, $idordine);
+        $stmt->bind_param('sisi', $titolo, $voto, $commento, $idordine);
         return $stmt->execute();
     }
 }

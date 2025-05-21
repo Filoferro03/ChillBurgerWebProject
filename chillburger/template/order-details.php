@@ -8,7 +8,7 @@
                 <p class="text-center">Caricamento dettagli ordine...</p>
             </div>
             <div class="card-body p-4 text-center">
-                <div class="card w-50 mx-auto" id="reviewContainer">
+                <div class="card w-75 mx-auto" id="reviewContainer">
                     <h2 class="card-header align-items-center">La tua Recensione</h2>
                 </div>
                 

@@ -1,4 +1,5 @@
 let currentOrderIdToReview = null;
+let currentReviewData = null;
 
 async function fetchData(url, formData) {
     try {
@@ -171,26 +172,27 @@ async function getReview(orderid) {
 
     if (json.success) {
         const reviewData = json.data[0];
+        currentReviewData = reviewData;
         reviewContainer.innerHTML += `<div class = "d-flex justify-content-between mt-2 ms-3 me-5"> 
                         <h3 class="card-title">${reviewData.titolo}</h3>
                         <p class="star-rating">${generateStarRating(reviewData.voto)}</p> 
                     </div>
                     <p class="card-text mt-2 d-flex justify-content-start ps-3">${reviewData.commento}</p>
                     <div class= "d-flex justify-content-evenly w-50 m-auto">
-                    <button class="btn order-button my-2 mx-auto">Modifica</button>
+                    <button class="btn order-button my-2 mx-auto edit-review-button" id="editReviewButton" data-bs-toggle="modal" data-bs-target="#reviewModal">Modifica</button>
                     <button class="btn btn-danger my-2 mx-auto" id="cancelReviewButton" data-bs-toggle="modal" data-bs-target="#deleteModal">Elimina</button>
                     </div>`;
     } else {
-        reviewContainer.innerHTML += `<p class="text-center mt-2">Non hai ancora lasciato nessuna recensione per         questo ordine...</p>
+        reviewContainer.innerHTML += `<p class="text-center mt-2">Non hai ancora lasciato nessuna recensione per questo ordine...</p>
         <button class="btn order-button my-2 mx-auto" id="addReviewButton" data-bs-toggle="modal" data-bs-target="#reviewModal">Lascia una Recensione</button>`;
     }
 
 } 
 
-async function submitReview(orderId, title, rating, comment) {
+async function submitReview(orderId, title, rating, comment, action) {
     const url = "api/api-reviews.php";
     const formData = new FormData();
-    formData.append('action', 'submit');
+    formData.append('action', action);
     formData.append('idordine', orderId);
     formData.append('review_title', title);
     formData.append('review_rating', rating);
@@ -220,7 +222,6 @@ function validateReviewForm() {
     let isValid = true;
     const titleInput = document.getElementById('review-title');
     const ratingInput = document.getElementById('review-rating');
-    // const commentInput = document.getElementById('review-textarea'); // Se necessario
 
     const titleError = document.getElementById('review-title-error');
     const ratingError = document.getElementById('review-rating-error');
@@ -266,12 +267,68 @@ async function deleteReview (orderId) {
         console.error("Errore nella cancellazione della recensione:", error);
         alert("Errore durante la cancellazione della recensione.");
     }
-
 }
 
 // Chiamata per caricare i dettagli dell'ordine quando il DOM è pronto
 document.addEventListener('DOMContentLoaded', async function () {
     await loadOrderDetails(); // Carica i dettagli dell'ordine quando il DOM è pronto
+
+    let action = 'submit'; // Default action, will be updated based on button clicked
+
+    const reviewModalP = document.querySelector('#reviewModal .modal-body p'); // Target the <p> tag in modal body
+    const confirmButtonText = document.getElementById('confirm-review-button');
+    const reviewForm = document.getElementById('reviewForm');
+    const titleInput = document.getElementById('review-title');
+    const ratingInput = document.getElementById('review-rating');
+    const textareaInput = document.getElementById('review-textarea');
+    const titleError = document.getElementById('review-title-error');
+    const ratingError = document.getElementById('review-rating-error');
+
+
+    // Function to clear validation and reset form for "Add"
+    function setupModalForAdd() {
+        action = 'submit';
+        if (reviewForm) reviewForm.reset();
+        if (titleInput) titleInput.classList.remove('is-invalid');
+        if (ratingInput) ratingInput.classList.remove('is-invalid');
+        if (titleError) titleError.textContent = '';
+        if (ratingError) ratingError.textContent = '';
+        if (reviewModalP) reviewModalP.textContent = 'Lascia una recensione per questo ordine:'; //
+        if (confirmButtonText) confirmButtonText.textContent = 'Inserisci';
+    }
+
+    // Function to clear validation and populate form for "Edit"
+    function setupModalForEdit() {
+        action = 'update';
+        if (currentReviewData) {
+            if (titleInput) titleInput.value = currentReviewData.titolo || '';
+            if (ratingInput) ratingInput.value = currentReviewData.voto || '';
+            if (textareaInput) textareaInput.value = currentReviewData.commento || '';
+
+            if (titleInput) titleInput.classList.remove('is-invalid');
+            if (ratingInput) ratingInput.classList.remove('is-invalid');
+            if (titleError) titleError.textContent = '';
+            if (ratingError) ratingError.textContent = '';
+
+            if (reviewModalP) reviewModalP.textContent = 'Modifica la tua recensione:';
+            if (confirmButtonText) confirmButtonText.textContent = 'Aggiorna';
+        } else {
+            console.error("Dati della recensione non disponibili per la modifica. Reimpostazione per l'aggiunta.");
+            setupModalForAdd(); // Fallback to add mode
+        }
+    }
+
+   const reviewContainer = document.getElementById('reviewContainer');
+    if (reviewContainer) {
+        reviewContainer.addEventListener('click', (event) => {
+            if (event.target.matches('#addReviewButton')) {
+                setupModalForAdd();
+            } else if (event.target.matches('.edit-review-button')) {
+                setupModalForEdit();
+            }
+        });
+    }
+
 
     const confirmReviewButton = document.getElementById('confirm-review-button');
     if (confirmReviewButton) {
@@ -286,23 +343,24 @@ document.addEventListener('DOMContentLoaded', async function () {
                 const title = document.getElementById('review-title').value.trim();
                 const rating = document.getElementById('review-rating').value;
                 const comment = document.getElementById('review-textarea').value.trim();
-                submitReview(currentOrderIdToReview, title, rating, comment);
+                submitReview(currentOrderIdToReview, title, rating, comment, action);
             }
         });
     }
 
-    const cancelReviewButton = document.getElementById('cancel-review-button');
-    if (cancelReviewButton) {
-        cancelReviewButton.addEventListener('click', async () => {
-            await loadOrderDetails();
-            // Assicurati che i campi di errore siano puliti quando il modale viene chiuso con "No, grazie"
-            document.getElementById('reviewForm').reset();
-            document.getElementById('review-title').classList.remove('is-invalid');
-            document.getElementById('review-rating').classList.remove('is-invalid');
-            document.getElementById('review-title-error').textContent = '';
-            document.getElementById('review-rating-error').textContent = '';
+    const cancelReviewModalButton = document.getElementById('cancel-review-button'); // "No, grazie" button in review modal
+    if (cancelReviewModalButton) {
+        cancelReviewModalButton.addEventListener('click', () => {
+            if (reviewForm) reviewForm.reset();
+            if (titleInput) titleInput.classList.remove('is-invalid');
+            if (ratingInput) ratingInput.classList.remove('is-invalid');
+            if (titleError) titleError.textContent = '';
+            if (ratingError) ratingError.textContent = '';
+            // Reset modal text to default (add) if needed, or leave as is until next open trigger
+             if (reviewModalP) reviewModalP.textContent = 'Lascia una recensione per questo ordine:';
+             if (confirmButtonText) confirmButtonText.textContent = 'Inserisci';
         });
-    } 
+    }
 
     const deleteButton = document.getElementById('delete-button');
     if (deleteButton) {
