@@ -46,7 +46,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel-review-button">No, grazie</button>
-        <button type="button" class="btn order-button" id="confirm-review-button">Inserisci</button>
+        <button type="submit" class="btn order-button" id="confirm-review-button">Inserisci</button>
       </div>
     </div>
   </div>

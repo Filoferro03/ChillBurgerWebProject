@@ -177,10 +177,10 @@ async function getReview(orderid) {
                         <h3 class="card-title">${reviewData.titolo}</h3>
                         <p class="star-rating">${generateStarRating(reviewData.voto)}</p> 
                     </div>
-                    <p class="card-text mt-2 d-flex justify-content-start ps-3">${reviewData.commento}</p>
+                    <p class="card-text mt-2 text-start ps-3 pe-3">${reviewData.commento}</p>
                     <div class= "d-flex justify-content-evenly w-50 m-auto">
-                    <button class="btn order-button my-2 mx-auto edit-review-button" id="editReviewButton" data-bs-toggle="modal" data-bs-target="#reviewModal">Modifica</button>
-                    <button class="btn btn-danger my-2 mx-auto" id="cancelReviewButton" data-bs-toggle="modal" data-bs-target="#deleteModal">Elimina</button>
+                        <button class="btn order-button my-2 mx-auto edit-review-button" id="editReviewButton" data-bs-toggle="modal" data-bs-target="#reviewModal">Modifica</button>
+                        <button class="btn btn-danger my-2 mx-auto" id="cancelReviewButton" data-bs-toggle="modal" data-bs-target="#deleteModal">Elimina</button>
                     </div>`;
     } else {
         reviewContainer.innerHTML += `<p class="text-center mt-2">Non hai ancora lasciato nessuna recensione per questo ordine...</p>
