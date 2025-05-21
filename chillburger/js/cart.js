@@ -44,6 +44,8 @@ async function getProductsInCart() {
 
     for (let i = 0; i < products.length; i++) {
         const product = products[i];
+        const quantita = product.quantita;
+        console.log("quantita del prodotto", product.nome, " è : ", quantita);
 
         let price = 0;
         if (product.idcategoria === 1) {
@@ -54,9 +56,49 @@ async function getProductsInCart() {
             price = product.prezzo;
         }
 
-        subTotal += Number(price);
+        subTotal += Number(price) * quantita;
 
-        result += `
+
+        if (product.idcategoria === 1 && quantita > 1) {
+            for (let i = 0; i < quantita; i++) {
+                result += `
+                <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-between col-12 border-bottom border-dark mb-2">
+                    <div class="d-flex flex-column align-items-center col-8 col-md-3 m-1">
+                        <img src="${product.image}" class="col-10 m-2" alt="${product.nome}">
+                    </div>
+                    <div class="d-flex w-100 h-100 flex-column justify-content-between p-1">
+                        <div class="d-flex flex-column w-100">
+                            <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-center">
+                                <div class="d-flex flex-column">
+                                    <p class="fs-3">${product.nome}</p>
+                                </div>
+                                <div>
+                                    <p class="fs-3">${price}€</p>
+                                </div>
+                                <div>
+                                    <p class="fs-3">Quantita: 1</p>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between d-md-none mt-2">
+                                <a href="./edit-burger.php?id=${product.idprodotto}">
+                                    <button class="btn btn-success w-10" data-id="${product.idprodotto}">Modifica</button>
+                                </a>
+                                <button class="btn btn-danger" data-id="${product.idprodotto}">Rimuovi</button>
+                            </div>
+                            <div class="d-none d-md-block mt-2">
+                                <a href="./edit-burger.php?id=${product.idprodotto}">
+                                    <button class="btn btn-success w-10" data-id="${product.idprodotto}">Modifica</button>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="d-none d-md-flex justify-content-end pb-3">
+                            <button class="btn btn-danger" data-id="${product.idprodotto}">Rimuovi</button>
+                        </div>
+                    </div>
+                </div>`;
+            }
+        } else {
+            result += `
             <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-between col-12 border-bottom border-dark mb-2">
                 <div class="d-flex flex-column align-items-center col-8 col-md-3 m-1">
                     <img src="${product.image}" class="col-10 m-2" alt="${product.nome}">
@@ -68,19 +110,20 @@ async function getProductsInCart() {
                                 <p class="fs-3">${product.nome}</p>
                             </div>
                             <div>
-                                <p class="fs-3">${price}€</p>
+                                <p class="fs-3">${(price * quantita).toFixed(2)}€</p>
+
+                            </div>
+                            <div>
+                                <p class="fs-3">Quantita: ${quantita}</p>
                             </div>
                         </div>
-
                         ${product.idcategoria === 1 ? `
-                            <!-- Mobile version: Modifica e Rimuovi insieme -->
                             <div class="d-flex justify-content-between d-md-none mt-2">
                                 <a href="./edit-burger.php?id=${product.idprodotto}">
                                     <button class="btn btn-success w-10" data-id="${product.idprodotto}">Modifica</button>
                                 </a>
                                 <button class="btn btn-danger" data-id="${product.idprodotto}">Rimuovi</button>
                             </div>
-                            <!-- Desktop version: Solo Modifica -->
                             <div class="d-none d-md-block mt-2">
                                 <a href="./edit-burger.php?id=${product.idprodotto}">
                                     <button class="btn btn-success w-10" data-id="${product.idprodotto}">Modifica</button>
@@ -88,14 +131,13 @@ async function getProductsInCart() {
                             </div>
                         ` : ""}
                     </div>
-
-                    <!-- Desktop version: Solo Rimuovi -->
                     <div class="d-none d-md-flex justify-content-end pb-3">
                         <button class="btn btn-danger" data-id="${product.idprodotto}">Rimuovi</button>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
+        }
+        
     }
 
     result += `

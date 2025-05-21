@@ -777,33 +777,6 @@ class DatabaseHelper
         return $products;
     }
 
-    /*public function getProductsInCart($id)
-    {
-        $query = "
-        SELECT 
-            cp.id
-            cp.idprodotto,
-            cp.idordine,
-            cp.quantita,
-            p.idcategoria,
-            p.nome,
-            p.prezzo,
-            p.image
-        FROM carrelli_prodotti cp
-        JOIN prodotti p ON cp.idprodotto = p.idprodotto
-        WHERE cp.id = ?
-    ";
-
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-        $products = $result->fetch_all(MYSQLI_ASSOC);
-
-        $stmt->close();
-        return $products;
-    } */
 
     public function removeProductFromCart($idprodotto, $idordine)
     {
@@ -816,38 +789,17 @@ class DatabaseHelper
         return $success;
     }
 
-    /*public function removeProductFromCart($id)
+    public function addProductToCart($idprodotto, $idordine, $quantita)
     {
-        $query = "DELETE FROM carrelli_prodotti WHERE id = ?";
+        $query = "INSERT INTO carrelli_prodotti (idprodotto, idordine, quantita) VALUES (?, ?, ?)";
         $stmt = $this->db->prepare($query);
-        $stmt->bind_param("i", $id);
-        $success = $stmt->execute();
-        $stmt->close();
-
-        return $success;
-    } */
-
-    public function addProductToCart($idprodotto, $idordine)
-    {
-        $query = "INSERT INTO carrelli_prodotti (idprodotto, idordine, quantita) VALUES (?, ?, 1)";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param("ii", $idprodotto, $idordine);
+        $stmt->bind_param("iii", $idprodotto, $idordine, $quantita);
         $success = $stmt->execute();
         $stmt->close();
 
         return $success;
     }
 
-    /*public function addProductToCart($idprodotto, $idordine,$id)
-    {
-        $query = "INSERT INTO carrelli_prodotti (id,idprodotto, idordine, quantita) VALUES (?, ?, 1)";
-        $stmt = $this->db->prepare($query);
-        $stmt->bind_param("iii",$id, $idprodotto, $idordine);
-        $success = $stmt->execute();
-        $stmt->close();
-
-        return $success;
-    } */
 
     public function getAllCategories()
     {

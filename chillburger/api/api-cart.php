@@ -6,7 +6,6 @@ if (isset($_POST["action"])) {
     switch ($_POST["action"]) {
         case "getProducts":
             $products = $dbh->getProductsInCart($_SESSION["idordine"]);
-            //$products = $dbh->getProductsInCart($_POST["id"]);
             for ($i = 0; $i < count($products); $i++) {
                 $products[$i]["image"] = RESOURCES_DIR . "products/" . $products[$i]["image"];
             }
@@ -15,8 +14,7 @@ if (isset($_POST["action"])) {
 
         case "addProd":
             if (isset($_POST["idprodotto"])) {
-                $dbh->addProductToCart($_POST["idprodotto"], $_SESSION["idordine"]);
-                //$dbh->addProductToCart($_POST["id"],$_POST["idprodotto"], $_SESSION["idordine"]);
+                $dbh->addProductToCart($_POST["idprodotto"], $_SESSION["idordine"], $_POST["quantita"]);
                 $result['success'] = true;
             } else {
                 $result['success'] = false;

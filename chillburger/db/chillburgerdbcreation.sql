@@ -57,8 +57,7 @@ CREATE TABLE personalizzazioni (
      idpersonalizzazione INT AUTO_INCREMENT NOT NULL,
      prezzo DECIMAL(10, 2) NOT NULL, -- Gestito dai trigger
      quantita INT NOT NULL,
-     idordine INT NOT NULL,
-     idprodotto INT NOT NULL,
+     idcarrelloprodotto INT NOT NULL,
      PRIMARY KEY (idpersonalizzazione)
 );
 
@@ -73,10 +72,11 @@ CREATE TABLE prodotti (
 );
 
 CREATE TABLE carrelli_prodotti (
+     idcarrelloprodotto INT NOT NULL,
      idprodotto INT NOT NULL,
      idordine INT NOT NULL,
      quantita INT NOT NULL,
-     PRIMARY KEY (idordine, idprodotto)
+     PRIMARY KEY (idcarrelloprodotto)
 );
 
 CREATE TABLE composizioni (
@@ -160,13 +160,8 @@ REFERENCES utenti (idutente);
 
 ALTER TABLE personalizzazioni
 ADD CONSTRAINT fkcarrelli_personalizzazione
-FOREIGN KEY (idordine)
-REFERENCES ordini (idordine);
-
-ALTER TABLE personalizzazioni
-ADD CONSTRAINT fksu
-FOREIGN KEY (idprodotto)
-REFERENCES prodotti (idprodotto);
+FOREIGN KEY (idcarrelloprodotto)
+REFERENCES carrelli_prodotti (idcarrelloprodotto);
 
 ALTER TABLE prodotti
 ADD CONSTRAINT fkappartenenza
@@ -229,9 +224,6 @@ CREATE INDEX idx_notifiche_timestamp ON notifiche (timestamp_notifica);
 
 CREATE INDEX idx_ordini_idutente ON ordini (idutente);
 CREATE INDEX idx_ordini_timestamp ON ordini (timestamp_ordine);
-
-CREATE INDEX idx_personalizzazioni_idordine ON personalizzazioni (idordine);
-CREATE INDEX idx_personalizzazioni_idprodotto ON personalizzazioni (idprodotto);
 
 CREATE INDEX idx_prodotti_idcategoria ON prodotti (idcategoria);
 
