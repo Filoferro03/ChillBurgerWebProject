@@ -9,7 +9,10 @@ $templateParams = [
         "css/menu_style.css",
         "css/order_now_style.css"
     ],
-    "js"     => ["js/menu_filter.js"]
+    "js"     => [
+        "js/menu_filter.js",
+        "js/order_now.js"
+    ]
 ];
 
 require "template/base.php";
