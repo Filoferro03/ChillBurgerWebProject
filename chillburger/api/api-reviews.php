@@ -45,7 +45,32 @@ if (isset($_POST['action']) && $_POST['action'] === 'submit') {
     $response['data'] = $reviews;
     $response['success'] = true;
 
-} else {
+} else if(isset($_POST['action']) && $_POST['action'] == "getbyorder") {
+    $idOrdine = isset($_POST['idordine']) ? intval($_POST['idordine']) : null;
+
+    $review = $dbh->getReviewByOrder($idOrdine);
+
+    if ($review !== null && !empty($review)) {
+        $response['data'] = $review;
+        $response['success'] = true;
+    } else {
+        $response['error'] = 'Recensione non trovata';
+        $response['success'] = false;
+    }
+} else if (isset($_POST['action']) && $_POST['action'] == "delete") {
+    $idordine = isset($_POST['idordine']) ? (int)$_POST['idordine'] : null;
+    $response['success'] = $dbh->deleteReview($idordine);
+}
+else if (isset($_POST['action']) && $_POST['action'] === 'update') {
+    $idrecensione = isset($_POST['idrecensione']) ? (int)$_POST['idrecensione'] : null;
+    $titolo = isset($_POST['review_title']) ? trim($_POST['review_title']) : '';
+    $voto = isset($_POST['review_rating']) ? (int)$_POST['review_rating'] : null;
+    $commento = isset($_POST['review_comment']) ? trim($_POST['review_comment']) : '';
+    $response['success'] = $dbh->updateReview($idrecensione, $titolo, $voto, $commento);
+;
+}
+
+else {
     $response['error'] = 'Azione non valida o parametri mancanti.';
     $response['success'] = false;
 }

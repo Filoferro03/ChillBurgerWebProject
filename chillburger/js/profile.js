@@ -1,5 +1,4 @@
 let currentOrderIdToConfirm = null;
-let currentOrderIdToReview = null;
 
 async function fetchData(url, formData) {
     try {
@@ -161,73 +160,6 @@ async function updateOrderStatus(idOrdine) {
     }
 }
 
-async function submitReview(orderId, title, rating, comment) {
-    const url = "api/api-reviews.php";
-    const formData = new FormData();
-    formData.append('action', 'submit');
-    formData.append('idordine', orderId);
-    formData.append('review_title', title);
-    formData.append('review_rating', rating);
-    formData.append('review_comment', comment);
-
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            body: formData
-        });
-        const result = await response.json();
-
-        if (result && result.success) {
-            alert("Recensione inviata con successo!");
-            const reviewModalElement = document.getElementById('reviewModal');
-            const reviewModal = bootstrap.Modal.getInstance(reviewModalElement);
-            if (reviewModal) {
-                reviewModal.hide();
-            }
-            document.getElementById('reviewForm').reset(); // Reset form fields
-            await loadUserOrders(currentOrdersPage);
-        } else {
-            alert("Errore nell'invio della recensione: " + (result.error || "Dettagli non disponibili."));
-        }
-    } catch (error) {
-        console.error("Errore invio recensione:", error);
-        alert("Errore durante l'invio della recensione.");
-    } 
-}
-
-function validateReviewForm() {
-    let isValid = true;
-    const titleInput = document.getElementById('review-title');
-    const ratingInput = document.getElementById('review-rating');
-    // const commentInput = document.getElementById('review-textarea'); // Se necessario
-
-    const titleError = document.getElementById('review-title-error');
-    const ratingError = document.getElementById('review-rating-error');
-
-    // Reset stati di errore
-    titleInput.classList.remove('is-invalid');
-    ratingInput.classList.remove('is-invalid');
-    titleError.textContent = '';
-    ratingError.textContent = '';
-
-    // Validazione Titolo
-    if (!titleInput.value.trim()) {
-        titleInput.classList.add('is-invalid');
-        titleError.textContent = 'Il titolo è obbligatorio.';
-        isValid = false;
-    }
-
-    // Validazione Voto
-    const ratingValue = parseInt(ratingInput.value, 10);
-    if (!ratingInput.value || isNaN(ratingValue) || ratingValue < 1 || ratingValue > 5) {
-        ratingInput.classList.add('is-invalid');
-        ratingError.textContent = 'Il voto deve essere un numero tra 1 e 5.';
-        isValid = false;
-    }
-
-    return isValid;
-}
-
 
 
 // --- Listener DOMContentLoaded (Chiama loadProfileData all'avvio) ---
@@ -258,22 +190,13 @@ document.addEventListener('DOMContentLoaded', async function() {
             if (currentOrderIdToConfirm) {
                 const success = await updateOrderStatus(currentOrderIdToConfirm);
                 if (success) {
-                    // Order confirmed successfully, now set ID for review and open review modal
-                    currentOrderIdToReview = currentOrderIdToConfirm;
-                    
                     // Close the stateModal
                     const stateModalElement = document.getElementById('stateModal');
                     const stateModal = bootstrap.Modal.getInstance(stateModalElement);
                     if (stateModal) {
                         stateModal.hide();
                     }
-
-                    // Open the reviewModal
-                    const reviewModalElement = document.getElementById('reviewModal');
-                    const reviewModal = new bootstrap.Modal(reviewModalElement); // Get or initialize
-                    reviewModal.show();
-                    
-                    currentOrderIdToConfirm = null; // Reset after use
+                    await loadUserOrders(currentOrdersPage);
                 }
             } else {
                 console.error("Nessun ID ordine da confermare trovato (stateModal).");
@@ -281,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    const confirmReviewButton = document.getElementById('confirm-review-button');
+    /*const confirmReviewButton = document.getElementById('confirm-review-button');
     if (confirmReviewButton) {
         confirmReviewButton.addEventListener('click', () => {
             if (!currentOrderIdToReview) {
@@ -312,5 +235,5 @@ document.addEventListener('DOMContentLoaded', async function() {
             document.getElementById('review-title-error').textContent = '';
             document.getElementById('review-rating-error').textContent = '';
         });
-    }
+    }*/
 });

@@ -959,4 +959,40 @@ class DatabaseHelper
 
         return $data;
     }
+
+    public function getReviewByOrder($idordine) {
+        $query = "SELECT r.titolo, r.voto, r.commento
+        FROM recensioni r
+        WHERE r.idordine = ?";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $idordine);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $review = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+
+        return $review;
+    }
+
+    public function deleteReview($idordine)
+    {
+        $query = "DELETE FROM recensioni WHERE idordine = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $idordine);
+        return $stmt->execute();
+    }
+
+    public function updateReview($idordine, $titolo, $voto, $commento) {
+        $query = "UPDATE recensioni SET titolo = ?, voto = ?, commento = ? WHERE idordine = ?";
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            error_log("Error preparing statement for updateReview: " . $this->db->error);
+            return false;
+        }
+        $stmt->bind_param('issi', $titolo, $voto, $commento, $idordine);
+        return $stmt->execute();
+    }
 }
