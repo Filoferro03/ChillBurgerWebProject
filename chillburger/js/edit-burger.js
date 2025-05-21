@@ -113,7 +113,8 @@ async function fetchData(url, formData) {
  */
 function generateIngredients(ingredients, product, personalization) {
     let result = "";
-    modifiche = personalization;
+    modifiche = personalization[0]["idingrediente"] !== null ? personalization : [];
+
     console.log("stato iniziale modifiche: ", modifiche);
     const idPersonalization = getPersonalizationID();
 
@@ -195,7 +196,7 @@ function generateIngredients(ingredients, product, personalization) {
 
     result += `
         <div class="w-100 d-flex justify-content-center mt-3 p-2">
-            <button class="btn btn-secondary fs-5" onclick="sendModifiche(modifiche).then(() => { window.location.href = 'cart.php'; });">Salva</button>
+            <button class="btn btn-secondary fs-5" onclick="sendModifiche(modifiche)">Salva</button>
         </div>
     `;
 
@@ -210,6 +211,7 @@ function generateIngredients(ingredients, product, personalization) {
 function getPersonalizationID() {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get('id');
+    //.then(() => { window.location.href = 'cart.php'; });
 }
 
 /**
@@ -235,9 +237,12 @@ async function deleteIngredient(idpersonalizzazione, idingrediente) {
 async function sendModifiche(modifiche) {
     const url = "api/api-edit-burger.php";
     console.log("Salvataggio modifiche:", modifiche);
+    console.log("Salvataggio modifiche2:", modifiche2);
+
 
     for (let i = 0; i < modifiche.length; i++) {
         const mod = modifiche[i];
+        console.log("i-esimo el", mod);
         const formData = new FormData();
         formData.append("action", "modify");
         formData.append("idpersonalizzazione", getPersonalizationID());
@@ -251,6 +256,7 @@ async function sendModifiche(modifiche) {
         const m = modifiche2[i];
         await deleteIngredient(m.idpersonalizzazione, m.idingrediente);
     }
+
 }
 
 /**
@@ -258,7 +264,6 @@ async function sendModifiche(modifiche) {
  * e genera l’HTML da inserire nella pagina.
  */
 async function getIngredientsData() {
-    console.log("idpersonalizzazione: ",getPersonalizationID());
     const url = "api/api-edit-burger.php";
     const formData = new FormData();
     formData.append("id", getPersonalizationID());

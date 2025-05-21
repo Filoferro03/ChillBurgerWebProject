@@ -51,9 +51,6 @@ try {
 
         // Inserisce la nuova modifica nel DB
         $modifica = $dbh->addIngredientModification($idPersonalizzazione, $idIngrediente, $azione);
-        if (!$modifica) {
-            throw new Exception("Errore nell'aggiunta della modifica ingrediente.");
-        }
         $result = $modifica;
 
         // Caso 3: Richiesta per eliminare una modifica a un ingrediente
