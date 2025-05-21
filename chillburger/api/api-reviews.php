@@ -62,12 +62,27 @@ if (isset($_POST['action']) && $_POST['action'] === 'submit') {
     $response['success'] = $dbh->deleteReview($idordine);
 }
 else if (isset($_POST['action']) && $_POST['action'] === 'update') {
-    $idrecensione = isset($_POST['idrecensione']) ? (int)$_POST['idrecensione'] : null;
-    $titolo = isset($_POST['review_title']) ? trim($_POST['review_title']) : '';
+    $idordine = isset($_POST['idordine']) ? (int)$_POST['idordine'] : null;
+    $titolo = isset($_POST['review_title']) ? trim($_POST['review_title']) : null;
     $voto = isset($_POST['review_rating']) ? (int)$_POST['review_rating'] : null;
-    $commento = isset($_POST['review_comment']) ? trim($_POST['review_comment']) : '';
-    $response['success'] = $dbh->updateReview($idrecensione, $titolo, $voto, $commento);
-;
+    $commento = isset($_POST['review_comment']) ? trim($_POST['review_comment']) : ''; // Comment can be empty
+
+    if (!$idordine) {
+            $response['error'] = 'ID ordine mancante.';
+    } elseif (!$titolo) {
+            $response['error'] = 'Titolo della recensione mancante.';
+    } elseif ($voto === null || $voto < 1 || $voto > 5) {
+            $response['error'] = 'Voto non valido. Deve essere tra 1 e 5.';
+   } else {
+        $insertSuccess = $dbh->updateReview($idordine, $titolo, $voto, $commento);
+
+        if ($insertSuccess) {
+            $response['success'] = true;
+            unset($response['error']); 
+        } else {
+            $response['error'] = 'Errore durante il salvataggio della recensione nel database.';
+        }
+    }
 }
 
 else {
