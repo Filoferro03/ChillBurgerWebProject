@@ -22,3 +22,56 @@
     color: #9C6644;
     text-shadow: 3px 3px white;
 }
+
+/* ——— LISTA PRINCIPALE ——— */
+.notification-list{
+    max-width: 960px;           /* resta centrata nei monitor larghi */
+    margin-inline: auto;
+    padding-left: 0;            /* annulla il padding default <ul> */
+}
+  
+/* ——— SINGOLA NOTIFICA ——— */
+.notification{
+    transition: background-color .2s ease;
+}
+  
+/* Evidenzia le non lette */
+.notification.unread{
+    background-color: #fff8e1;  /* giallo molto chiaro */
+}
+  
+/* Icona campanella */
+.notification .icon{
+    font-size: 1.5rem;
+    line-height: 1;
+    color: #ffc107;             /* giallo Bootstrap */
+}
+  
+  /* Meta-info (data/ora) */
+  .notification .meta{
+    font-size: .875rem;
+    color: #6c757d;             /* grigio Bootstrap */
+  }
+  
+/* Testo principale */
+  .notification .text{
+    word-break: break-word;
+}
+  
+/* Bottoni azione */
+.notification .actions button{
+    all: unset;                 /* azzera lo stile default */
+    cursor: pointer;
+    line-height: 1;
+    font-size: 1rem;
+    color: #6c757d;
+}
+.notification .actions button:hover{
+    color: #212529;
+}
+  
+/* Mobile: stack verticale */
+@media (max-width: 576px){
+    .notification{flex-direction: column;}
+    .notification .actions{flex-direction: row;}
+}  
