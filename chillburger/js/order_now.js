@@ -1,56 +1,49 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const menuGrid = document.getElementById('menuGrid');
-    const filterButtons = document.querySelectorAll('.btn-filter');
-    let prodotti = [];
-  
-    // Crea card prodotto bootstrap
-    function createCard(p) {
-      return `
-        <div class="col-6 col-md-4 col-lg-3 menu-item" data-category="${p.categoria.toLowerCase()}">
-          <div class="card h-100 text-center shadow-sm hover-up">
-            <img src="./resources/products/${p.image}" class="card-img-top" alt="${p.nome}">
-            <div class="card-body">
-              <h5 class="card-title">${p.nome}</h5>
-              <p class="card-text small text-muted">€${Number(p.prezzo).toFixed(2)}</p>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-  
-    // Mostra i prodotti filtrati
-    function showProducts(category) {
-      let html = '';
-      prodotti.forEach(p => {
-        if (category === 'all' || p.categoria.toLowerCase() === category) {
-          html += createCard(p);
-        }
+async function fetchData(url, formData) {
+  try {
+      const response = await fetch(url, {
+          method: "POST",
+          body: formData
       });
-      menuGrid.innerHTML = html;
-    }
-  
-    // Gestione click filtri
-    filterButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        filterButtons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        showProducts(btn.dataset.category);
-      });
-    });
-  
-    // Carica dati da API
-    fetch('/api/api-order-now.php')
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          prodotti = data.data;
-          showProducts('all');
-        } else {
-          menuGrid.innerHTML = '<p class="text-center text-danger">Errore nel caricamento prodotti.</p>';
-        }
-      })
-      .catch(() => {
-        menuGrid.innerHTML = '<p class="text-center text-danger">Errore di comunicazione con il server.</p>';
-      });
-  });
-  
+      if (!response.ok) {
+          throw new Error(`Response status: ${response.status}`);
+      }
+      return await response.json();
+  } catch (error) {
+      console.log(error.message);
+  }
+}
+
+function generateProducts(products, categories) {
+  let result = "";
+
+  products.forEach((product) => {
+    result += `<div class="w-100" d-flex flex-column> 
+      <img src="${product.image}" alt="${product.nome}" class="img-responsive">
+      <div class="d-flex flex-column">
+        <p class="text-center">${product.nome}</p>
+      </div>
+      <div class="d-flex flex-column">
+        <p class="text-center">${product.prezzo}</p>
+      </div>
+      </div>`
+    })
+
+  return result;
+}
+
+
+
+async function getAllProducts() {
+  const url = "api/api-order-now.php";  
+  const formData = new FormData();
+  formData.append("action", "getAllProducts");
+  const jsonResponse = await fetchData(url, formData);
+  console.log("i miei prodotti e categorie",jsonResponse);
+
+  const products = generateProducts(jsonResponse.products, jsonResponse.categories);
+  const main = document.querySelector("#menuGrid");
+  main.innerHTML = products;
+}
+
+// Funzione per generare il menu
+getAllProducts();
