@@ -87,7 +87,7 @@ async function getProductsInCart(order) {
         result += `
             <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-between col-12 border-bottom border-dark mb-2">
                 <div class="d-flex flex-column align-items-center col-8 col-md-3 m-1">
-                    <img src="${product.image}" class="col-10 m-2" alt="${product.nome}">
+                <img src="${product.image}" class="col-10 m-2 rounded-3" alt="${product.nome}">
                 </div>
                 <div class="d-flex w-100 h-100 flex-column justify-content-between p-1">
                     <div class="d-flex flex-column w-100">
