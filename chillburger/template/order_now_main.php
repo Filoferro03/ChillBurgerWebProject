@@ -18,4 +18,3 @@
 </section>
 
 <script src="js/order_now.js"></script>
-

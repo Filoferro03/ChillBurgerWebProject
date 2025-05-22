@@ -1,79 +1,56 @@
-async function fetchData(url, formData) {
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            body: formData
-        });
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-        return await response.json();
-    } catch (error) {
-        console.log(error.message);
-        return null;
-    }
-}
-
-function createProductCard(p) {
-    const div = document.createElement('div');
-    div.className = 'col-6 col-md-4 col-lg-3 menu-item';
-    div.dataset.category = (p.idcategoria || '').toLowerCase();
-
-    div.innerHTML = `
-        <div class="card h-100 text-center shadow-sm hover-up">
-            <img src="${p.image}" class="card-img-top" alt="${p.nome}">
-            <div class="card-body">
-                <h5 class="card-title">${p.nome}</h5>
-                <p class="card-text small text-muted"></p>
-            </div>
-            <div class="card-footer bg-white border-0">
-                <div class="d-block mb-3">
-                    <span class="fw-bold text-primary">${parseFloat(p.prezzo).toFixed(2).replace('.', ',')} €</span>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-outline-success btn-sm btn-add" data-id="${p.idprodotto}">+ Aggiungi</button>
-                    <button class="btn btn-outline-danger btn-sm btn-remove" data-id="${p.idprodotto}">− Rimuovi</button>
-                </div>
-            </div>
-        </div>
-    `;
-    return div;
-}
-
-async function renderProducts(idcategoria = null) {
-    const container = document.getElementById('menuGrid');
-    container.innerHTML = '';
-
-    const url = '/chillburger/api/api-menu.php'; // usa percorso completo e corretto
-    const formData = new FormData();
-
-    // Se vuoi filtrare per categoria lato API, aggiungi idcategoria nel formData
-    if (idcategoria !== null) {
-        formData.append('idcategoria', idcategoria);
-    }
-
-    const json = await fetchData(url, formData);
-
-    if (json && json.data) {
-        let productsToRender = json.data;
-
-        // Se vuoi filtrare lato client (alternativa a inviare idcategoria lato server)
-        if (idcategoria !== null) {
-            productsToRender = productsToRender.filter(p => p.idcategoria == idcategoria);
-        }
-
-        // Aggiungi ogni prodotto al container
-        productsToRender.forEach(p => {
-            const card = createProductCard(p);
-            container.appendChild(card);
-        });
-    } else {
-        container.innerHTML = '<p>Nessun prodotto disponibile</p>';
-    }
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-    renderProducts();
-
-    // Qui puoi aggiungere i listener per i bottoni filtro categoria e aggiungi/rimuovi
-});
+    const menuGrid = document.getElementById('menuGrid');
+    const filterButtons = document.querySelectorAll('.btn-filter');
+    let prodotti = [];
+  
+    // Crea card prodotto bootstrap
+    function createCard(p) {
+      return `
+        <div class="col-6 col-md-4 col-lg-3 menu-item" data-category="${p.categoria.toLowerCase()}">
+          <div class="card h-100 text-center shadow-sm hover-up">
+            <img src="./resources/products/${p.image}" class="card-img-top" alt="${p.nome}">
+            <div class="card-body">
+              <h5 class="card-title">${p.nome}</h5>
+              <p class="card-text small text-muted">€${Number(p.prezzo).toFixed(2)}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  
+    // Mostra i prodotti filtrati
+    function showProducts(category) {
+      let html = '';
+      prodotti.forEach(p => {
+        if (category === 'all' || p.categoria.toLowerCase() === category) {
+          html += createCard(p);
+        }
+      });
+      menuGrid.innerHTML = html;
+    }
+  
+    // Gestione click filtri
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showProducts(btn.dataset.category);
+      });
+    });
+  
+    // Carica dati da API
+    fetch('/api/api-order-now.php')
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          prodotti = data.data;
+          showProducts('all');
+        } else {
+          menuGrid.innerHTML = '<p class="text-center text-danger">Errore nel caricamento prodotti.</p>';
+        }
+      })
+      .catch(() => {
+        menuGrid.innerHTML = '<p class="text-center text-danger">Errore di comunicazione con il server.</p>';
+      });
+  });
+  
