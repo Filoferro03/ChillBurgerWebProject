@@ -1059,4 +1059,14 @@ class DatabaseHelper
         $stmt->close();
         return $success;
     }
+
+    public function modifyPersonalizationQuantity($idordine, $idpersonalizzazione, $add)
+    {
+        $query = "UPDATE personalizzazioni SET quantita = quantita + ? WHERE idordine = ? AND idpersonalizzazione = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("iii", $add, $idordine, $idpersonalizzazione);
+        $success = $stmt->execute();
+        $stmt->close();
+        return $success;
+    }
 }
