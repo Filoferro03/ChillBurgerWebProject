@@ -31,6 +31,11 @@ async function modifyQuantity(idprodotto,quantity){
     
 }
 
+async function removeProductFromCart(idprodotto, quantita = 1) {
+    // Use negative quantity to decrease
+    await modifyQuantity(idprodotto, -quantita);
+}  
+
 async function modifyPersonalizationQuantity(idpersonalizzazione,quantity){
     const url = 'api/api-cart.php';
     const formData = new FormData();
