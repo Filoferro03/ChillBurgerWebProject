@@ -69,6 +69,30 @@ if (isset($_POST["action"])) {
             }
             break;
 
+        case "getCartPrice":
+            if (isset($_SESSION["idordine"])) {
+                $order = $dbh->getOrderById($_SESSION["idordine"]);
+                $result["order"] = $order;
+                $result['success'] = true;
+            } else {
+                $result["order"] = [];
+                $result['success'] = false;
+            }
+
+            break;
+
+
+        case "modifyProdQuantity":
+            if (isset($_SESSION["idordine"]) && isset($POST["idprodotto"]) && isset($POST["quantita"])) {
+                $dbh->modifyProductQuantity($_SESSION["idordine"], $_POST["idprodotto"], $_POST["quantita"]);
+                $result['success'] = true;
+            } else {
+                $result["message"] = "Non è stata settata la scelta";
+                $result['success'] = false;
+            }
+
+            break;
+
         case "createCart":
             if (isset($_SESSION["idutente"])) {
                 if ($dbh->hasUncompletedOrder($_SESSION["idutente"])) {

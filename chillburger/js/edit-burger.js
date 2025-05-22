@@ -196,7 +196,7 @@ function generateIngredients(ingredients, product, personalization) {
 
     result += `
         <div class="w-100 d-flex justify-content-center mt-3 p-2">
-            <button class="btn btn-secondary fs-5" onclick="sendModifiche(modifiche).then(() => { window.location.href = 'cart.php'; });">Salva</button>
+            <button class="btn btn-secondary fs-5" onclick="sendModifiche(modifiche)">Salva</button>
         </div>
     `;
 
