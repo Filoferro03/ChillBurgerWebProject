@@ -43,14 +43,15 @@ INSERT INTO chillburgerdb.categorie (descrizione) VALUES
 ('Dolci');
 
 -- Insert Prodotti
-INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, image) VALUES
+INSERT INTO chillburgerdb.prodotti (nome, prezzo, idcategoria, image) VALUES
 -- Categoria: panini (idcategoria = 1)
-('Bacon Cheeseburger', 14.50, 20, 1, 'bacon-cheeseburger.png'),
-('Chicken Deluxe', 13.00, 20, 1, 'chicken-deluxe.png'),
-('Smoky Burger', 15.50, 15, 1, 'smoky-burger.png'),
-('Veggie Burger', 12.00, 15, 1, 'veggie-burger.png'),
+('Bacon Cheeseburger', 14.50, 1, 'bacon-cheeseburger.png'),
+('Chicken Deluxe', 13.00, 1, 'chicken-deluxe.png'),
+('Smoky Burger', 15.50, 1, 'smoky-burger.png'),
+('Veggie Burger', 12.00, 1, 'veggie-burger.png');
 
 -- Categoria: fritti (idcategoria = 2)
+INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, image) VALUES
 ('Onion Rings', 4.50, 30, 2, 'onion-rings.png'),
 ('Patatine Fritte', 3.50, 50, 2, 'patatine-fritte.png'),
 ('Alette di Pollo BBQ', 6.00, 25, 2, 'alette-pollo-bbq.png'),
