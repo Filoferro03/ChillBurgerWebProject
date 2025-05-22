@@ -13,23 +13,32 @@ async function fetchData(url, formData) {
   }
 }
 
-function generateProducts(products, categories) {
+function generateProducts(products) {
   let result = "";
-
   products.forEach((product) => {
-    result += `<div class="w-100" d-flex flex-column> 
-      <img src="${product.image}" alt="${product.nome}" class="img-responsive">
-      <div class="d-flex flex-column">
-        <p class="text-center">${product.nome}</p>
-      </div>
-      <div class="d-flex flex-column">
-        <p class="text-center">${product.prezzo}</p>
-      </div>
-      </div>`
-    })
+    result += `
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="card h-100 text-center shadow-sm hover-up">
+        <img src="${product.image}" class="card-img-top" alt="${product.nome}">
+        <div class="card-body">
+          <h5 class="card-title">${product.nome}</h5>
+          <p class="card-text small text-muted">${product.descrizione || ''}</p>
+        </div>
 
+        <div class="card-footer bg-white border-0">
+          <span class="fw-bold text-primary">${product.prezzo}</span>
+          <div class="d-flex">
+            <button class="btn btn-outline-primary btn-sm">-</button>
+            <button class="btn btn-outline-primary btn-sm">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    `;
+  });
   return result;
 }
+
 
 
 
@@ -38,12 +47,13 @@ async function getAllProducts() {
   const formData = new FormData();
   formData.append("action", "getAllProducts");
   const jsonResponse = await fetchData(url, formData);
-  console.log("i miei prodotti e categorie",jsonResponse);
+  console.log("i miei prodotti e categorie", jsonResponse);
 
-  const products = generateProducts(jsonResponse.products, jsonResponse.categories);
+  const productsHtml = generateProducts(jsonResponse.products);
   const main = document.querySelector("#menuGrid");
-  main.innerHTML = products;
+  if (main) main.innerHTML = productsHtml;
 }
+
 
 // Funzione per generare il menu
 getAllProducts();
