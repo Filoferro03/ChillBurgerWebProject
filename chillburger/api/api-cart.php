@@ -83,11 +83,23 @@ if (isset($_POST["action"])) {
 
 
         case "modifyProdQuantity":
-            if (isset($_SESSION["idordine"]) && isset($POST["idprodotto"]) && isset($POST["quantita"])) {
+            if (isset($_SESSION["idordine"]) && isset($_POST["idprodotto"]) && isset($_POST["quantita"])) {
                 $dbh->modifyProductQuantity($_SESSION["idordine"], $_POST["idprodotto"], $_POST["quantita"]);
                 $result['success'] = true;
             } else {
-                $result["message"] = "Non è stata settata la scelta";
+                $result["message"] = "Non è stata settata in modfiy la scelta";
+                $result['success'] = false;
+            }
+
+            break;
+
+
+        case "modifyPersQuantity":
+            if (isset($_SESSION["idordine"]) && isset($_POST["idpersonalizzazione"]) && isset($_POST["quantita"])) {
+                $dbh->modifyPersonalizationQuantity($_SESSION["idordine"], $_POST["idpersonalizzazione"], $_POST["quantita"]);
+                $result['success'] = true;
+            } else {
+                $result["message"] = "Non è stata settata in modfiy la scelta";
                 $result['success'] = false;
             }
 

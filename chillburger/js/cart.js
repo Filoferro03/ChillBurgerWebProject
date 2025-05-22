@@ -27,7 +27,21 @@ async function modifyQuantity(idprodotto,quantity){
     const json = await fetchData(url, formData);
     console.log(json);
 
-    //window.location.reload();
+    await init();
+    
+}
+
+async function modifyPersonalizationQuantity(idpersonalizzazione,quantity){
+    const url = 'api/api-cart.php';
+    const formData = new FormData();
+    formData.append("action", "modifyPersQuantity");
+    formData.append("idpersonalizzazione",idpersonalizzazione);
+    formData.append("quantita",quantity);
+
+    const json = await fetchData(url, formData);
+    console.log(json);
+
+    await init();
     
 }
 
@@ -40,7 +54,6 @@ async function getProductsInCart(order) {
 
     const json = await fetchData(url, formData);
     console.log("json: ", json);
-
     console.log("prezzo ordine", order[0].prezzo_totale);
 
     const products = json.products || [];
@@ -53,8 +66,6 @@ async function getProductsInCart(order) {
         return;
     }
 
-    console.log("Prodotti caricati con successo:", products);
-
     let subTotal = 0;
     let result = "";
 
@@ -64,6 +75,9 @@ async function getProductsInCart(order) {
         const quantita = product.quantita;
         const price = product.prezzo;
         subTotal += Number(price) * quantita;
+
+        const disableMinus = quantita === 0 ? "disabled" : "";
+        const disableRemove = quantita > 0 ? "disabled" : "";
 
         result += `
             <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-between col-12 border-bottom border-dark mb-2">
@@ -82,16 +96,12 @@ async function getProductsInCart(order) {
                             <div class="d-flex flex-column">
                                 <p class="fs-3">Quantita: <span class="quantita">${quantita}</span></p>
                                 <div class="d-flex flex-row">
-                                    <button type="button" class="btn p-1 p-md-3 md:m-1" 
-                                        onclick="
-                                            modifyQuantity(${product.idprodotto},-1)
-                                        ">
+                                    <button type="button" class="btn p-1 p-md-3 md:m-1" ${disableMinus}
+                                        onclick="modifyQuantity(${product.idprodotto}, -1)">
                                         <i class="fa-solid fa-circle-minus icon"></i>
                                     </button>
                                     <button type="button" class="btn p-1 p-md-3 md:m-1 btn-plus" 
-                                        onclick="
-                                            modifyQuantity(${product.idprodotto},1)
-                                        ">
+                                        onclick="modifyQuantity(${product.idprodotto}, 1)">
                                         <i class="fa-solid fa-circle-plus icon"></i>
                                     </button>
                                 </div>
@@ -99,7 +109,9 @@ async function getProductsInCart(order) {
                         </div>
                     </div>
                     <div class="d-none d-md-flex justify-content-end pb-3">
-                        <button class="btn btn-danger" data-id="${product.idprodotto}" data-type="product">Rimuovi</button>
+                        <button class="btn btn-danger" data-id="${product.idprodotto}" data-type="product" ${disableRemove}>
+                            Rimuovi
+                        </button>
                     </div>
                 </div>
             </div>`;
@@ -111,44 +123,58 @@ async function getProductsInCart(order) {
         const price = personalization.prezzo;
         const quantita = personalization.quantita;
         subTotal += Number(price) * quantita;
+        const disableMinusPers = quantita === 0 ? "disabled" : "";
+const disableRemovePers = quantita > 0 ? "disabled" : "";
 
-        for (let j = 0; j < quantita; j++) {
-            result += `
-                <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-between col-12 border-bottom border-dark mb-2">
-                    <div class="d-flex flex-column align-items-center col-8 col-md-3 m-1">
-                        <img src="${personalization.image}" class="col-10 m-2" alt="${personalization.nomeprodotto}">
+result += `
+    <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-between col-12 border-bottom border-dark mb-2">
+        <div class="d-flex flex-column align-items-center col-8 col-md-3 m-1">
+            <img src="${personalization.image}" class="col-10 m-2" alt="${personalization.nomeprodotto}">
+        </div>
+        <div class="d-flex w-100 h-100 flex-column justify-content-between p-1">
+            <div class="d-flex flex-column w-100">
+                <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-center">
+                    <div class="d-flex flex-column">
+                        <p class="fs-3">${personalization.nomeprodotto}</p>
                     </div>
-                    <div class="d-flex w-100 h-100 flex-column justify-content-between p-1">
-                        <div class="d-flex flex-column w-100">
-                            <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-center">
-                                <div class="d-flex flex-column">
-                                    <p class="fs-3">${personalization.nomeprodotto}</p>
-                                </div>
-                                <div>
-                                    <p class="fs-3">${price}€</p>
-                                </div>
-                                <div>
-                                    <p class="fs-3">Quantita: 1</p>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-between d-md-none mt-2">
-                                <a href="./edit-burger.php?id=${personalization.idpersonalizzazione}">
-                                    <button class="btn btn-success w-10" data-id="${personalization.idpersonalizzazione}">Modifica</button>
-                                </a>
-                                <button class="btn btn-danger" data-id="${personalization.idpersonalizzazione}" data-type="personalization">Rimuovi</button>
-                            </div>
-                            <div class="d-none d-md-block mt-2">
-                                <a href="./edit-burger.php?id=${personalization.idpersonalizzazione}">
-                                    <button class="btn btn-success w-10" data-id="${personalization.idpersonalizzazione}">Modifica</button>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="d-none d-md-flex justify-content-end pb-3">
-                            <button class="btn btn-danger" data-id="${personalization.idpersonalizzazione}" data-type="personalization">Rimuovi</button>
+                    <div>
+                        <p class="fs-3">${(price * quantita).toFixed(2)}€</p>
+                    </div>
+                    <div class="d-flex flex-column">
+                        <p class="fs-3">Quantita: <span class="quantita">${quantita}</span></p>
+                        <div class="d-flex flex-row">
+                            <button type="button" class="btn p-1 p-md-3 md:m-1" ${disableMinusPers}
+                                onclick="modifyPersonalizationQuantity(${personalization.idpersonalizzazione}, -1)">
+                                <i class="fa-solid fa-circle-minus icon"></i>
+                            </button>
+                            <button type="button" class="btn p-1 p-md-3 md:m-1"
+                                onclick="modifyPersonalizationQuantity(${personalization.idpersonalizzazione}, 1)">
+                                <i class="fa-solid fa-circle-plus icon"></i>
+                            </button>
                         </div>
                     </div>
-                </div>`;
-        }
+                </div>
+                <div class="d-flex justify-content-between d-md-none mt-2">
+                    <a href="./edit-burger.php?id=${personalization.idpersonalizzazione}">
+                        <button class="btn btn-success w-10" data-id="${personalization.idpersonalizzazione}">Modifica</button>
+                    </a>
+                    <button class="btn btn-danger" data-id="${personalization.idpersonalizzazione}" data-type="personalization" ${disableRemovePers}>
+                        Rimuovi
+                    </button>
+                </div>
+                <div class="d-none d-md-block mt-2">
+                    <a href="./edit-burger.php?id=${personalization.idpersonalizzazione}">
+                        <button class="btn btn-success w-10" data-id="${personalization.idpersonalizzazione}">Modifica</button>
+                    </a>
+                </div>
+            </div>
+            <div class="d-none d-md-flex justify-content-end pb-3">
+                <button class="btn btn-danger" data-id="${personalization.idpersonalizzazione}" data-type="personalization" ${disableRemovePers}>
+                    Rimuovi
+                </button>
+            </div>
+        </div>
+    </div>`;
     }
 
     // Totale
@@ -175,6 +201,8 @@ async function getProductsInCart(order) {
 
     div.innerHTML = result;
 }
+
+
 
 
 
