@@ -50,6 +50,7 @@ CREATE TABLE ordini (
      idutente INT NOT NULL,
      timestamp_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
      completato BOOLEAN DEFAULT FALSE,
+     prezzo_totale DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
      PRIMARY KEY (idordine)
 );
 
@@ -453,6 +454,113 @@ AFTER DELETE ON composizioni
 FOR EACH ROW
 BEGIN
     CALL SP_UpdateProductAvailability(OLD.idprodotto);
+END //
+
+DELIMITER ;
+
+-- Stored Procedure per aggiornare il prezzo totale di un ordine
+DELIMITER //
+
+CREATE PROCEDURE SP_UpdateOrderTotalPrice(IN p_idordine INT)
+BEGIN
+    DECLARE total_from_personalizzazioni DECIMAL(10, 2);
+    DECLARE total_from_carrelli_prodotti DECIMAL(10, 2);
+
+    -- Calcola il totale dalla tabella personalizzazioni (prezzo unitario * quantità)
+    SELECT COALESCE(SUM(prezzo * quantita), 0)
+    INTO total_from_personalizzazioni
+    FROM personalizzazioni
+    WHERE idordine = p_idordine;
+
+    -- Calcola il totale dalla tabella carrelli_prodotti (prezzo prodotto * quantità)
+    SELECT COALESCE(SUM(p.prezzo * cp.quantita), 0)
+    INTO total_from_carrelli_prodotti
+    FROM carrelli_prodotti cp
+    JOIN prodotti p ON cp.idprodotto = p.idprodotto
+    WHERE cp.idordine = p_idordine;
+
+    -- Aggiorna il prezzo_totale nella tabella ordini
+    UPDATE ordini
+    SET prezzo_totale = total_from_personalizzazioni + total_from_carrelli_prodotti + 2.50
+    WHERE idordine = p_idordine;
+END //
+
+DELIMITER ;
+
+-- Triggers per la tabella 'personalizzazioni'
+DELIMITER //
+
+CREATE TRIGGER trg_after_personalizzazioni_insert_update_order_total
+AFTER INSERT ON personalizzazioni
+FOR EACH ROW
+BEGIN
+    CALL SP_UpdateOrderTotalPrice(NEW.idordine);
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER trg_after_personalizzazioni_update_update_order_total
+AFTER UPDATE ON personalizzazioni
+FOR EACH ROW
+BEGIN
+    -- Ricalcola se il prezzo o la quantità della personalizzazione sono cambiati.
+    -- NEW.idordine dovrebbe essere uguale a OLD.idordine in un update standard.
+    IF OLD.prezzo <> NEW.prezzo OR OLD.quantita <> NEW.quantita THEN
+        CALL SP_UpdateOrderTotalPrice(NEW.idordine);
+    END IF;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER trg_after_personalizzazioni_delete_update_order_total
+AFTER DELETE ON personalizzazioni
+FOR EACH ROW
+BEGIN
+    CALL SP_UpdateOrderTotalPrice(OLD.idordine);
+END //
+
+DELIMITER ;
+
+-- Triggers per la tabella 'carrelli_prodotti'
+DELIMITER //
+
+CREATE TRIGGER trg_after_carrelli_prodotti_insert_update_order_total
+AFTER INSERT ON carrelli_prodotti
+FOR EACH ROW
+BEGIN
+    CALL SP_UpdateOrderTotalPrice(NEW.idordine);
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER trg_after_carrelli_prodotti_update_update_order_total
+AFTER UPDATE ON carrelli_prodotti
+FOR EACH ROW
+BEGIN
+    -- In carrelli_prodotti, (idprodotto, idordine) è la chiave primaria.
+    -- Un UPDATE su una riga esistente modificherà tipicamente solo la 'quantita'.
+    -- Se 'idprodotto' o 'idordine' cambiassero, si tratterebbe di un DELETE della vecchia riga
+    -- e un INSERT di una nuova, gestiti dagli altri trigger.
+    IF OLD.quantita <> NEW.quantita THEN
+        CALL SP_UpdateOrderTotalPrice(NEW.idordine); -- NEW.idordine sarà uguale a OLD.idordine
+    END IF;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER trg_after_carrelli_prodotti_delete_update_order_total
+AFTER DELETE ON carrelli_prodotti
+FOR EACH ROW
+BEGIN
+    CALL SP_UpdateOrderTotalPrice(OLD.idordine);
 END //
 
 DELIMITER ;

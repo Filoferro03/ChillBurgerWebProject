@@ -653,6 +653,8 @@ class DatabaseHelper
             }
         }
 
+        $totalPrice += 2.50;
+
         return [
             'orderCustom' => $orderCustom,
             'orderStock' => $orderStock,
