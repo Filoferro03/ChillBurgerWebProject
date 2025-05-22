@@ -629,31 +629,16 @@ class DatabaseHelper
             error_log("Errore preparazione queryStock in getOrderDetails: " . $this->db->error);
         }
 
-        // Calcolo del prezzo totale corretto
-        $processed_personalizations = []; // Per tenere traccia degli idpersonalizzazione già sommati
-
-        if (!empty($orderCustom)) { // Verifica che $orderCustom non sia vuoto
-            foreach ($orderCustom as $item) {
-                // Assicurati che gli indici esistano
-                if (isset($item['idpersonalizzazione'], $item['prezzo'], $item['quantita'])) {
-                    if (!in_array($item['idpersonalizzazione'], $processed_personalizations)) {
-                        $totalPrice += floatval($item['prezzo']) * intval($item['quantita']);
-                        $processed_personalizations[] = $item['idpersonalizzazione'];
-                    }
-                }
-            }
+        $priceQuery = "SELECT prezzo_totale FROM ordini WHERE idordine = ?";
+        $stmtPrice = $this->db->prepare($priceQuery);
+        $stmtPrice->bind_param('i', $idordine);
+        $stmtPrice->execute();
+        $resultPrice = $stmtPrice->get_result();
+        $rowPrice = $resultPrice->fetch_assoc();
+        if ($rowPrice !== null) {
+            $totalPrice = floatval($rowPrice['prezzo_totale']);
         }
-
-        if (!empty($orderStock)) { // Verifica che $orderStock non sia vuoto
-            foreach ($orderStock as $item) {
-                // Assicurati che gli indici esistano
-                if (isset($item['prezzo'], $item['quantita'])) {
-                    $totalPrice += floatval($item['prezzo']) * intval($item['quantita']);
-                }
-            }
-        }
-
-        $totalPrice += 2.50;
+        $stmtPrice->close();
 
         return [
             'orderCustom' => $orderCustom,
