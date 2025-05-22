@@ -1,20 +1,10 @@
--- *********************************************
--- * SQL MySQL generation
--- *--------------------------------------------
--- * DB-MAIN version: 11.0.2
--- * Generator date: Sep 14 2021
--- * Generation date: Tue May 13 2025
--- *********************************************
-
 -- Database Section
--- ________________
 
 DROP DATABASE IF EXISTS chillburgerdb;
 CREATE DATABASE IF NOT EXISTS chillburgerdb;
 USE chillburgerdb;
 
 -- Tables Section
--- _____________
 
 CREATE TABLE categorie (
      idcategoria INT AUTO_INCREMENT NOT NULL,
@@ -35,7 +25,7 @@ CREATE TABLE notifiche (
      idnotifica INT AUTO_INCREMENT NOT NULL,
      titolo VARCHAR(255) NOT NULL,
      testo TEXT NOT NULL,
-     vista BOOLEAN NOT NULL DEFAULT FALSE,
+     vista TINYINT(1) NOT NULL DEFAULT 0,
      tipo ENUM('ordine', 'prodotto', 'ingrediente') NOT NULL,
      idutente INT NOT NULL,
      idprodotto INT,
@@ -49,14 +39,14 @@ CREATE TABLE ordini (
      idordine INT AUTO_INCREMENT NOT NULL,
      idutente INT NOT NULL,
      timestamp_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-     completato BOOLEAN DEFAULT FALSE,
+     completato TINYINT(1) DEFAULT 0,
      prezzo_totale DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
      PRIMARY KEY (idordine)
 );
 
 CREATE TABLE personalizzazioni (
      idpersonalizzazione INT AUTO_INCREMENT NOT NULL,
-     prezzo DECIMAL(10, 2) NOT NULL, -- Gestito dai trigger
+     prezzo DECIMAL(10, 2) NOT NULL,
      quantita INT NOT NULL,
      idordine INT NOT NULL,
      idprodotto INT NOT NULL,
@@ -77,14 +67,14 @@ CREATE TABLE carrelli_prodotti (
      idprodotto INT NOT NULL,
      idordine INT NOT NULL,
      quantita INT NOT NULL,
-     PRIMARY KEY (idprodotto,idordine)
+     PRIMARY KEY (idprodotto, idordine)
 );
 
 CREATE TABLE composizioni (
      idprodotto INT NOT NULL,
      idingrediente INT NOT NULL,
      quantita INT NOT NULL,
-     essenziale BOOLEAN DEFAULT FALSE,
+     essenziale TINYINT(1) DEFAULT 0,
      PRIMARY KEY (idprodotto, idingrediente)
 );
 
@@ -93,13 +83,12 @@ CREATE TABLE modifiche_stato (
      idstato INT NOT NULL,
      timestamp_modifica TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
      PRIMARY KEY (idordine, idstato)
-     -- Le FK e gli indici per idordine e idstato verranno definiti più avanti
 );
 
 CREATE TABLE modifiche_ingredienti (
      idpersonalizzazione INT NOT NULL,
      idingrediente INT NOT NULL,
-     azione ENUM('rimosso','aggiunto') NOT NULL,
+     azione ENUM('rimosso', 'aggiunto') NOT NULL,
      PRIMARY KEY (idpersonalizzazione, idingrediente)
 );
 
@@ -107,11 +96,11 @@ CREATE TABLE recensioni (
      idrecensione INT AUTO_INCREMENT NOT NULL,
      idordine INT NOT NULL,
      titolo VARCHAR(255) NOT NULL,
-     voto INT NOT NULL CHECK (voto BETWEEN 1 AND 5),
+     voto INT NOT NULL,
      commento TEXT,
      timestamp_recensione TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
      PRIMARY KEY (idrecensione),
-     UNIQUE (idordine)
+     UNIQUE KEY unique_idordine (idordine)
 );
 
 CREATE TABLE stati_ordine (
@@ -125,14 +114,13 @@ CREATE TABLE utenti (
      nome VARCHAR(255) NOT NULL,
      cognome VARCHAR(255) NOT NULL,
      username VARCHAR(255) NOT NULL,
-     password VARCHAR(255) NOT NULL, -- Considerare hashing sicuro per le password
+     password VARCHAR(255) NOT NULL,
      tipo ENUM('cliente', 'venditore') NOT NULL,
      PRIMARY KEY (idutente),
-     UNIQUE (username)
+     UNIQUE KEY unique_username (username)
 );
 
 -- Constraints Section
--- ___________________
 
 ALTER TABLE notifiche
 ADD CONSTRAINT fkrelativa
@@ -220,7 +208,6 @@ FOREIGN KEY (idordine)
 REFERENCES ordini (idordine);
 
 -- Index Section
--- _____________
 
 CREATE INDEX idx_notifiche_idutente ON notifiche (idutente);
 CREATE INDEX idx_notifiche_idprodotto ON notifiche (idprodotto);
@@ -253,11 +240,8 @@ CREATE INDEX idx_recensioni_idordine ON recensioni (idordine);
 CREATE INDEX idx_recensioni_timestamp ON recensioni (timestamp_recensione);
 
 -- Triggers Section
--- ________________
 
 DELIMITER //
-
-
 
 CREATE TRIGGER trg_before_personalizzazione_insert_set_base_price
 BEFORE INSERT ON personalizzazioni
@@ -322,17 +306,13 @@ BEGIN
     WHERE idpersonalizzazione = current_personalizzazione_id;
 END; //
 
-DELIMITER ;
-
-DELIMITER //
-
 CREATE TRIGGER trg_after_order_update_set_completed_status
 AFTER UPDATE ON ordini
 FOR EACH ROW
 BEGIN
-    IF NEW.completato = TRUE AND OLD.completato = FALSE THEN
-        INSERT INTO modifiche_stato (idordine, idstato) -- timestamp_modifica userà DEFAULT CURRENT_TIMESTAMP
-        VALUES (NEW.idordine, 1); -- Cambia '3' se l'ID per 'Completato' è diverso
+    IF NEW.completato = 1 AND OLD.completato = 0 THEN
+        INSERT INTO modifiche_stato (idordine, idstato)
+        VALUES (NEW.idordine, 1);
     END IF;
 END //
 
