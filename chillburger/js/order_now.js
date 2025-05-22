@@ -26,10 +26,10 @@ function generateProducts(products) {
         </div>
 
         <div class="card-footer bg-white border-0">
-          <span class="fw-bold text-primary">${product.prezzo}</span>
+          <span class="fw-bold text-primary">${product.prezzo} €</span>
           <div class="d-flex">
-            <button class="btn btn-outline-primary btn-sm">-</button>
-            <button class="btn btn-outline-primary btn-sm">+</button>
+            <button class="btn btn-outline-danger ">-</button>
+            <button class="btn btn-outline-success">+</button>
           </div>
         </div>
       </div>
