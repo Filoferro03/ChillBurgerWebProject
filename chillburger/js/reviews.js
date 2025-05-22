@@ -99,11 +99,6 @@ async function loadReviews(page = 1) { // Accetta la pagina come argomento
     }
 }
 
-// Chiamata iniziale per caricare la prima pagina di recensioni
-// Assicurati che questo venga eseguito dopo che il DOM è pronto
-// Puoi metterlo dentro un listener DOMContentLoaded se questo script viene caricato nell'head,
-// o lasciarlo così se viene caricato alla fine del body.
-// Per coerenza con profile.js, usiamo DOMContentLoaded:
 document.addEventListener('DOMContentLoaded', () => {
      // Verifica se siamo sulla pagina delle recensioni controllando l'esistenza dei contenitori
      if (document.getElementById('reviewsList') && document.getElementById('reviewsPagination')) {

@@ -543,10 +543,6 @@ CREATE TRIGGER trg_after_carrelli_prodotti_update_update_order_total
 AFTER UPDATE ON carrelli_prodotti
 FOR EACH ROW
 BEGIN
-    -- In carrelli_prodotti, (idprodotto, idordine) è la chiave primaria.
-    -- Un UPDATE su una riga esistente modificherà tipicamente solo la 'quantita'.
-    -- Se 'idprodotto' o 'idordine' cambiassero, si tratterebbe di un DELETE della vecchia riga
-    -- e un INSERT di una nuova, gestiti dagli altri trigger.
     IF OLD.quantita <> NEW.quantita THEN
         CALL SP_UpdateOrderTotalPrice(NEW.idordine); -- NEW.idordine sarà uguale a OLD.idordine
     END IF;
