@@ -238,6 +238,15 @@ function validateCVV(cvv) {
     return true;
 }
 
+async function confirmOrder() {
+    const apiUrl = `api/api-orders.php`;
+    const formData = new FormData();
+    formData.append('action', 'payed');
+
+    const json = await fetchData(apiUrl, formData);
+    return json.success;
+}
+
 
 // --- Event Listener for Payment Form ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -277,12 +286,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Here you would typically send data to a payment gateway.
                 // For this example, we'll just show a success message after a delay.
-                setTimeout(() => {
-                    displayGeneralMessage('🎉 Pagamento confermato con successo! Il tuo ordine è in preparazione.', true);
-                    // Optionally, redirect or clear form:
-                    // paymentForm.reset();
-                    // window.location.href = 'thank_you_page.php'; // Redirect to a thank you page
-                }, 2000);
+                 setTimeout(() => {
+                    if (confirmOrder()) {
+                    displayGeneralMessage('🎉 Pagamento confermato con successo! Il tuo ordine è in preparazione. Sarai reindirizzato al tuo profilo...', true);
+                    setTimeout(() => {
+                        window.location.href = 'profile.php';
+                    }, 2500); }
+                }, 2000); 
 
             } else {
                 displayGeneralMessage('Alcuni campi non sono validi. Controlla i messaggi di errore.', false);

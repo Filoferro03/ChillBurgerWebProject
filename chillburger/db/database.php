@@ -1069,4 +1069,14 @@ class DatabaseHelper
         $stmt->close();
         return $success;
     }
+
+    public function updateStatusToPayed($idordine)
+    {
+        $updateQuery = "UPDATE ordini SET completato = TRUE WHERE idordine = ?";
+        $stmtUpdate = $this->db->prepare($updateQuery);
+        $stmtUpdate->bind_param('i', $idordine);
+        $success = $stmtUpdate->execute();
+        $stmtUpdate->close();
+        return $success;
+    }
 }

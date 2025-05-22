@@ -41,10 +41,21 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
         if(!$result){
             http_response_code(500); // Internal Server Error
             $response = ['success' => false, 'error' => 'Errore durante la conferma dell\'ordine'];
-        }else{
+        } else{
             $response['success'] = true;
         }
-    } else {
+    } else if (isset($_POST['action']) && $_POST['action'] == 'payed') {
+        $idordine = $_SESSION['idordine'];
+        $result = $dbh->updateStatusToPayed($idordine);
+        if (!$result) {
+            http_response_code(500); // Internal Server Error
+            $response = ['success' => false, 'error' => 'Errore durante il pagamento dell\'ordine'];
+        } else {
+            $response['success'] = true;
+        }
+    } 
+    
+    else {
         http_response_code(400); // Bad Request
         $response = ['success' => false, 'error' => 'Azione non specificata o non valida'];
     }
