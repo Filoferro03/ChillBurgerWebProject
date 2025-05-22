@@ -1,3 +1,5 @@
+let products = [];
+
 async function fetchData(url, formData) {
   try {
       const response = await fetch(url, {
@@ -45,14 +47,14 @@ async function getAllProducts() {
   formData.append("action", "getAllProducts");
 
   const jsonResponse = await fetchData(url, formData);
-  const products = jsonResponse.products;
+  products = jsonResponse.products;  // store globally
 
   const productsHtml = generateProducts(products);
   const main = document.querySelector("#menuGrid");
   if (main) main.innerHTML = productsHtml;
 
   setupFiltering();
-  setupAddToCartButtons();
+  setupAddToCartButtons(); // call after products generated
 }
 
 
@@ -76,25 +78,44 @@ function setupFiltering() {
   });
 }
 
-async function addProductToCart(idprodotto, quantita = 1) {
+async function addProductToCart(idprodotto) {
+  // Find the product in the loaded products list
+  const product = products.find(p => p.idprodotto == idprodotto);
+  if (!product) {
+    console.error("Prodotto non trovato:", idprodotto);
+    return;
+  }
+
   const url = "api/api-cart.php";
   const formData = new FormData();
-  formData.append("action", "addProd");
-  formData.append("idprodotto", idprodotto);
-  formData.append("quantita", quantita);
-
-  const response = await fetch(url, {
-    method: "POST",
-    body: formData
-  });
-  const json = await response.json();
-
-  if (json.success) {
-    console.log("Prodotto aggiunto al carrello!");
-    // Ricarica il carrello se vuoi:
-    await init();  // supponendo che init() ricarichi il carrello dal backend
+  
+  if (product.categoryDescrizione === "1") {
+    // Call addPers
+    formData.append("action", "addPers");
+    formData.append("idprodotto", idprodotto);
+    formData.append("quantita", 1);
   } else {
-    console.error("Errore aggiungendo prodotto:", json.error);
+    // Call addProd
+    formData.append("action", "addProd");
+    formData.append("idprodotto", idprodotto);
+    formData.append("quantita", 1);
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      body: formData
+    });
+    const json = await response.json();
+
+    if (json.success) {
+      console.log("Prodotto aggiunto al carrello!");
+      await init();
+    } else {
+      console.error("Errore aggiungendo prodotto:", json.error);
+    }
+  } catch (error) {
+    console.error("Errore fetch:", error);
   }
 }
 
