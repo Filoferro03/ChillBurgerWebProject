@@ -32,9 +32,9 @@
     }
     100% {
       opacity: 0;
-      transform: translateY(-20px) scale(1.5);
+      transform: translateY(-20px) scale(10);
     }
-  }
+}
   
   .add-one-popup {
     position: absolute;
