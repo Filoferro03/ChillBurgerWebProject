@@ -1036,4 +1036,27 @@ class DatabaseHelper
         $stmt->bind_param('sisi', $titolo, $voto, $commento, $idordine);
         return $stmt->execute();
     }
+
+    public function getOrderById($idordine)
+    {
+        $query = "SELECT * FROM ordini WHERE idordine = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $idordine);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $order = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $order;
+    }
+
+    public function modifyProductQuantity($idordine, $idprodotto, $add)
+    {
+        $query = "UPDATE carrelli_prodotti SET quantita = quantita + ? WHERE idordine = ? AND idprodotto = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("iii", $add, $idordine, $idprodotto);
+        $success = $stmt->execute();
+        $stmt->close();
+        return $success;
+    }
 }
