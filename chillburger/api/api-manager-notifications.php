@@ -5,7 +5,7 @@
  *  POST toggle → inverte il flag vista
  *  POST delete → elimina la notifica
  */
-require_once __DIR__ . '/../db/database.php';
+require_once __DIR__ . '../bootstrap.php';
 session_start();
 
 /* -------------------------------------------------------------
