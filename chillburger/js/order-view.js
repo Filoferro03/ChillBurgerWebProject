@@ -109,6 +109,16 @@ function displayOrderDetails(data) {
         });
     }
 
+    result += `<div class="card-body d-flex flex-row justify-content-between align-items-center">
+                        <h5 class="card-title w-25">Spedizione:</h5>
+                        <p class="card-text mb-1">
+                        </p>
+                        <p class="card-text">
+                            € 2.50
+                        </p>
+                    </div>
+                `;
+
     // ---- PREZZO TOTALE ----
     if (data.totalPrice !== undefined && data.totalPrice !== null) {
         const totalPriceFormatted = parseFloat(data.totalPrice).toFixed(2);
