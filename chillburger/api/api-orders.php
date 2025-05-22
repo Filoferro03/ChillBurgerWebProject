@@ -28,6 +28,8 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
         $idOrdine = null;
         if (isset($_GET['idordine'])) {
             $idOrdine = $_GET['idordine'];
+        } else {
+            $idOrdine = $_SESSION['idordine'];
         }
         $allOrders = $dbh->getOrderDetails($idOrdine);
         $response['success'] = true;
