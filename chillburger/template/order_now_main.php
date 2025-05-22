@@ -18,4 +18,5 @@
     </div>
 </section>
 
+<link rel="stylesheet" href="css/order_now_style.css" />
 <script src="js/order_now.js"></script>

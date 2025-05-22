@@ -1,0 +1,47 @@
+/* General button styling */
+.card-footer .btn {
+    width: 48%;
+    font-size: 0.85rem;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    border-radius: 4px; /* Optional: adds rounded corners */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+/* Flex container for buttons */
+.card-footer .d-flex {
+    width: 100%;
+    gap: 0.5rem;
+}
+
+/* Green button styling */
+.card-footer .btn-green {
+    background-color: white;
+    border: 2px solid green;
+    color: green;
+}
+
+.card-footer .btn-green:hover {
+    background-color: green;
+    color: white;
+}
+
+@keyframes popUp {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-20px) scale(1.5);
+    }
+  }
+  
+  .add-one-popup {
+    position: absolute;
+    font-weight: bold;
+    color: #28a745; /* Bootstrap success green */
+    pointer-events: none;
+    animation: popUp 1s forwards;
+    user-select: none;
+    z-index: 1000;
+  }

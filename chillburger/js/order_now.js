@@ -28,7 +28,8 @@ function generateProducts(products) {
         <div class="card-footer bg-white border-0">
           <span class="fw-bold text-primary">${product.prezzo} €</span>
           <div class="d-flex justify-content-center">
-            <button class="btn btn-outline-success btn-add" data-idprodotto="${product.idprodotto}">+</button>
+          <button class="btn btn-add btn-sm btn-green" data-idprodotto="${product.idprodotto}">+</button>
+
           </div>
         </div>
       </div>
@@ -100,10 +101,31 @@ async function addProductToCart(idprodotto, quantita = 1) {
 function setupAddToCartButtons() {
   const buttons = document.querySelectorAll(".btn-add");
   buttons.forEach(button => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
+      showAddOnePopup(button); // show +1 animation
       const idprodotto = button.dataset.idprodotto;
-      addProductToCart(idprodotto, 1);
+      await addProductToCart(idprodotto, 1);
     });
+  });
+}
+
+function showAddOnePopup(button) {
+  // Create span element
+  const popup = document.createElement("span");
+  popup.textContent = "+1";
+  popup.className = "add-one-popup";
+
+  // Position it relative to the button
+  const rect = button.getBoundingClientRect();
+  popup.style.left = `${rect.right + 5 + window.scrollX}px`; // 5px right of button
+  popup.style.top = `${rect.top + rect.height / 2 + window.scrollY}px`; // vertically centered
+
+  // Append to body
+  document.body.appendChild(popup);
+
+  // Remove after animation ends
+  popup.addEventListener("animationend", () => {
+    popup.remove();
   });
 }
 
