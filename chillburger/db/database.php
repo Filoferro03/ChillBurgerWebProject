@@ -528,9 +528,28 @@ class DatabaseHelper
         return $ingredients;
     }
 
+    // TODO Guardate se ho fatto del casino modificando la query
+    /**
+    * Vecchia funzione:
+    * public function getAllProducts()
+    * {
+    *       $query = "SELECT * FROM prodotti";
+    *       $stmt = $this->db->prepare($query);
+    *       $stmt->execute();
+    *       $result = $stmt->get_result();
+    *       $products = $result->fetch_all(MYSQLI_ASSOC);
+    *       $result->free();
+    *       $stmt->close();
+    *       return $products;
+    * }
+     */
     public function getAllProducts()
     {
-        $query = "SELECT * FROM prodotti";
+        $query = "
+            SELECT p.*, c.descrizione AS categoryDescrizione
+            FROM prodotti p
+            JOIN categorie c ON p.idcategoria = c.idcategoria
+        ";
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();

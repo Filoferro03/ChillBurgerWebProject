@@ -7,9 +7,10 @@
 
     <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
         <button class="btn btn-filter active" data-category="all">Tutto</button>
-        <button class="btn btn-filter" data-category="burger">Burger</button>
-        <button class="btn btn-filter" data-category="fries">Patatine</button>
-        <button class="btn btn-filter" data-category="drink">Bevande</button>
+        <button class="btn btn-filter" data-category="Panini">Panini</button>
+        <button class="btn btn-filter" data-category="Fritti">Fritti</button>
+        <button class="btn btn-filter" data-category="Bevande">Bevande</button>
+        <button class="btn btn-filter" data-category="Dolci">Dolci</button>
     </div>
 
     <div class="row g-4" id="menuGrid">

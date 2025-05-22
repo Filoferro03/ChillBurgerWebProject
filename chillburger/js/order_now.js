@@ -17,7 +17,7 @@ function generateProducts(products) {
   let result = "";
   products.forEach((product) => {
     result += `
-    <div class="col-6 col-md-4 col-lg-3">
+    <div class="col-6 col-md-4 col-lg-3 menu-item" data-category="${product.categoryDescrizione}">
       <div class="card h-100 text-center shadow-sm hover-up">
         <img src="${product.image}" class="card-img-top" alt="${product.nome}">
         <div class="card-body">
@@ -39,9 +39,6 @@ function generateProducts(products) {
   return result;
 }
 
-
-
-
 async function getAllProducts() {
   const url = "api/api-order-now.php";  
   const formData = new FormData();
@@ -52,6 +49,28 @@ async function getAllProducts() {
   const productsHtml = generateProducts(jsonResponse.products);
   const main = document.querySelector("#menuGrid");
   if (main) main.innerHTML = productsHtml;
+
+  setupFiltering();  // <-- call the filtering setup here
+}
+
+function setupFiltering() {
+  const buttons = document.querySelectorAll(".btn-filter");
+  const items = document.querySelectorAll(".menu-item");
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      // Remove active from all buttons
+      buttons.forEach(b => b.classList.remove("active"));
+      // Add active to clicked button
+      btn.classList.add("active");
+
+      const cat = btn.dataset.category;
+
+      items.forEach(card => {
+        card.style.display = (cat === "all" || card.dataset.category === cat) ? "" : "none";
+      });
+    });
+  });
 }
 
 
