@@ -197,29 +197,29 @@ result += `
                     <button class="btn btn-lg bg-white">Vai al Checkout</button>
                 </a>
             </div>
-        </div>`;
+        </div>
+        
+        <!-- Modal Conferma Rimozione -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmDeleteLabel">Conferma Rimozione</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+      </div>
+      <div class="modal-body">
+        Sei sicuro di voler rimuovere questo prodotto dal carrello?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn btn-success" id="confirmDeleteBtn">Sì</button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
 
     div.innerHTML = result;
-}
-
-
-
-
-
-
-
-
-
-async function getPersonalization(idprodotto) {
-    const url = "api/api-edit-burger.php";
-    const formData = new FormData();
-    formData.append("action", "getPersonalization");
-    formData.append("id", idprodotto);
-    const json = await fetchData(url, formData);
-    console.log("la mia personalizzazione:",json);
-    return json;
-
-
 }
 
 
@@ -234,35 +234,41 @@ async function init() {
     await getProductsInCart(json.order);
 
     document.querySelectorAll('.btn-danger').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            const url = 'api/api-cart.php';
-            const formData = new FormData();
+        btn.addEventListener('click', () => {
             const id = btn.getAttribute("data-id");
             const type = btn.getAttribute("data-type");
     
-            if (type === "product") {
-                formData.append('action', 'removeProd');
-                formData.append('idprodotto', id);
-            } else if (type === "personalization") {
-                formData.append('action', 'removePers');
-                formData.append('idpersonalizzazione', id);
-            } else {
-                console.error("Tipo non riconosciuto");
-                return;
-            }
+            // Mostra il modale
+            const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            modal.show();
     
-            const response = await fetchData(url, formData);
+            // Clona il bottone per rimuovere eventuali vecchi event listener
+            const oldBtn = document.getElementById("confirmDeleteBtn");
+            const newBtn = oldBtn.cloneNode(true);
+            oldBtn.parentNode.replaceChild(newBtn, oldBtn);
     
-            if (response && response.success) {
-                console.log("Elemento rimosso con successo:", response);
-                init();
-                window.location.reload();
-            } else {
-                console.error("Errore nella rimozione:", response || "Risposta non valida");
-                alert("Errore nel rimuovere l'elemento.");
-            }
+            // Aggiungi nuovo event listener pulito
+            newBtn.addEventListener("click", async () => {
+                const formData = new FormData();
+                formData.append('action', type === "product" ? 'removeProd' : 'removePers');
+                formData.append(type === "product" ? 'idprodotto' : 'idpersonalizzazione', id);
+    
+                const response = await fetchData('api/api-cart.php', formData);
+    
+                if (response && response.success) {
+                    console.log("Elemento rimosso con successo:", response);
+                    const modalEl = document.getElementById('confirmDeleteModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    modalInstance.hide();
+                    await init();
+                } else {
+                    alert("Errore nel rimuovere l'elemento.");
+                }
+            });
         });
     });
+    
+    
     
     
 
