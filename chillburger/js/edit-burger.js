@@ -174,7 +174,7 @@ function generateIngredients(ingredients, product, personalization) {
         result += `
         <div class="col-12 ${borderClass}">
             <div class="d-flex flex-row justify-content-between align-items-center p-2 md:p-3" ${tooltip}>
-                <img src="${ing.image}" alt="${ing.nome}" class="img-responsive">
+                <img src="${ing.image}" alt="${ing.nome}" class="rounded-4 img-responsive">
                 <p class="fs-5" style="max-width: 100px; white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">${ing.nome ?? "Nome mancante"}</p>
                 <p>${ing.sovrapprezzo}€</p>
                 <p class="quantita m-2">${quantita}</p>
