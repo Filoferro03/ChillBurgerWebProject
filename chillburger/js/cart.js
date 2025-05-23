@@ -76,7 +76,7 @@ async function getProductsInCart(order) {
     const div = document.querySelector("#cart-elements");
 
     if (products.length === 0 && personalizations.length === 0) {
-        div.innerHTML = `<p>Nessun prodotto presente nel carrello</p>`;
+        div.innerHTML = `<p class="text-center">Nessun prodotto presente nel carrello</p>`;
         return;
     }
 
@@ -101,19 +101,19 @@ async function getProductsInCart(order) {
                 <div class="d-flex w-100 h-100 flex-column justify-content-between p-1">
                     <div class="d-flex flex-column w-100">
                         <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-center">
-                            <div class="d-flex flex-column">
+                            <div class="d-flex flex-column align-items-center">
                                 <p class="fs-3">${product.nome}</p>
                             </div>
-                            <div>
+                            <div class="d-flex align-items-center">
                                 <p class="fs-3">${(price * quantita).toFixed(2)}€</p>
                             </div>
-                            <div class="d-flex flex-column">
-                                <p class="fs-3">Quantita: <span class="quantita">${quantita}</span></p>
-                                <div class="d-flex flex-row">
+                            <div class="d-flex flex-column justify-content-center align-items-center">
+                                <div class="d-flex flex-row justify-content-between">
                                     <button type="button" class="btn p-1 p-md-3 md:m-1" ${disableMinus}
                                         onclick="modifyQuantity(${product.idprodotto}, -1)">
                                         <i class="fa-solid fa-circle-minus icon"></i>
                                     </button>
+                                    <p class="fs-3"><span class="quantita">${quantita}</span></p>
                                     <button type="button" class="btn p-1 p-md-3 md:m-1 btn-plus" 
                                         onclick="modifyQuantity(${product.idprodotto}, 1)">
                                         <i class="fa-solid fa-circle-plus icon"></i>
@@ -148,19 +148,19 @@ result += `
         <div class="d-flex w-100 h-100 flex-column justify-content-between p-1">
             <div class="d-flex flex-column w-100">
                 <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-center">
-                    <div class="d-flex flex-column">
+                    <div class="d-flex flex-column align-items-center">
                         <p class="fs-3">${personalization.nomeprodotto}</p>
                     </div>
-                    <div>
+                    <div class="d-flex align-items-center">
                         <p class="fs-3">${(price * quantita).toFixed(2)}€</p>
                     </div>
-                    <div class="d-flex flex-column">
-                        <p class="fs-3">Quantita: <span class="quantita">${quantita}</span></p>
-                        <div class="d-flex flex-row">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="d-flex flex-row justify-content-between align-items-center">
                             <button type="button" class="btn p-1 p-md-3 md:m-1" ${disableMinusPers}
                                 onclick="modifyPersonalizationQuantity(${personalization.idpersonalizzazione}, -1)">
                                 <i class="fa-solid fa-circle-minus icon"></i>
                             </button>
+                            <p class="fs-3"><span class="quantita">${quantita}</span></p>
                             <button type="button" class="btn p-1 p-md-3 md:m-1"
                                 onclick="modifyPersonalizationQuantity(${personalization.idpersonalizzazione}, 1)">
                                 <i class="fa-solid fa-circle-plus icon"></i>
@@ -248,14 +248,17 @@ async function init() {
     const checkoutBtn = document.getElementById('checkoutBtn');
 
 // Verifica se il valore è 0 e disabilita il bottone
-if (quantityData == 0 || quantityData === "0") {
-    checkoutBtn.disabled = true;
-    checkoutBtn.classList.add("disabled", "btn-secondary");
-    checkoutBtn.classList.remove("bg-white");
-} else {
-    checkoutBtn.addEventListener("click", () => {
-        window.location.href = "./checkout.php";
-    });
+if (checkoutBtn) {
+    // Verifica se il valore è 0 e disabilita il bottone
+    if (quantityData == 0 || quantityData === "0") {
+        checkoutBtn.disabled = true;
+        checkoutBtn.classList.add("disabled", "btn-secondary");
+        checkoutBtn.classList.remove("bg-white");
+    } else {
+        checkoutBtn.addEventListener("click", () => {
+            window.location.href = "./checkout.php";
+        });
+    }
 }
 
     document.querySelectorAll('.btn-remove').forEach(btn => {

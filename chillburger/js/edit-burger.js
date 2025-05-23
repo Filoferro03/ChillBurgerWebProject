@@ -13,29 +13,53 @@ let modifiche2 = [];
  * @param {string} azione - Tipo di modifica ("aggiunto" o "rimosso")
  */
 function modifyIngredientQuantity(idIngrediente, idPersonalizzazione, azione) {
+    if (!idIngrediente || !idPersonalizzazione || !azione) {
+        console.warn("Dati incompleti per la modifica.");
+        return;
+    }
+
+    // Trova l'indice nella lista modifiche
     const index = modifiche.findIndex(m =>
         m.idpersonalizzazione === idPersonalizzazione &&
         m.idingrediente === idIngrediente
     );
 
     if (index !== -1) {
-        // Sposta in modifiche2 per futura rimozione dal DB
-        modifiche2.push({
-            idpersonalizzazione: idPersonalizzazione,
-            idingrediente: idIngrediente,
-        });
+        // Rimozione della modifica esistente
+        const existing = modifiche[index];
         modifiche.splice(index, 1);
+
+        // Aggiungi solo una volta a modifiche2 per la rimozione dal DB
+        const alreadyMarked = modifiche2.some(m =>
+            m.idpersonalizzazione === idPersonalizzazione &&
+            m.idingrediente === idIngrediente
+        );
+
+        if (!alreadyMarked && existing.azione !== azione) {
+            modifiche2.push({
+                idpersonalizzazione: idPersonalizzazione,
+                idingrediente: idIngrediente
+            });
+        }
     } else {
-        // Aggiunge alla lista di modifiche
+        // Aggiunta della nuova modifica
         modifiche.push({
             idpersonalizzazione: idPersonalizzazione,
             idingrediente: idIngrediente,
             azione: azione
         });
+
+        // Se era presente in modifiche2 perché precedentemente rimosso, annulla
+        modifiche2 = modifiche2.filter(m =>
+            !(m.idpersonalizzazione === idPersonalizzazione &&
+              m.idingrediente === idIngrediente)
+        );
     }
 
-    console.log("Modifiche aggiornate:", modifiche);
+    console.log("Modifiche attive:", modifiche);
+    console.log("Da rimuovere dal DB:", modifiche2);
 }
+
 
 /**
  * Verifica se un ingrediente è già presente nella personalizzazione.
