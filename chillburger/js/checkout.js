@@ -92,7 +92,7 @@ data.orderCustom.forEach(item => {
             const price = stockElement.prezzo !== undefined ? parseFloat(stockElement.prezzo).toFixed(2) : 'N/D';
 
             result += `
-                <div class="card shadow-sm mb-2">
+                <div class="card shadow-sm">
                     <div class="card-body d-flex flex-row justify-content-between align-items-center">
                         <h5 class="card-title w-25 mb-0">${productName}</h5>
                         <p class="card-text m-0">
@@ -266,6 +266,14 @@ async function confirmOrder() {
     return json.success;
 }
 
+async function updateCart() {
+    const apiUrl = `api/api-cart.php`;
+    const formData = new FormData();
+    formData.append('action', 'createCart');
+    const json = await fetchData(apiUrl, formData);
+    return json.success;
+}
+
 
 // --- Event Listener for Payment Form ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -307,9 +315,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // For this example, we'll just show a success message after a delay.
                  setTimeout(() => {
                     if (confirmOrder()) {
-                    displayGeneralMessage('🎉 Pagamento confermato con successo! Il tuo ordine è in preparazione. Sarai reindirizzato al tuo profilo...', true);
-                    setTimeout(() => {
-                        window.location.href = 'profile.php';
+                        updateCart();
+                        displayGeneralMessage('🎉 Pagamento confermato con successo! Il tuo ordine è in preparazione. Sarai reindirizzato al tuo profilo...', true);
+                        setTimeout(() => {
+                            window.location.href = 'profile.php';
                     }, 2500); }
                 }, 2000); 
 
