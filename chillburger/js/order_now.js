@@ -89,7 +89,7 @@ async function addProductToCart(idprodotto) {
   const url = "api/api-cart.php";
   const formData = new FormData();
   
-  if (product.categoryDescrizione === "1") {
+  if (product.categoryDescrizione.toLowerCase() === "panini") {
     // Call addPers
     formData.append("action", "addPers");
     formData.append("idprodotto", idprodotto);
