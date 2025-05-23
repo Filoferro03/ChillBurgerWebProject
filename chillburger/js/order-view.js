@@ -44,8 +44,8 @@ function displayOrderDetails(data) {
             }
             // Aggiungi la modifica specifica a questo prodotto personalizzato
             customProductsMap.get(item.idpersonalizzazione).modifiche.push({
-                ingredientName: item.nomeingrediente || 'Ingrediente N/D',
-                action: item.azione || 'Azione N/D'
+                ingredientName: item.nomeingrediente || '',
+                action: item.azione || ''
             });
         });
 
@@ -55,11 +55,12 @@ function displayOrderDetails(data) {
                 <div class="card shadow-sm">
                     <div class="card-body d-flex flex-row justify-content-between align-items-center">
                         <div class="d-flex flex-column w-25">
-                        <h5 class="card-title">${customProduct.productName}</h5>
-                        <ul class="list-unstyled ms-3">`;
+                        <h5 class="card-title">${customProduct.productName}</h5>`;
 
-            if (customProduct.modifiche.length > 0) {
+            if (customProduct.modifiche.length > 0 && customProduct.modifiche[0].ingredientName != '') {
                 customProduct.modifiche.forEach(mod => {
+                    result += `<ul class="list-unstyled ms-3">`;
+
                     let prefix = '';
                     let actionText = mod.action; // Testo dell'azione da visualizzare (es. 'aggiunto', 'rimosso')
 
@@ -70,9 +71,7 @@ function displayOrderDetails(data) {
                     }
                     result += `<li>${prefix}${mod.ingredientName}</li>`;
                 });
-            } 
-
-            result += `
+                result += `
                         </ul>
                         </div>
                         <p class="card-text m-0">
@@ -83,8 +82,18 @@ function displayOrderDetails(data) {
                         </p>
                     </div>
                 </div>`;
+            } else {
+                result += `</div>
+                        <p class="card-text mb-1">
+                            <strong>Quantità:</strong> ${customProduct.productQuantity}
+                        </p>
+                        <p class="card-text">
+                            € ${customProduct.productPrice}
+                        </p>
+                    </div>
+                </div>`;
+            }
         });
-
     }
 
     // ---- SEZIONE PRODOTTI STANDARD ----
