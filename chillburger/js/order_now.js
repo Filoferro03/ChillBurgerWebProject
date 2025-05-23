@@ -1,5 +1,3 @@
-let products = [];
-
 async function fetchData(url, formData) {
   try {
       const response = await fetch(url, {
@@ -148,6 +146,12 @@ function showAddOnePopup(button) {
   popup.addEventListener("animationend", () => {
     popup.remove();
   });
+}
+
+// TODO : implement this function
+async function init() {
+  await getAllProducts();
+  // optionally, you can call other UI refresh functions here
 }
 
 // Funzione per generare il menu
