@@ -10,7 +10,6 @@ $templateParams = [
         "css/order_now_style.css"
     ],
     "js"     => [
-        "js/menu_filter.js",
         "js/order_now.js"
     ]
 ];
