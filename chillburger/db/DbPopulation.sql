@@ -86,7 +86,7 @@ INSERT INTO chillburgerdb.prodotti (nome, prezzo, idcategoria, image) VALUES
 ('Panna Cotta al Caramello', 4.00, 4, 'panna-cotta-caramello.png'),
 ('Mousse al Cioccolato', 5.00, 4, 'mousse-cioccolato.png'),
 ('Torta della Nonna', 5.50, 4, 'torta-della-nonna.png'),
-('Dolci Misti', 6.00, 4, 'crostatina-marmellata.png');
+('Dolci Misti', 6.00, 4, 'dolci-misti.png');
 
 
 -- Bacon Cheeseburger (idprodotto = 1)
