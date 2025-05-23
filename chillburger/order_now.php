@@ -1,6 +1,11 @@
 <?php
 require_once "bootstrap.php";
 
+if (!isUserLoggedIn()) {
+    header("Location: login.php");
+    exit();
+}
+
 $templateParams = [
     "titolo" => "ChillBurger – Order_now",
     "nome"   => "template/order_now_main.php",
