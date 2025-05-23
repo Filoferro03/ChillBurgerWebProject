@@ -108,7 +108,6 @@ async function addProductToCart(idprodotto) {
 
     if (json.success) {
       console.log("Prodotto aggiunto al carrello!");
-      await init();
     } else {
       console.error("Errore aggiungendo prodotto:", json.error);
     }
@@ -146,12 +145,6 @@ function showAddOnePopup(button) {
   popup.addEventListener("animationend", () => {
     popup.remove();
   });
-}
-
-// TODO : implement this function
-async function init() {
-  await getAllProducts();
-  // optionally, you can call other UI refresh functions here
 }
 
 // Funzione per generare il menu
