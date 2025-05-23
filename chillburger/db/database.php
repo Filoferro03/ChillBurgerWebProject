@@ -1137,4 +1137,15 @@ class DatabaseHelper
 
         return $success;
     }
+
+    public function isProductInCart($idprodotto, $idordine)
+    {
+        $sql = "SELECT 1 FROM carrelli_prodotti WHERE idprodotto = ? AND idordine = ? LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param("ii", $idprodotto, $idordine);
+        $stmt->execute();
+        $stmt->store_result();
+
+        return $stmt->num_rows > 0;
+    }
 }

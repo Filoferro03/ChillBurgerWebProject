@@ -21,8 +21,13 @@ if (isset($_POST["action"])) {
 
         case "addProd":
             if (isset($_POST["idprodotto"])) {
-                $dbh->addProductToCart($_POST["idprodotto"], $_SESSION["idordine"], $_POST["quantita"]);
-                $result['success'] = true;
+                if ($dbh->isProductInCart($_POST["idprodotto"], $_SESSION["idordine"])) {
+                    $dbh->modifyProductQuantity($_SESSION["idordine"], $_POST["idprodotto"], $_POST["quantita"]);
+                    $result['success'] = true;
+                } else {
+                    $dbh->addProductToCart($_POST["idprodotto"], $_SESSION["idordine"], $_POST["quantita"]);
+                    $result['success'] = true;
+                }
             } else {
                 $result['success'] = false;
                 $result['error'] = "ID prodotto mancante";
