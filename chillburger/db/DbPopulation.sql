@@ -43,32 +43,53 @@ INSERT INTO chillburgerdb.categorie (descrizione) VALUES
 ('Dolci');
 
 -- Insert Prodotti
-INSERT INTO chillburgerdb.prodotti (nome, prezzo, idcategoria, image) VALUES
 -- Categoria: panini (idcategoria = 1)
+INSERT INTO chillburgerdb.prodotti (nome, prezzo, idcategoria, image) VALUES
 ('Bacon Cheeseburger', 14.50, 1, 'bacon-cheeseburger.png'),
 ('Chicken Deluxe', 13.00, 1, 'chicken-deluxe.png'),
 ('Smoky Burger', 15.50, 1, 'smoky-burger.png'),
-('Veggie Burger', 12.00, 1, 'veggie-burger.png');
+('Veggie Burger', 12.00, 1, 'veggie-burger.png'),
+('Double Beef BBQ', 16.00, 1, 'double-beef-bbq.png'),
+('Zucchini Delight', 13.00, 1, 'zucchini-delight.png'),
+('Crispy Cotoletta', 14.00, 1, 'crispy-cotoletta.png'),
+('Hot Pepper Burger', 13.50, 1, 'hot-pepper-burger.png'),
+('Melanzana Veggie', 12.50, 1, 'melanzana-veggie.png'),
+('Truffle Deluxe', 15.00, 1, 'truffle-deluxe.png'),
+('Green Garden', 12.50, 1, 'green-garden.png'),
+('Crispy BBQ Chicken', 13.50, 1, 'crispy-bbq-chicken.png');
 
 -- Categoria: fritti (idcategoria = 2)
 INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, image) VALUES
 ('Onion Rings', 4.50, 30, 2, 'onion-rings.png'),
 ('Patatine Fritte', 3.50, 50, 2, 'patatine-fritte.png'),
 ('Alette di Pollo BBQ', 6.00, 25, 2, 'alette-pollo-bbq.png'),
+('Mozzarella Sticks', 5.00, 20, 2, 'mozzarella-sticks.png'),
+('Crocchette di Patate', 4.00, 40, 2, 'crocchette-patate.png'),
+('Nuggets di Pollo', 5.50, 35, 2, 'nuggets-pollo.png'),
+('Jalapeño Popper', 5.00, 15, 2, 'jalapeno-popper.png');
 
 -- Categoria: bevande (idcategoria = 3)
+INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, image) VALUES
 ('Coca Cola', 3.00, 100, 3, 'coca-cola.png'),
 ('Fanta', 3.00, 100, 3, 'fanta.png'),
 ('Acqua Naturale', 1.50, 150, 3, 'acqua-naturale.png'),
 ('Acqua Frizzante', 1.50, 150, 3, 'acqua-frizzante.png'),
 ('Birra Artigianale Bionda', 5.00, 50, 3, 'birra-bionda.png'),
+('Tè al Limone', 2.50, 80, 3, 'te-limone.png'),
+('Sprite', 3.00, 90, 3, 'sprite.png');
 
 -- Categoria: dolci (idcategoria = 4)
-('Tiramisù', 5.00, 15, 4, 'tiramisu.png'),
-('Cheesecake ai Frutti di Bosco', 5.50, 15, 4, 'cheesecake-frutti-di-bosco.png');
+INSERT INTO chillburgerdb.prodotti (nome, prezzo, idcategoria, image) VALUES
+('Tiramisù', 5.00, 4, 'tiramisu.png'),
+('Cheesecake ai Frutti di Bosco', 5.50, 4, 'cheesecake-frutti-di-bosco.png'),
+('Brownie al Cioccolato', 4.50, 4, 'brownie-cioccolato.png'),
+('Panna Cotta al Caramello', 4.00, 4, 'panna-cotta-caramello.png'),
+('Mousse al Cioccolato', 5.00, 4, 'mousse-cioccolato.png'),
+('Torta della Nonna', 5.50, 4, 'torta-della-nonna.png'),
+('Dolci Misti', 6.00, 4, 'crostatina-marmellata.png');
 
--- Insert Composizioni
--- Composizione del Bacon Cheeseburger (idprodotto = 1)
+
+-- Bacon Cheeseburger (idprodotto = 1)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (1, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (1, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger di manzo'), 1, TRUE),
@@ -77,7 +98,7 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (1, (SELECT idingrediente FROM ingredienti WHERE nome = 'ketchup'), 1, default),
 (1, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default);
 
--- Composizione del Chicken Deluxe (idprodotto = 2)
+-- Chicken Deluxe (idprodotto = 2)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (2, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (2, (SELECT idingrediente FROM ingredienti WHERE nome = 'petto di pollo'), 1, TRUE),
@@ -85,7 +106,7 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (2, (SELECT idingrediente FROM ingredienti WHERE nome = 'insalata'), 1, default),
 (2, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default);
 
--- Composizione del Smoky Burger (idprodotto = 3)
+-- Smoky Burger (idprodotto = 3)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (3, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (3, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger di manzo'), 1, TRUE),
@@ -94,7 +115,7 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (3, (SELECT idingrediente FROM ingredienti WHERE nome = 'scamorza affumicata'), 1, TRUE),
 (3, (SELECT idingrediente FROM ingredienti WHERE nome = 'bacon'), 1, default);
 
--- Composizione Veggie Burger (idprodotto = 4)
+-- Veggie Burger (idprodotto = 4)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (4, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (4, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger vegano'), 1, TRUE),
@@ -102,6 +123,71 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (4, (SELECT idingrediente FROM ingredienti WHERE nome = 'insalata'), 1, default),
 (4, (SELECT idingrediente FROM ingredienti WHERE nome = 'pomodori'), 1, default),
 (4, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default);
+
+-- Double Beef BBQ (idprodotto = 5)
+INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
+(5, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
+(5, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger di manzo'), 2, TRUE),
+(5, (SELECT idingrediente FROM ingredienti WHERE nome = 'salsa barbecue'), 1, TRUE),
+(5, (SELECT idingrediente FROM ingredienti WHERE nome = 'cheddar'), 1, default),
+(5, (SELECT idingrediente FROM ingredienti WHERE nome = 'cipolla'), 1, default);
+
+-- Zucchini Delight (idprodotto = 6)
+INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
+(6, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
+(6, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger vegano'), 1, TRUE),
+(6, (SELECT idingrediente FROM ingredienti WHERE nome = 'zucchine'), 2, TRUE),
+(6, (SELECT idingrediente FROM ingredienti WHERE nome = 'insalata'), 1, default),
+(6, (SELECT idingrediente FROM ingredienti WHERE nome = 'salsa rosa'), 1, default);
+
+-- Crispy Cotoletta (idprodotto = 7)
+INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
+(7, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
+(7, (SELECT idingrediente FROM ingredienti WHERE nome = 'cotoletta'), 1, TRUE),
+(7, (SELECT idingrediente FROM ingredienti WHERE nome = 'pomodori'), 1, TRUE),
+(7, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default),
+(7, (SELECT idingrediente FROM ingredienti WHERE nome = 'insalata'), 1, default);
+
+-- Hot Pepper Burger (idprodotto = 8)
+INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
+(8, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
+(8, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger di manzo'), 1, TRUE),
+(8, (SELECT idingrediente FROM ingredienti WHERE nome = 'peperoni'), 2, TRUE),
+(8, (SELECT idingrediente FROM ingredienti WHERE nome = 'cheddar'), 1, default),
+(8, (SELECT idingrediente FROM ingredienti WHERE nome = 'ketchup'), 1, default);
+
+-- Melanzana Veggie (idprodotto = 9)
+INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
+(9, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
+(9, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger vegano'), 1, TRUE),
+(9, (SELECT idingrediente FROM ingredienti WHERE nome = 'melanzane'), 1, TRUE),
+(9, (SELECT idingrediente FROM ingredienti WHERE nome = 'fontina'), 1, default),
+(9, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default);
+
+-- Truffle Deluxe (idprodotto = 10)
+INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
+(10, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
+(10, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger di manzo'), 1, TRUE),
+(10, (SELECT idingrediente FROM ingredienti WHERE nome = 'scamorza affumicata'), 1, TRUE),
+(10, (SELECT idingrediente FROM ingredienti WHERE nome = 'funghi'), 1, default),
+(10, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default);
+
+-- Green Garden (idprodotto = 11)
+INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
+(11, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
+(11, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger vegano'), 1, TRUE),
+(11, (SELECT idingrediente FROM ingredienti WHERE nome = 'zucchine'), 1, TRUE),
+(11, (SELECT idingrediente FROM ingredienti WHERE nome = 'pomodori'), 1, default),
+(11, (SELECT idingrediente FROM ingredienti WHERE nome = 'insalata'), 1, default);
+
+-- Crispy BBQ Chicken (idprodotto = 12)
+INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
+(12, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
+(12, (SELECT idingrediente FROM ingredienti WHERE nome = 'cotoletta'), 1, TRUE),
+(12, (SELECT idingrediente FROM ingredienti WHERE nome = 'salsa barbecue'), 1, TRUE),
+(12, (SELECT idingrediente FROM ingredienti WHERE nome = 'cheddar'), 1, default),
+(12, (SELECT idingrediente FROM ingredienti WHERE nome = 'insalata'), 1, default);
+
 
 
 -- Insert Stati Ordine
