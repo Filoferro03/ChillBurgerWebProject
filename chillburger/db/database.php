@@ -530,18 +530,18 @@ class DatabaseHelper
 
     // TODO Guardate se ho fatto del casino modificando la query
     /**
-    * Vecchia funzione:
-    * public function getAllProducts()
-    * {
-    *       $query = "SELECT * FROM prodotti";
-    *       $stmt = $this->db->prepare($query);
-    *       $stmt->execute();
-    *       $result = $stmt->get_result();
-    *       $products = $result->fetch_all(MYSQLI_ASSOC);
-    *       $result->free();
-    *       $stmt->close();
-    *       return $products;
-    * }
+     * Vecchia funzione:
+     * public function getAllProducts()
+     * {
+     *       $query = "SELECT * FROM prodotti";
+     *       $stmt = $this->db->prepare($query);
+     *       $stmt->execute();
+     *       $result = $stmt->get_result();
+     *       $products = $result->fetch_all(MYSQLI_ASSOC);
+     *       $result->free();
+     *       $stmt->close();
+     *       return $products;
+     * }
      */
     public function getAllProducts()
     {
@@ -1096,6 +1096,45 @@ class DatabaseHelper
         $stmtUpdate->bind_param('i', $idordine);
         $success = $stmtUpdate->execute();
         $stmtUpdate->close();
+        return $success;
+    }
+
+    public function getAllQuantitiesInCart($idordine)
+    {
+        $query = "
+            SELECT SUM(quantita) AS totale_quantita
+            FROM (
+                SELECT quantita FROM carrelli_prodotti WHERE idordine = ?
+                UNION ALL
+                SELECT quantita FROM personalizzazioni WHERE idordine = ?
+            ) AS combined_quantities
+        ";
+
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            return null;
+        }
+
+        $stmt->bind_param("ii", $idordine, $idordine);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result && $row = $result->fetch_assoc()) {
+            return (int)$row['totale_quantita'];
+        }
+
+        return 0;
+    }
+
+    public function removePersonalizationComposition($idpersonalizzazione)
+    {
+
+        $query = "DELETE FROM modifiche_ingredienti WHERE idpersonalizzazione = ?";
+        $stmt = $this->db->prepare($query);
+        $stmt->bind_param("i", $idpersonalizzazione);
+        $success = $stmt->execute();
+        $stmt->close();
+
         return $success;
     }
 }

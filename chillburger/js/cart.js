@@ -36,6 +36,15 @@ async function removeProductFromCart(idprodotto, quantita = 1) {
     await modifyQuantity(idprodotto, -quantita);
 }  
 
+async function getTotalCartQuantity(){
+    const url = 'api/api-cart.php';
+    const formData = new FormData;
+    formData.append('action','getCartTotalQuantity');
+    const json = await fetchData(url,formData);
+    console.log("quantita carrello: ",json);
+    return json;
+}
+
 async function modifyPersonalizationQuantity(idpersonalizzazione,quantity){
     const url = 'api/api-cart.php';
     const formData = new FormData();
@@ -114,7 +123,7 @@ async function getProductsInCart(order) {
                         </div>
                     </div>
                     <div class="d-none d-md-flex justify-content-end pb-3">
-                        <button class="btn btn-danger" data-id="${product.idprodotto}" data-type="product" ${disableRemove}>
+                        <button class="btn btn-danger btn-remove" data-id="${product.idprodotto}" data-type="product" ${disableRemove}>
                             Rimuovi
                         </button>
                     </div>
@@ -174,7 +183,7 @@ result += `
                 </div>
             </div>
             <div class="d-none d-md-flex justify-content-end pb-3">
-                <button class="btn btn-danger" data-id="${personalization.idpersonalizzazione}" data-type="personalization" ${disableRemovePers}>
+                <button class="btn btn-danger btn-remove" data-id="${personalization.idpersonalizzazione}" data-type="personalization" ${disableRemovePers}>
                     Rimuovi
                 </button>
             </div>
@@ -198,9 +207,7 @@ result += `
                 <p class="fs-3">${order[0].prezzo_totale}€</p>
             </div>
             <div class="d-flex flex-column align-items-center mt-5">
-                <a href="./checkout.php">
-                    <button class="btn btn-lg bg-white">Vai al Checkout</button>
-                </a>
+                <button id="checkoutBtn" class="btn btn-lg bg-white">Vai al Checkout</button>
             </div>
         </div>
         
@@ -237,8 +244,21 @@ async function init() {
     console.log("idordine: ",json.order);
 
     await getProductsInCart(json.order);
+    const quantityData = await getTotalCartQuantity();
+    const checkoutBtn = document.getElementById('checkoutBtn');
 
-    document.querySelectorAll('.btn-danger').forEach(btn => {
+// Verifica se il valore è 0 e disabilita il bottone
+if (quantityData == 0 || quantityData === "0") {
+    checkoutBtn.disabled = true;
+    checkoutBtn.classList.add("disabled", "btn-secondary");
+    checkoutBtn.classList.remove("bg-white");
+} else {
+    checkoutBtn.addEventListener("click", () => {
+        window.location.href = "./checkout.php";
+    });
+}
+
+    document.querySelectorAll('.btn-remove').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.getAttribute("data-id");
             const type = btn.getAttribute("data-type");
@@ -272,10 +292,6 @@ async function init() {
             });
         });
     });
-    
-    
-    
-    
 
 }
 

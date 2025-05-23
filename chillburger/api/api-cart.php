@@ -30,7 +30,7 @@ if (isset($_POST["action"])) {
             break;
 
         case "addPers":
-            if (isset($_POST["idpersonalizzazione"])) {
+            if (isset($_POST["idprodotto"])) {
                 $dbh->createPersonalization($_POST["idprodotto"], $_SESSION["idordine"], $_POST["quantita"]);
                 $result['success'] = true;
             } else {
@@ -56,11 +56,14 @@ if (isset($_POST["action"])) {
 
         case "removePers":
             if (isset($_POST["idpersonalizzazione"])) {
+                $success2 = $dbh->removePersonalizationComposition($_POST["idpersonalizzazione"]);
                 $success = $dbh->removePersonalizationFromCart($_POST["idpersonalizzazione"], $_SESSION["idordine"]);
-                if ($success) {
+                if ($success && $success2) {
                     $result['success'] = true;
+                    $result["success2"] = true;
                 } else {
                     $result['success'] = false;
+                    $result["success2"] = false;
                     $result['error'] = "Errore durante la rimozione del prodotto dal carrello";
                 }
             } else {
@@ -102,6 +105,13 @@ if (isset($_POST["action"])) {
                 $result["message"] = "Non è stata settata in modfiy la scelta";
                 $result['success'] = false;
             }
+
+            break;
+
+        case "getCartTotalQuantity":
+
+            $totalquantity = $dbh->getAllQuantitiesInCart($_SESSION["idordine"]);
+            $result = $totalquantity;
 
             break;
 
