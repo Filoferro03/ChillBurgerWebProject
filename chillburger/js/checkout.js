@@ -20,38 +20,47 @@ function displayOrderDetails(data) {
     if (data.orderCustom && data.orderCustom.length > 0) {
         const customProductsMap = new Map();
 
-        data.orderCustom.forEach(item => {
+data.orderCustom.forEach(item => {
+
             if (!customProductsMap.has(item.idpersonalizzazione)) {
                 customProductsMap.set(item.idpersonalizzazione, {
                     idpersonalizzazione: item.idpersonalizzazione,
                     productName: item.nomeprodotto || 'Nome Prodotto N/D',
-                    productQuantity: item.quantita !== undefined ? item.quantita : 'N/D',
-                    productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D',
-                    modifiche: []
+                    productQuantity: item.quantita !== undefined ? item.quantita : 'N/D', // Quantità del prodotto personalizzato
+                    productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D', // Prezzo totale della personalizzazione
+                    modifiche: [] // Array per le modifiche ingredienti
                 });
             }
+            // Aggiungi la modifica specifica a questo prodotto personalizzato
             customProductsMap.get(item.idpersonalizzazione).modifiche.push({
-                ingredientName: item.nomeingrediente || 'Ingrediente N/D',
-                action: item.azione || 'Azione N/D'
+                ingredientName: item.nomeingrediente || '',
+                action: item.azione || ''
             });
         });
 
+        // 2. Itera sulla mappa dei prodotti personalizzati raggruppati e genera l'HTML
         customProductsMap.forEach(customProduct => {
             result += `
-                <div class="card shadow-sm mb-2">
+                <div class="card shadow-sm">
                     <div class="card-body d-flex flex-row justify-content-between align-items-center">
-                        <div class="d-flex flex-column w-50">
-                        <h5 class="card-title mb-1">${customProduct.productName}</h5>
-                        <ul class="list-unstyled ms-3 small">`;
+                        <div class="d-flex flex-column w-25">
+                        <h5 class="card-title">${customProduct.productName}</h5>`;
 
-            if (customProduct.modifiche.length > 0) {
+            if (customProduct.modifiche.length > 0 && customProduct.modifiche[0].ingredientName != '') {
                 customProduct.modifiche.forEach(mod => {
-                    let prefix = mod.action === 'aggiunto' ? '+ ' : (mod.action === 'rimosso' ? '- ' : '');
+                    result += `<ul class="list-unstyled ms-3">`;
+
+                    let prefix = '';
+                    let actionText = mod.action; // Testo dell'azione da visualizzare (es. 'aggiunto', 'rimosso')
+
+                    if (mod.action === 'aggiunto') {
+                        prefix = '+ ';
+                    } else if (mod.action === 'rimosso') {
+                        prefix = '- ';
+                    }
                     result += `<li>${prefix}${mod.ingredientName}</li>`;
                 });
-            }
-
-            result += `
+                result += `
                         </ul>
                         </div>
                         <p class="card-text m-0">
@@ -62,10 +71,20 @@ function displayOrderDetails(data) {
                         </p>
                     </div>
                 </div>`;
+            } else {
+                result += `</div>
+                        <p class="card-text mb-1">
+                            <strong>Quantità:</strong> ${customProduct.productQuantity}
+                        </p>
+                        <p class="card-text">
+                            € ${customProduct.productPrice}
+                        </p>
+                    </div>
+                </div>`;
+            }
         });
     }
-
-    // ---- SEZIONE PRODOTTI STANDARD ----
+        // ---- SEZIONE PRODOTTI STANDARD ----
     if (data.orderStock && data.orderStock.length > 0) {
         data.orderStock.forEach(stockElement => {
             const productName = stockElement.nome || 'Nome Prodotto N/D';
@@ -73,9 +92,9 @@ function displayOrderDetails(data) {
             const price = stockElement.prezzo !== undefined ? parseFloat(stockElement.prezzo).toFixed(2) : 'N/D';
 
             result += `
-                <div class="card shadow-sm mb-2">
+                <div class="card shadow-sm">
                     <div class="card-body d-flex flex-row justify-content-between align-items-center">
-                        <h5 class="card-title w-50 mb-0">${productName}</h5>
+                        <h5 class="card-title w-25 mb-0">${productName}</h5>
                         <p class="card-text m-0">
                             <strong>Quantità:</strong> ${quantity}
                         </p>
@@ -247,6 +266,14 @@ async function confirmOrder() {
     return json.success;
 }
 
+async function updateCart() {
+    const apiUrl = `api/api-cart.php`;
+    const formData = new FormData();
+    formData.append('action', 'createCart');
+    const json = await fetchData(apiUrl, formData);
+    return json.success;
+}
+
 
 // --- Event Listener for Payment Form ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -288,9 +315,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // For this example, we'll just show a success message after a delay.
                  setTimeout(() => {
                     if (confirmOrder()) {
-                    displayGeneralMessage('🎉 Pagamento confermato con successo! Il tuo ordine è in preparazione. Sarai reindirizzato al tuo profilo...', true);
-                    setTimeout(() => {
-                        window.location.href = 'profile.php';
+                        updateCart();
+                        displayGeneralMessage('🎉 Pagamento confermato con successo! Il tuo ordine è in preparazione. Sarai reindirizzato al tuo profilo...', true);
+                        setTimeout(() => {
+                            window.location.href = 'profile.php';
                     }, 2500); }
                 }, 2000); 
 

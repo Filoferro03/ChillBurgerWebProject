@@ -608,8 +608,8 @@ class DatabaseHelper
                                i.nome AS nomeingrediente, m.azione
                         FROM ordini o
                         JOIN personalizzazioni pe ON o.idordine = pe.idordine
-                        JOIN modifiche_ingredienti m ON pe.idpersonalizzazione = m.idpersonalizzazione
-                        JOIN ingredienti i ON m.idingrediente = i.idingrediente
+                        LEFT JOIN modifiche_ingredienti m ON pe.idpersonalizzazione = m.idpersonalizzazione
+                        LEFT JOIN ingredienti i ON m.idingrediente = i.idingrediente
                         JOIN prodotti p ON pe.idprodotto = p.idprodotto
                         WHERE o.idordine = ?
                         ORDER BY pe.idpersonalizzazione";
