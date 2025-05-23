@@ -142,7 +142,11 @@ function generateIngredients(ingredients, product, personalization) {
     console.log("stato iniziale modifiche: ", modifiche);
     const idPersonalization = getPersonalizationID();
 
-    result += `<div class="d-flex flex-row justify-content-center m-5"><p class="text-black fs-1">${product?.[0]?.nome || "Prodotto"}</p></div>`;
+    result += `<section class="container py-5">
+        <h2 class="display-4 custom-title text-center mb-3">
+            <span class="txt">${product?.[0]?.nome || "Prodotto"}</span>
+        </h2>
+        </section>`;
 
     if (!Array.isArray(ingredients) || ingredients.length === 0) {
         result += `<p class="text-muted text-center">Il panino non ha ingredienti</p>`;
