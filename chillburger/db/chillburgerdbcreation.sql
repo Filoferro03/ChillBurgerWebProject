@@ -207,6 +207,12 @@ ADD CONSTRAINT fkriguardo_fk
 FOREIGN KEY (idordine)
 REFERENCES ordini (idordine);
 
+ALTER TABLE ingredienti
+ADD CONSTRAINT chk_giacenza_non_negative CHECK (giacenza >= 0);
+
+ALTER TABLE prodotti
+ADD CONSTRAINT chk_disponibilita_non_negative CHECK (disponibilita >= 0);
+
 -- Index Section
 
 CREATE INDEX idx_notifiche_idutente ON notifiche (idutente);
@@ -537,6 +543,186 @@ AFTER DELETE ON carrelli_prodotti
 FOR EACH ROW
 BEGIN
     CALL SP_UpdateOrderTotalPrice(OLD.idordine);
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER trg_process_order_stock_on_preparation_atomic
+AFTER INSERT ON modifiche_stato
+FOR EACH ROW
+BEGIN
+    -- Variabili locali per lo scope principale del trigger
+    DECLARE v_idordine INT;
+    DECLARE v_idprodotto_standard INT;
+    DECLARE v_quantita_standard INT;
+    DECLARE v_is_composite INT;
+    DECLARE v_idpersonalizzazione INT;
+    DECLARE v_idprodotto_base_pers INT;
+    DECLARE v_quantita_personalizzazione INT;
+    DECLARE v_idingrediente_comp_loop INT;
+    DECLARE v_quantita_ingrediente_base_loop INT; -- Corretto tipo da DECIMAL a INT
+    DECLARE v_is_removed INT;
+    DECLARE v_idingrediente_aggiunto_loop INT;
+    DECLARE QTA_INGREDIENTE_AGGIUNTO_UNITARIA INT DEFAULT 1;
+    DECLARE v_current_giacenza INT; -- Corretto tipo da DECIMAL a INT
+    DECLARE v_current_disponibilita INT;
+    DECLARE v_decrement_amount INT; -- Corretto tipo da DECIMAL a INT
+    DECLARE v_error_message VARCHAR(255);
+    -- I flag 'done_...' verranno dichiarati localmente nei blocchi nidificati
+
+    IF NEW.idstato = 2 THEN
+        SET v_idordine = NEW.idordine;
+
+        -- Sezione 1: Processa i prodotti standard da carrelli_prodotti
+        BEGIN -- Blocco per il cursore dei prodotti standard
+            DECLARE done_standard_products INT DEFAULT FALSE;
+            DECLARE cur_standard_products CURSOR FOR
+                SELECT cp.idprodotto, cp.quantita
+                FROM carrelli_prodotti cp
+                WHERE cp.idordine = v_idordine;
+            DECLARE CONTINUE HANDLER FOR NOT FOUND SET done_standard_products = TRUE;
+
+            OPEN cur_standard_products;
+            loop_standard_products: LOOP
+                FETCH cur_standard_products INTO v_idprodotto_standard, v_quantita_standard;
+                IF done_standard_products THEN
+                    LEAVE loop_standard_products;
+                END IF;
+
+                SELECT COUNT(*) INTO v_is_composite
+                FROM composizioni c
+                WHERE c.idprodotto = v_idprodotto_standard;
+
+                IF v_is_composite > 0 THEN
+                    -- Prodotto standard composito: decrementa ingredienti
+                    BEGIN -- Blocco per il cursore degli ingredienti del prodotto standard composito
+                        DECLARE done_std_comp_ing INT DEFAULT FALSE;
+                        DECLARE v_id_ing_std_comp INT;
+                        DECLARE v_qta_ing_std_comp INT; -- Corretto tipo
+                        DECLARE cur_std_comp_ing CURSOR FOR
+                            SELECT c.idingrediente, c.quantita
+                            FROM composizioni c -- Assicurarsi che l'alias 'c' sia corretto
+                            WHERE c.idprodotto = v_idprodotto_standard;
+                        DECLARE CONTINUE HANDLER FOR NOT FOUND SET done_std_comp_ing = TRUE;
+
+                        OPEN cur_std_comp_ing;
+                        loop_std_comp_ing: LOOP
+                            FETCH cur_std_comp_ing INTO v_id_ing_std_comp, v_qta_ing_std_comp;
+                            IF done_std_comp_ing THEN
+                                LEAVE loop_std_comp_ing;
+                            END IF;
+
+                            SET v_decrement_amount = v_qta_ing_std_comp * v_quantita_standard;
+                            SELECT giacenza INTO v_current_giacenza FROM ingredienti WHERE idingrediente = v_id_ing_std_comp FOR UPDATE;
+
+                            IF v_current_giacenza < v_decrement_amount THEN
+                                SET v_error_message = CONCAT('Giacenza insufficiente per ingrediente ID ', v_id_ing_std_comp, ' (prodotto standard ID ', v_idprodotto_standard, ', ordine ID ', v_idordine, '). Richiesti: ', v_decrement_amount, ', Disponibili: ', v_current_giacenza);
+                                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
+                            END IF;
+                            UPDATE ingredienti SET giacenza = giacenza - v_decrement_amount WHERE idingrediente = v_id_ing_std_comp;
+                        END LOOP loop_std_comp_ing;
+                        CLOSE cur_std_comp_ing;
+                    END; -- Fine blocco cursore ingredienti prodotto standard composito
+                ELSE
+                    -- Prodotto standard non composito: decrementa disponibilità diretta
+                    SET v_decrement_amount = v_quantita_standard;
+                    SELECT disponibilita INTO v_current_disponibilita FROM prodotti WHERE idprodotto = v_idprodotto_standard FOR UPDATE;
+
+                    IF v_current_disponibilita < v_decrement_amount THEN
+                        SET v_error_message = CONCAT('Disponibilità insufficiente per prodotto ID ', v_idprodotto_standard, ' (ordine ID ', v_idordine, '). Richiesti: ', v_decrement_amount, ', Disponibili: ', v_current_disponibilita);
+                        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
+                    END IF;
+                    UPDATE prodotti SET disponibilita = disponibilita - v_decrement_amount WHERE idprodotto = v_idprodotto_standard;
+                END IF;
+            END LOOP loop_standard_products;
+            CLOSE cur_standard_products;
+        END; -- Fine blocco cursore prodotti standard
+
+        -- Sezione 2: Processa i prodotti personalizzati da personalizzazioni
+        BEGIN -- Blocco per il cursore delle personalizzazioni
+            DECLARE done_personalizzazioni INT DEFAULT FALSE;
+            DECLARE cur_personalizzazioni CURSOR FOR
+                SELECT p.idpersonalizzazione, p.idprodotto, p.quantita
+                FROM personalizzazioni p
+                WHERE p.idordine = v_idordine;
+            DECLARE CONTINUE HANDLER FOR NOT FOUND SET done_personalizzazioni = TRUE;
+
+            OPEN cur_personalizzazioni;
+            loop_personalizzazioni: LOOP
+                FETCH cur_personalizzazioni INTO v_idpersonalizzazione, v_idprodotto_base_pers, v_quantita_personalizzazione;
+                IF done_personalizzazioni THEN
+                    LEAVE loop_personalizzazioni;
+                END IF;
+
+                -- 2a. Ingredienti base (considerando rimozioni)
+                BEGIN -- Blocco per cursore ingredienti base personalizzazione
+                    DECLARE done_base_ing_pers INT DEFAULT FALSE;
+                    -- v_idingrediente_comp_loop e v_quantita_ingrediente_base_loop sono già dichiarate nello scope esterno
+                    DECLARE cur_base_ing_pers CURSOR FOR
+                        SELECT c.idingrediente, c.quantita
+                        FROM composizioni c
+                        WHERE c.idprodotto = v_idprodotto_base_pers;
+                    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done_base_ing_pers = TRUE;
+
+                    OPEN cur_base_ing_pers;
+                    loop_base_ing_pers: LOOP
+                        FETCH cur_base_ing_pers INTO v_idingrediente_comp_loop, v_quantita_ingrediente_base_loop;
+                        IF done_base_ing_pers THEN LEAVE loop_base_ing_pers; END IF;
+
+                        SELECT COUNT(*) INTO v_is_removed
+                        FROM modifiche_ingredienti mi
+                        WHERE mi.idpersonalizzazione = v_idpersonalizzazione
+                          AND mi.idingrediente = v_idingrediente_comp_loop
+                          AND mi.azione = 'rimosso';
+
+                        IF v_is_removed = 0 THEN -- Non rimosso
+                            SET v_decrement_amount = v_quantita_ingrediente_base_loop * v_quantita_personalizzazione;
+                            SELECT giacenza INTO v_current_giacenza FROM ingredienti WHERE idingrediente = v_idingrediente_comp_loop FOR UPDATE;
+
+                            IF v_current_giacenza < v_decrement_amount THEN
+                                SET v_error_message = CONCAT('Giacenza insufficiente per ingrediente base ID ', v_idingrediente_comp_loop, ' (personalizzazione ID ', v_idpersonalizzazione, ', ordine ID ', v_idordine, '). Richiesti: ', v_decrement_amount, ', Disponibili: ', v_current_giacenza);
+                                SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
+                            END IF;
+                            UPDATE ingredienti SET giacenza = giacenza - v_decrement_amount WHERE idingrediente = v_idingrediente_comp_loop;
+                        END IF;
+                    END LOOP loop_base_ing_pers;
+                    CLOSE cur_base_ing_pers;
+                END; -- Fine blocco cursore ingredienti base personalizzazione
+
+                -- 2b. Ingredienti aggiunti
+                BEGIN -- Blocco per cursore ingredienti aggiunti personalizzazione
+                    DECLARE done_added_ing_pers INT DEFAULT FALSE;
+                    -- v_idingrediente_aggiunto_loop è già dichiarata nello scope esterno
+                    DECLARE cur_added_ing_pers CURSOR FOR
+                        SELECT mi.idingrediente
+                        FROM modifiche_ingredienti mi
+                        WHERE mi.idpersonalizzazione = v_idpersonalizzazione AND mi.azione = 'aggiunto';
+                    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done_added_ing_pers = TRUE;
+
+                    OPEN cur_added_ing_pers;
+                    loop_added_ing_pers: LOOP
+                        FETCH cur_added_ing_pers INTO v_idingrediente_aggiunto_loop;
+                        IF done_added_ing_pers THEN LEAVE loop_added_ing_pers; END IF;
+
+                        SET v_decrement_amount = QTA_INGREDIENTE_AGGIUNTO_UNITARIA * v_quantita_personalizzazione;
+                        SELECT giacenza INTO v_current_giacenza FROM ingredienti WHERE idingrediente = v_idingrediente_aggiunto_loop FOR UPDATE;
+
+                        IF v_current_giacenza < v_decrement_amount THEN
+                           SET v_error_message = CONCAT('Giacenza insufficiente per ingrediente aggiunto ID ', v_idingrediente_aggiunto_loop, ' (personalizzazione ID ', v_idpersonalizzazione, ', ordine ID ', v_idordine, '). Richiesti: ', v_decrement_amount, ', Disponibili: ', v_current_giacenza);
+                           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_error_message;
+                        END IF;
+                        UPDATE ingredienti SET giacenza = giacenza - v_decrement_amount WHERE idingrediente = v_idingrediente_aggiunto_loop;
+                    END LOOP loop_added_ing_pers;
+                    CLOSE cur_added_ing_pers;
+                END; -- Fine blocco cursore ingredienti aggiunti personalizzazione
+
+            END LOOP loop_personalizzazioni;
+            CLOSE cur_personalizzazioni;
+        END; -- Fine blocco cursore personalizzazioni
+
+    END IF; -- Fine IF NEW.idstato = 2
 END //
 
 DELIMITER ;
