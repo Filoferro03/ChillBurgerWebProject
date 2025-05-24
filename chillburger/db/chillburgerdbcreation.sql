@@ -43,8 +43,8 @@ CREATE TABLE fasce_orari (
 CREATE TABLE ordini (
      idordine INT AUTO_INCREMENT NOT NULL,
      idutente INT NOT NULL,
-     data_ordine DATE NOT NULL DEFAULT (CURRENT_DATE), -- Data dell'ordine
-     orario TIME DEFAULT (current_time()), -- Chiave esterna che punta a fasce_orari
+     data_ordine DATE DEFAULT NULL, -- Data dell'ordine
+     orario TIME DEFAULT NULL, -- Chiave esterna che punta a fasce_orari
      completato boolean DEFAULT false,
      timestamp_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
      prezzo_totale DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
