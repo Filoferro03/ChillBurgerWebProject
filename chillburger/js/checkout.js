@@ -261,6 +261,15 @@ async function confirmOrder() {
     const apiUrl = `api/api-orders.php`;
     const formData = new FormData();
     formData.append('action', 'payed');
+    
+    // Aggiungi data e ora di consegna
+    const deliveryDate = document.getElementById('delivery-date').value;
+    const deliveryTime = document.getElementById('delivery-time').value;
+    
+    if (deliveryDate && deliveryTime) {
+        formData.append('deliveryDate', deliveryDate);
+        formData.append('deliveryTime', deliveryTime);
+    }
 
     const json = await fetchData(apiUrl, formData);
     return json.success;
@@ -273,10 +282,112 @@ async function updateCart() {
     const json = await fetchData(apiUrl, formData);
 }
 
+function populateDeliveryDates() {
+    const dateSelect = document.getElementById('delivery-date');
+    if (!dateSelect) return;
+    
+    // Svuota il selettore
+    dateSelect.innerHTML = '<option value="" selected disabled>Seleziona una data</option>';
+    
+    // Ottieni la data corrente
+    const today = new Date();
+    
+    // Aggiungi la data corrente e i due giorni successivi
+    for (let i = 0; i < 3; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        
+        const formattedDate = date.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+        
+        // Formatta la data per la visualizzazione (es. "Lunedì 15 Maggio")
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        const displayDate = date.toLocaleDateString('it-IT', options);
+        
+        // Crea l'opzione
+        const option = document.createElement('option');
+        option.value = formattedDate;
+        option.textContent = displayDate.charAt(0).toUpperCase() + displayDate.slice(1); // Prima lettera maiuscola
+        
+        // Se è oggi, aggiungi "(Oggi)" al testo
+        if (i === 0) {
+            option.textContent += ' (Oggi)';
+        }
+        
+        dateSelect.appendChild(option);
+    }
+}
+
+async function populateDeliveryTimes(date) {
+    const timeSelect = document.getElementById('delivery-time');
+    if (!timeSelect) return;
+    
+    // Disabilita il selettore mentre carica
+    timeSelect.disabled = true;
+    timeSelect.innerHTML = '<option value="" selected disabled>Caricamento orari...</option>';
+    
+    // Chiama l'API per ottenere gli orari disponibili
+    const apiUrl = `api/api-orders.php`;
+    const formData = new FormData();
+    formData.append('action', 'getAvailableTimes');
+    formData.append('date', date);
+    
+    const json = await fetchData(apiUrl, formData);
+    
+    // Svuota il selettore
+    timeSelect.innerHTML = '<option value="" selected disabled>Seleziona un orario</option>';
+    
+    if (json && json.success && json.data) {
+        // Popola il selettore con gli orari disponibili
+        json.data.forEach(time => {
+            const option = document.createElement('option');
+            option.value = time;
+            option.textContent = time.substring(0, 5);
+            timeSelect.appendChild(option);
+        });
+        
+        // Abilita il selettore
+        timeSelect.disabled = false;
+    } else {
+        // Gestisci l'errore
+        timeSelect.innerHTML = '<option value="" selected disabled>Nessun orario disponibile</option>';
+    }
+}
+
+function validateDeliveryDateTime() {
+    const dateSelect = document.getElementById('delivery-date');
+    const timeSelect = document.getElementById('delivery-time');
+    
+    let isValid = true;
+    
+    if (!dateSelect.value) {
+        displayError('delivery-date', 'Seleziona una data di consegna.');
+        isValid = false;
+    } else {
+        clearError('delivery-date');
+    }
+    
+    if (!timeSelect.value) {
+        displayError('delivery-time', 'Seleziona un orario di consegna.');
+        isValid = false;
+    } else {
+        clearError('delivery-time');
+    }
+    
+    return isValid;
+}
 
 // --- Event Listener for Payment Form ---
 document.addEventListener('DOMContentLoaded', () => {
     loadOrderDetails();
+    populateDeliveryDates();
+    
+    // Event listener per il cambio della data
+    const dateSelect = document.getElementById('delivery-date');
+    if (dateSelect) {
+        dateSelect.addEventListener('change', function() {
+            populateDeliveryTimes(this.value);
+        });
+    }
 
     const paymentForm = document.getElementById('paymentForm');
     if (paymentForm) {
@@ -286,7 +397,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clear previous general messages
             displayGeneralMessage('', false);
 
-
             // Get form values
             const cardholderName = document.getElementById('cardholder-name').value;
             const cardNumber = document.getElementById('card-number').value;
@@ -294,12 +404,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const cvv = document.getElementById('cvv').value;
 
             // Perform validation
+            const isDateTimeValid = validateDeliveryDateTime();
             const isNameValid = validateCardholderName(cardholderName);
             const isCardNumberValid = validateCardNumber(cardNumber);
             const isExpiryValid = validateExpiryDate(expiryDate);
             const isCvvValid = validateCVV(cvv);
 
-            if (isNameValid && isCardNumberValid && isExpiryValid && isCvvValid) {
+            if (isDateTimeValid && isNameValid && isCardNumberValid && isExpiryValid && isCvvValid) {
                 // All validations passed
                 // Simulate payment processing
                 displayGeneralMessage('Pagamento in elaborazione...', true);
@@ -310,7 +421,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         displayGeneralMessage('🎉 Pagamento confermato con successo! Il tuo ordine è in preparazione. Sarai reindirizzato al tuo profilo...', true);
                         setTimeout(() => {
                             window.location.href = 'profile.php';
-                    }, 2500); }
+                        }, 2500); 
+                    }
                 }, 2000); 
 
             } else {

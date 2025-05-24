@@ -46,14 +46,28 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
         }
     } else if (isset($_POST['action']) && $_POST['action'] == 'payed') {
         $idordine = $_SESSION['idordine'];
-        $result = $dbh->updateStatusToPayed($idordine);
+        
+        // Aggiorna la data e l'ora di consegna se sono state specificate
+        if (isset($_POST['deliveryDate']) && isset($_POST['deliveryTime'])) {
+            $deliveryDate = $_POST['deliveryDate'];
+            $deliveryTime = $_POST['deliveryTime'];
+        }
+        $result = $dbh->updateStatusToPayed($idordine, $deliveryDate, $deliveryTime);
         if (!$result) {
             http_response_code(500); // Internal Server Error
             $response = ['success' => false, 'error' => 'Errore durante il pagamento dell\'ordine'];
         } else {
             $response['success'] = true;
         }
-    } 
+    } else if (isset($_POST['action']) && $_POST['action'] == 'getAvailableTimes') {
+        // Restituisce gli orari disponibili per una data specifica
+        $date = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
+
+        $availableTimes = $dbh->getAvailableTimeSlots($date);
+        
+        $response['success'] = true;
+        $response['data'] = $availableTimes; 
+    }
     
     else {
         http_response_code(400); // Bad Request

@@ -1096,8 +1096,19 @@ class DatabaseHelper
         return $success;
     }
 
-    public function updateStatusToPayed($idordine)
+    public function updateStatusToPayed($idordine, $deliveryDate, $deliveryTime)
     {
+        $updateQuery = "UPDATE ordini SET data_ordine = ?, orario = ? WHERE idordine = ?";
+        $stmtUpdate = $this->db->prepare($updateQuery);
+        $stmtUpdate->bind_param('ssi', $deliveryDate, $deliveryTime, $idordine);
+        $success = $stmtUpdate->execute();
+        $stmtUpdate->close();
+
+        if (!$success) {
+            error_log("Failed to execute updateStatusToPayed for order ID $idordine");
+            return false;
+        }
+
         $updateQuery = "UPDATE ordini SET completato = 1 WHERE idordine = ?";
         $stmtUpdate = $this->db->prepare($updateQuery);
         $stmtUpdate->bind_param('i', $idordine);
@@ -1105,6 +1116,61 @@ class DatabaseHelper
         $stmtUpdate->close();
         return $success;
     }
+    
+    public function getAvailableTimeSlots($date)
+    {
+    $query = "SELECT orario
+              FROM fasce_orari
+              WHERE orario NOT IN (
+                  SELECT orario
+                  FROM ordini
+                  WHERE data_ordine = ?
+              )
+              ORDER BY orario"; // aggiunto ORDER BY per avere gli orari in ordine
+
+    $stmt = $this->db->prepare($query);
+    
+    if (!$stmt) {
+        error_log("Errore nella preparazione della query getAvailableTimeSlots: " . $this->db->error);
+        return false;
+    }
+
+    $stmt->bind_param('s', $date);
+    
+    if (!$stmt->execute()) {
+        error_log("Errore nell'esecuzione della query getAvailableTimeSlots: " . $stmt->error);
+        $stmt->close();
+        return false;
+    }
+
+    $result = $stmt->get_result();
+    $availableSlots = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    
+    $simplifiedSlots = array_map(function($slot) {
+        return $slot['orario'];
+    }, $availableSlots);
+    
+    // Verifica se la data selezionata è oggi
+    $today = date('Y-m-d');
+    if ($date === $today) {
+        // Ottieni l'ora corrente
+        $currentTime = date('H:i:s');
+        
+        // Aggiungi un buffer di 30 minuti per la preparazione
+        $minTime = date('H:i:s', strtotime($currentTime) + 30 * 60);
+        
+        // Filtra gli orari per rimuovere quelli già passati
+        $simplifiedSlots = array_filter($simplifiedSlots, function($time) use ($minTime) {
+            return $time > $minTime;
+        });
+        
+        // Reindexing array
+        $simplifiedSlots = array_values($simplifiedSlots);
+    }
+    
+    return $simplifiedSlots;
+}
 
     public function getAllQuantitiesInCart($idordine)
     {

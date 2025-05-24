@@ -20,6 +20,28 @@
             <div class="card-body p-4 w-50 m-auto" id="paymentContainer">
                 <h5 class="text-center mb-4">Inserisci i tuoi dati di pagamento</h5>
                 <form id="paymentForm" novalidate>
+                    <div class="card mb-4 p-3 border-light shadow-sm">
+                        <h5 class="card-title mb-3">Seleziona data e ora di consegna</h5>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="delivery-date" class="form-label">Data di consegna</label>
+                                <select class="form-select" id="delivery-date" name="delivery-date" required>
+                                    <option value="" selected disabled>Seleziona una data</option>
+                                    <!-- Le opzioni verranno popolate dinamicamente -->
+                                </select>
+                                <div class="invalid-feedback" id="delivery-date-error">Seleziona una data di consegna.</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="delivery-time" class="form-label">Ora di consegna</label>
+                                <select class="form-select" id="delivery-time" name="delivery-time" required disabled>
+                                    <option value="" selected disabled>Seleziona prima una data</option>
+                                    <!-- Le opzioni verranno popolate dinamicamente -->
+                                </select>
+                                <div class="invalid-feedback" id="delivery-time-error">Seleziona un'ora di consegna.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="mb-3">
                         <label for="cardholder-name" class="form-label">Nome sulla Carta</label>
                         <input type="text" class="form-control" id="cardholder-name" name="cardholder-name" required>

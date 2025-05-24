@@ -833,7 +833,7 @@ BEGIN
     LIMIT 1;
 
     -- Notifica al cliente (per stati diversi da 5 - "Confermato")
-    IF NEW.idstato <> 5 THEN
+    IF NEW.idstato <> 5 AND NEW.idstato <> 1 THEN
         SELECT descrizione INTO v_testo
         FROM stati_ordine
         WHERE idstato = NEW.idstato;
