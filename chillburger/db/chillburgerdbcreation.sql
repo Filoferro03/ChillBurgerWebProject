@@ -35,13 +35,21 @@ CREATE TABLE notifiche (
      PRIMARY KEY (idnotifica)
 );
 
+CREATE TABLE fasce_orari (
+    orario TIME NOT NULL, -- L'ID è l'orario stesso
+    PRIMARY KEY (orario)
+);
+
 CREATE TABLE ordini (
      idordine INT AUTO_INCREMENT NOT NULL,
      idutente INT NOT NULL,
+     data_ordine DATE NOT NULL DEFAULT (CURRENT_DATE), -- Data dell'ordine
+     orario TIME, -- Chiave esterna che punta a fasce_orari
+     completato BOOLEAN DEFAULT FALSE,
      timestamp_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-     completato TINYINT(1) DEFAULT 0,
      prezzo_totale DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-     PRIMARY KEY (idordine)
+     PRIMARY KEY (idordine),
+     UNIQUE KEY unique_data_orario_ordine (data_ordine, orario) -- Vincolo di unicità
 );
 
 CREATE TABLE personalizzazioni (
@@ -57,7 +65,7 @@ CREATE TABLE prodotti (
      idprodotto INT AUTO_INCREMENT NOT NULL,
      nome VARCHAR(255) NOT NULL,
      prezzo DECIMAL(10, 2) NOT NULL,
-     disponibilita INT NOT NULL,
+     disponibilita INT NOT NULL DEFAULT 0,
      idcategoria INT NOT NULL,
      image VARCHAR(255),
      PRIMARY KEY (idprodotto)
@@ -115,7 +123,7 @@ CREATE TABLE utenti (
      cognome VARCHAR(255) NOT NULL,
      username VARCHAR(255) NOT NULL,
      password VARCHAR(255) NOT NULL,
-     tipo ENUM('cliente', 'venditore') NOT NULL,
+     tipo ENUM('cliente', 'venditore') NOT NULL DEFAULT 'cliente',
      PRIMARY KEY (idutente),
      UNIQUE KEY unique_username (username)
 );
@@ -146,6 +154,11 @@ ALTER TABLE ordini
 ADD CONSTRAINT fkr
 FOREIGN KEY (idutente)
 REFERENCES utenti (idutente);
+
+ALTER TABLE ordini
+ADD CONSTRAINT fk_fascia_oraria
+FOREIGN KEY (orario)
+REFERENCES fasce_orari (orario);
 
 ALTER TABLE personalizzazioni
 ADD CONSTRAINT fkcarrelli_personalizzazione
@@ -223,6 +236,8 @@ CREATE INDEX idx_notifiche_timestamp ON notifiche (timestamp_notifica);
 
 CREATE INDEX idx_ordini_idutente ON ordini (idutente);
 CREATE INDEX idx_ordini_timestamp ON ordini (timestamp_ordine);
+CREATE INDEX idx_ordini_data_ordine ON ordini (data_ordine);
+CREATE INDEX idx_ordini_idfascia_oraria ON ordini (orario);
 
 CREATE INDEX idx_personalizzazioni_idordine ON personalizzazioni (idordine);
 CREATE INDEX idx_personalizzazioni_idprodotto ON personalizzazioni (idprodotto);
@@ -725,4 +740,119 @@ BEGIN
     END IF; -- Fine IF NEW.idstato = 2
 END //
 
+DELIMITER ;
+
+-- Trigger per notifiche automatiche quando giacenza ingredienti <= 3
+DELIMITER //
+
+CREATE TRIGGER trg_after_ingredienti_update_low_stock_notification
+AFTER UPDATE ON ingredienti
+FOR EACH ROW
+BEGIN
+    -- Controlla se la giacenza è scesa a 3 o meno E non era già <= 3 prima
+    -- (per evitare notifiche duplicate)
+    IF NEW.giacenza <= 3 AND OLD.giacenza > 3 THEN
+        -- Inserisce notifica per tutti gli utenti di tipo 'venditore'
+        INSERT INTO notifiche (
+            titolo, 
+            testo, 
+            tipo, 
+            idutente, 
+            idingrediente,
+            vista
+        )
+        SELECT 
+            CONCAT('Scorte Basse: ', NEW.nome),
+            CONCAT('L''ingrediente "', NEW.nome, '" ha solo ', NEW.giacenza, ' unità rimaste in giacenza. Considera di rifornire.'),
+            'ingrediente',
+            u.idutente,
+            NEW.idingrediente,
+            0
+        FROM utenti u 
+        WHERE u.tipo = 'venditore';
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Trigger per notifiche automatiche quando disponibilità prodotti <= 3
+DELIMITER //
+
+CREATE TRIGGER trg_after_prodotti_update_low_availability_notification
+AFTER UPDATE ON prodotti
+FOR EACH ROW
+BEGIN
+    -- Controlla se la disponibilità è scesa a 3 o meno E non era già <= 3 prima
+    -- (per evitare notifiche duplicate)
+    IF NEW.disponibilita <= 3 AND OLD.disponibilita > 3 THEN
+        -- Inserisce notifica per tutti gli utenti di tipo 'venditore'
+        INSERT INTO notifiche (
+            titolo, 
+            testo, 
+            tipo, 
+            idutente, 
+            idprodotto,
+            vista
+        )
+        SELECT 
+            CONCAT('Prodotto in Esaurimento: ', NEW.nome),
+            CONCAT('Il prodotto "', NEW.nome, '" ha solo ', NEW.disponibilita, ' unità disponibili. Verifica se è necessario aumentare la produzione.'),
+            'prodotto',
+            u.idutente,
+            NEW.idprodotto,
+            0
+        FROM utenti u 
+        WHERE u.tipo = 'venditore';
+    END IF;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE TRIGGER trg_after_modifiche_stato_notification
+AFTER INSERT ON modifiche_stato
+FOR EACH ROW
+BEGIN
+    DECLARE v_idutente_cliente INT;
+    DECLARE v_idutente_venditore INT;
+    DECLARE v_titolo VARCHAR(255);
+    DECLARE v_testo TEXT;
+    DECLARE v_data_ordine DATE;
+    DECLARE v_orario_ordine TIME;
+
+    -- Ottieni l'ID dell'utente cliente, la data e l'orario associati all'ordine
+    SELECT idutente, data_ordine, orario INTO v_idutente_cliente, v_data_ordine, v_orario_ordine
+    FROM ordini
+    WHERE idordine = NEW.idordine;
+
+    -- Ottieni l'ID di un utente venditore (assumiamo che ce ne sia almeno uno)
+    SELECT idutente INTO v_idutente_venditore
+    FROM utenti
+    WHERE tipo = 'venditore'
+    LIMIT 1;
+
+    -- Notifica al cliente (per stati diversi da 5 - "Confermato")
+    IF NEW.idstato <> 5 THEN
+        SELECT descrizione INTO v_testo
+        FROM stati_ordine
+        WHERE idstato = NEW.idstato;
+
+        SET v_titolo = CONCAT('Aggiornamento Ordine #', NEW.idordine);
+        SET v_testo = CONCAT('Il tuo ordine del ', DATE_FORMAT(v_data_ordine, '%d/%m/%Y'), ' alle ', v_orario_ordine, ' è ora: ', v_testo, '.');
+
+        INSERT INTO notifiche (titolo, testo, vista, tipo, idutente, idordine)
+        VALUES (v_titolo, v_testo, 0, 'ordine', v_idutente_cliente, NEW.idordine);
+    END IF;
+
+    -- Notifica al venditore (solo per stato 5 - "Confermato")
+    IF NEW.idstato = 5 THEN
+        SET v_titolo = CONCAT('Ordine Completato #', NEW.idordine);
+        SET v_testo = CONCAT('L''ordine #', NEW.idordine, ' è stato completato e confermato dal cliente.');
+
+        INSERT INTO notifiche (titolo, testo, vista, tipo, idutente, idordine)
+        VALUES (v_titolo, v_testo, 0, 'ordine', v_idutente_venditore, NEW.idordine);
+    END IF;
+END;
+//
 DELIMITER ;

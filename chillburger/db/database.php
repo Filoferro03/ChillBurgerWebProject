@@ -143,7 +143,8 @@ class DatabaseHelper
         if ($totalOrders > 0 && $page <= $totalPages) {
             $query = "SELECT
                     o.idordine,
-                    o.timestamp_ordine,
+                    o.data_ordine,
+                    o.orario,
                     COALESCE(so.descrizione, 'Non disponibile') AS stato
                   FROM ordini o
                   LEFT JOIN (
@@ -156,7 +157,7 @@ class DatabaseHelper
                   ) ON o.idordine = ms.idordine
                   LEFT JOIN stati_ordine so ON ms.idstato = so.idstato
                   WHERE o.idutente = ? AND o.completato = TRUE
-                  ORDER BY o.timestamp_ordine DESC
+                  ORDER BY o.data_ordine DESC, o.orario DESC
                   LIMIT ? OFFSET ?";
 
             $stmt = $this->db->prepare($query);
@@ -666,10 +667,16 @@ class DatabaseHelper
         ];
     }
 
-    public function updateStatusToConfirmed($orderId)
+    public function updateOrderStatus($orderId)
     {
-        $insertQuery = "INSERT INTO modifiche_stato (idordine, idstato)
-                    VALUES (?, (SELECT idstato FROM stati_ordine WHERE descrizione = 'Confermato'))";
+        $insertQuery = "INSERT INTO modifiche_stato (idordine, idstato) VALUES (?, 
+        (SELECT idstato 
+         FROM stati_ordine 
+         WHERE idstato = (
+             SELECT COALESCE(MAX(ms.idstato), 0) + 1
+             FROM modifiche_stato ms 
+             WHERE ms.idordine = ?
+         )))";
         $stmt = $this->db->prepare($insertQuery);
 
         if (!$stmt) {
@@ -677,7 +684,7 @@ class DatabaseHelper
             return false;
         }
 
-        $stmt->bind_param('i', $orderId);
+        $stmt->bind_param('ii', $orderId, $orderId);
 
         if (!$stmt->execute()) {
             error_log("Errore esecuzione statement (insertQuery) in updateStatusToConfirmed per ordine ID $orderId: " . $stmt->error);

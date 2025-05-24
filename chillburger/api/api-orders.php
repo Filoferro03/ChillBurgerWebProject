@@ -37,7 +37,7 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
         
     } else if(isset($_POST['action']) && $_POST['action'] == 'confirm') {
         $idordine = $_POST['idordine'];
-        $result = $dbh->updateStatusToConfirmed($idordine);
+        $result = $dbh->updateOrderStatus($idordine);
         if(!$result){
             http_response_code(500); // Internal Server Error
             $response = ['success' => false, 'error' => 'Errore durante la conferma dell\'ordine'];

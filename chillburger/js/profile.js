@@ -50,7 +50,7 @@ function generateOrdersHTML(orders) {
             <div class="list-group-item mb-3 mt-2 d-flex justify-content-between align-items-center">
                 <div>
                     <h4> Ordine #${order.idordine}</h4>
-                    <small>${formatDateFromTimestamp(order.timestamp_ordine)} - ${formatTimeFromTimestamp(order.timestamp_ordine)}</small><br>
+                    <small>${(order.data_ordine.split('-')[2])}-${(order.data_ordine.split('-')[1])}-${(order.data_ordine.split('-')[0])} - ${order.orario.substring(0, 5)}</small><br>
                 </div>
                 <p><strong>Stato:</strong><br> ${order.stato}<p>
                 <a href="order-view.php?idordine=${order.idordine}" class="order-button btn">Dettagli</a>`;
