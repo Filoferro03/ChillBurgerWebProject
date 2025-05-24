@@ -839,7 +839,7 @@ BEGIN
         WHERE idstato = NEW.idstato;
 
         SET v_titolo = CONCAT('Aggiornamento Ordine #', NEW.idordine);
-        SET v_testo = CONCAT('Il tuo ordine del ', DATE_FORMAT(v_data_ordine, '%d/%m/%Y'), ' alle ', v_orario_ordine, ' è ora: ', v_testo, '.');
+        SET v_testo = CONCAT('Il tuo ordine del ', DATE_FORMAT(v_data_ordine, '%d/%m/%Y'), ' alle  è ora: ', v_testo, '.');
 
         INSERT INTO notifiche (titolo, testo, vista, tipo, idutente, idordine)
         VALUES (v_titolo, v_testo, 0, 'ordine', v_idutente_cliente, NEW.idordine);

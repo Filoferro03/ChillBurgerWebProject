@@ -271,7 +271,6 @@ async function updateCart() {
     const formData = new FormData();
     formData.append('action', 'createCart');
     const json = await fetchData(apiUrl, formData);
-    return json.success;
 }
 
 
@@ -304,16 +303,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // All validations passed
                 // Simulate payment processing
                 displayGeneralMessage('Pagamento in elaborazione...', true);
-                console.log('Payment data (not sent to DB):', {
-                    cardholderName,
-                    cardNumber,
-                    expiryDate,
-                    cvv
-                });
 
-                // Here you would typically send data to a payment gateway.
-                // For this example, we'll just show a success message after a delay.
-                 setTimeout(() => {
+                setTimeout(() => {
                     if (confirmOrder()) {
                         updateCart();
                         displayGeneralMessage('🎉 Pagamento confermato con successo! Il tuo ordine è in preparazione. Sarai reindirizzato al tuo profilo...', true);
