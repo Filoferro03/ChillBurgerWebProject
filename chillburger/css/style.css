@@ -59,12 +59,12 @@ h1 {
 }
 
 /* ombra solo sul testo, NON sulle emoji */
-.custom-title .txt { 
-    text-shadow: 4px 4px 0 white; 
+.custom-title .txt {
+    text-shadow: 4px 4px 0 white;
 }
 
-.custom-title .emoji { 
-    text-shadow: none; 
+.custom-title .emoji {
+    text-shadow: none;
 }
 
 /* -------------------- Animated underline -------------------- */
@@ -195,10 +195,10 @@ html, body {
     z-index: 2;
 }
 
-/* 
-    FIXME 
+/*
+    FIXME
     bottoni, capire quale sia la configurazione migliore
-    è meglio avere il bottone trasparente prima o dopo 
+    è meglio avere il bottone trasparente prima o dopo
     passarci con il mouse?
 */
 
@@ -326,7 +326,7 @@ html, body {
     height: 20%;
     object-fit: cover;
 }
-  
+
   @media (min-width: 768px) {
     .img-responsive {
       width: 10%;
@@ -340,7 +340,7 @@ html, body {
     max-height: 300px;
     object-fit: cover;
 }
-  
+
   @media (min-width: 768px) {
     .menu-img-responsive {
       width: 80%;
@@ -383,4 +383,21 @@ html, body {
 .read-notification {
     /* Nessuno stile definito */
     display: flex;
+}
+
+.order-button {
+    background-color: #7f5539;
+    color: white;
+}
+
+.order-button:hover {
+    background-color: #7f5539;
+    color: white;
+    opacity: 0.8;
+}
+
+@media (max-width:768px) {
+    .card {
+        width: 100% !important;
+    }
 }

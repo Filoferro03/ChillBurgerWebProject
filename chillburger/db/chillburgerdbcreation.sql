@@ -45,7 +45,7 @@ CREATE TABLE ordini (
      idutente INT NOT NULL,
      data_ordine DATE NOT NULL DEFAULT (CURRENT_DATE), -- Data dell'ordine
      orario TIME, -- Chiave esterna che punta a fasce_orari
-     completato BOOLEAN DEFAULT FALSE,
+     completato TINYINT(1) DEFAULT 0,
      timestamp_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
      prezzo_totale DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
      PRIMARY KEY (idordine),

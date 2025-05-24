@@ -222,14 +222,14 @@ INSERT INTO chillburgerdb.fasce_orari (orario) VALUES
 
 -- Insert Ordini (timestamp_ordine è 'YYYY-MM-DD HH:MM:SS')
 INSERT INTO chillburgerdb.ordini (idutente, completato, data_ordine, orario) VALUES
-((SELECT idutente FROM utenti WHERE username = 'mario.rossi'), true, '2024-05-10', '12:30:00'),
-((SELECT idutente FROM utenti WHERE username = 'anna.verdi'), true, '2024-05-10', '19:00:00'),
-((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), true, '2024-05-11', '13:15:00'),
-((SELECT idutente FROM utenti WHERE username = 'laura.bruni'), true, '2024-05-11', '20:00:00'),
-((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), true, '2024-05-12', '19:15:00'),
-((SELECT idutente FROM utenti WHERE username = 'laura.bruni'), true, '2025-05-12', '21:15:00'),
-((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), true, '2025-05-15', '19:15:00'),
-((SELECT idutente FROM utenti WHERE username = 'mario.rossi'), true, '2024-05-12', '12:00:00');
+((SELECT idutente FROM utenti WHERE username = 'mario.rossi'), 1, '2024-05-10', '12:30:00'),
+((SELECT idutente FROM utenti WHERE username = 'anna.verdi'), 1, '2024-05-10', '19:00:00'),
+((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), 1, '2024-05-11', '13:15:00'),
+((SELECT idutente FROM utenti WHERE username = 'laura.bruni'), 1, '2024-05-11', '20:00:00'),
+((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), 1, '2024-05-12', '19:15:00'),
+((SELECT idutente FROM utenti WHERE username = 'laura.bruni'), 1, '2025-05-12', '21:15:00'),
+((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), 1, '2025-05-15', '19:15:00'),
+((SELECT idutente FROM utenti WHERE username = 'mario.rossi'), 1, '2024-05-12', '12:00:00');
 -- Esempio di popolamento manuale di modifiche_stato
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (1, 5, '2024-05-10 13:35:00');
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (2, 5, '2024-05-10 20:55:00');

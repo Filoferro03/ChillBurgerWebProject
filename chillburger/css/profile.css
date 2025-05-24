@@ -1,14 +1,3 @@
-.order-button {
-    background-color: #7f5539;
-    color: white;
-}
-
-.order-button:hover {
-    background-color: #7f5539;
-    opacity: 0.8;
-    color: white;
-}
-
 .modal-content {
     background-color: #e6ccb2;
 }
@@ -20,9 +9,5 @@
 
     #order-history-area {
         padding: 6px 4px !important;
-    }
-
-    .card {
-        width: 100% !important;
     }
 }

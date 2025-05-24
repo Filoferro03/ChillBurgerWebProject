@@ -1098,7 +1098,7 @@ class DatabaseHelper
 
     public function updateStatusToPayed($idordine)
     {
-        $updateQuery = "UPDATE ordini SET completato = TRUE WHERE idordine = ?";
+        $updateQuery = "UPDATE ordini SET completato = 1 WHERE idordine = ?";
         $stmtUpdate = $this->db->prepare($updateQuery);
         $stmtUpdate->bind_param('i', $idordine);
         $success = $stmtUpdate->execute();
