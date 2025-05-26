@@ -810,6 +810,8 @@ DELIMITER ;
 
 DELIMITER //
 
+DELIMITER //
+
 CREATE TRIGGER trg_after_modifiche_stato_notification
 AFTER INSERT ON modifiche_stato
 FOR EACH ROW
@@ -832,7 +834,7 @@ BEGIN
     WHERE tipo = 'venditore'
     LIMIT 1;
 
-    -- Notifica al cliente (per stati diversi da 5 - "Confermato")
+    -- Notifica al cliente (per stati diversi da 5 - "Confermato" e 1 - "In Attesa")
     IF NEW.idstato <> 5 AND NEW.idstato <> 1 THEN
         SELECT descrizione INTO v_testo
         FROM stati_ordine
@@ -845,8 +847,14 @@ BEGIN
         VALUES (v_titolo, v_testo, 0, 'ordine', v_idutente_cliente, NEW.idordine);
     END IF;
 
-    -- Notifica al venditore (solo per stato 5 - "Confermato")
-    IF NEW.idstato = 5 THEN
+    -- Notifica al venditore (solo per stato 1 - "In Attesa" e 5 - "Completato")
+    IF NEW.idstato = 1 THEN
+        SET v_titolo = CONCAT('Nuovo Ordine Ricevuto #', NEW.idordine);
+        SET v_testo = CONCAT('È stato effettuato un nuovo ordine #', NEW.idordine, ' in data ', DATE_FORMAT(v_data_ordine, '%d/%m/%Y'), ' alle ', v_orario_ordine, '.');
+
+        INSERT INTO notifiche (titolo, testo, vista, tipo, idutente, idordine)
+        VALUES (v_titolo, v_testo, 0, 'ordine', v_idutente_venditore, NEW.idordine);
+    ELSEIF NEW.idstato = 5 THEN
         SET v_titolo = CONCAT('Ordine Completato #', NEW.idordine);
         SET v_testo = CONCAT('L''ordine #', NEW.idordine, ' è stato completato e confermato dal cliente.');
 
