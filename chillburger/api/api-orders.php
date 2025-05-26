@@ -24,6 +24,26 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
         $response['success'] = true;
         $response['data'] = $paginatedData;
 
+    } else if (isset($_POST['action']) && $_POST['action'] == 'getActiveOrders') {
+        // Verifica se l'utente è un manager
+        if (!isUserAdmin()) {
+            http_response_code(403); // Forbidden
+            $response = ['success' => false, 'error' => 'Accesso non autorizzato'];
+        } else {
+            $activeOrders = $dbh->getActiveOrders();
+            $response['success'] = true;
+            $response['data'] = $activeOrders;
+        }
+    } else if (isset($_POST['action']) && $_POST['action'] == 'getOrderHistory') {
+        // Verifica se l'utente è un manager
+        if (!isUserAdmin()) {
+            http_response_code(403); // Forbidden
+            $response = ['success' => false, 'error' => 'Accesso non autorizzato'];
+        } else {
+            $orderHistory = $dbh->getOrderHistory();
+            $response['success'] = true;
+            $response['data'] = $orderHistory;
+        }
     } else if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
         $idOrdine = null;
         if (isset($_GET['idordine'])) {

@@ -1221,4 +1221,76 @@ class DatabaseHelper
 
         return $stmt->num_rows > 0;
     }
+    
+    /**
+     * Ottiene tutti gli ordini attivi (non completati)
+     * @return array Array di ordini attivi
+     */
+    public function getActiveOrders()
+    {
+        $query = "SELECT o.idordine, o.data_ordine, o.orario, o.prezzo_totale,
+                  COALESCE(so.descrizione, 'In attesa') AS stato
+                  FROM ordini o
+                  LEFT JOIN (
+                      modifiche_stato ms
+                      JOIN (
+                          SELECT idordine, MAX(timestamp_modifica) AS max_timestamp
+                          FROM modifiche_stato
+                          GROUP BY idordine
+                      ) ms_max ON ms.idordine = ms_max.idordine AND ms.timestamp_modifica = ms_max.max_timestamp
+                  ) ON o.idordine = ms.idordine
+                  LEFT JOIN stati_ordine so ON ms.idstato = so.idstato
+                  WHERE ms.idstato != 5 AND o.completato = 1
+                  ORDER BY o.data_ordine DESC, o.orario DESC";
+                  
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            error_log("Errore preparazione statement getActiveOrders: " . $this->db->error);
+            return [];
+        }
+        
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $orders = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        
+        return $orders;
+    }
+    
+    /**
+     * Ottiene lo storico degli ordini (completati)
+     * @return array Array di ordini completati
+     */
+    public function getOrderHistory()
+    {
+        $query = "SELECT o.idordine, o.data_ordine, o.orario, o.prezzo_totale,
+                  COALESCE(so.descrizione, 'Completato') AS stato
+                  FROM ordini o
+                  LEFT JOIN (
+                      modifiche_stato ms
+                      JOIN (
+                          SELECT idordine, MAX(timestamp_modifica) AS max_timestamp
+                          FROM modifiche_stato
+                          GROUP BY idordine
+                      ) ms_max ON ms.idordine = ms_max.idordine AND ms.timestamp_modifica = ms_max.max_timestamp
+                  ) ON o.idordine = ms.idordine
+                  LEFT JOIN stati_ordine so ON ms.idstato = so.idstato
+                  WHERE ms.idstato = 5
+                  ORDER BY o.data_ordine DESC, o.orario DESC";
+                  
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            error_log("Errore preparazione statement getOrderHistory: " . $this->db->error);
+            return [];
+        }
+        
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $orders = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        
+        return $orders;
+    }
 }
