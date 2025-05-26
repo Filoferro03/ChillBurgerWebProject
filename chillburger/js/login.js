@@ -38,7 +38,6 @@ async function tryLogin(username, password) {
     console.log(json);
 
     if (json?.loginresult) {
-        console.log("qui arrivi");
         getUserCart();
         window.location.reload();
     } else {

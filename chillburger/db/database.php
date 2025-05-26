@@ -336,7 +336,7 @@ class DatabaseHelper
     public function getNotificationsByUserId($idutente)
     {
         try {
-            $query = "SELECT * FROM notifiche WHERE idutente = ?";
+            $query = "SELECT * FROM notifiche WHERE idutente = ? AND vista = 0";
 
             $stmt = $this->db->prepare($query);
 
@@ -1116,10 +1116,10 @@ class DatabaseHelper
         $stmtUpdate->close();
         return $success;
     }
-    
+
     public function getAvailableTimeSlots($date)
     {
-    $query = "SELECT orario
+        $query = "SELECT orario
               FROM fasce_orari
               WHERE orario NOT IN (
                   SELECT orario
@@ -1128,49 +1128,49 @@ class DatabaseHelper
               )
               ORDER BY orario"; // aggiunto ORDER BY per avere gli orari in ordine
 
-    $stmt = $this->db->prepare($query);
-    
-    if (!$stmt) {
-        error_log("Errore nella preparazione della query getAvailableTimeSlots: " . $this->db->error);
-        return false;
-    }
+        $stmt = $this->db->prepare($query);
 
-    $stmt->bind_param('s', $date);
-    
-    if (!$stmt->execute()) {
-        error_log("Errore nell'esecuzione della query getAvailableTimeSlots: " . $stmt->error);
+        if (!$stmt) {
+            error_log("Errore nella preparazione della query getAvailableTimeSlots: " . $this->db->error);
+            return false;
+        }
+
+        $stmt->bind_param('s', $date);
+
+        if (!$stmt->execute()) {
+            error_log("Errore nell'esecuzione della query getAvailableTimeSlots: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+
+        $result = $stmt->get_result();
+        $availableSlots = $result->fetch_all(MYSQLI_ASSOC);
         $stmt->close();
-        return false;
-    }
 
-    $result = $stmt->get_result();
-    $availableSlots = $result->fetch_all(MYSQLI_ASSOC);
-    $stmt->close();
-    
-    $simplifiedSlots = array_map(function($slot) {
-        return $slot['orario'];
-    }, $availableSlots);
-    
-    // Verifica se la data selezionata è oggi
-    $today = date('Y-m-d');
-    if ($date === $today) {
-        // Ottieni l'ora corrente
-        $currentTime = date('H:i:s');
-        
-        // Aggiungi un buffer di 30 minuti per la preparazione
-        $minTime = date('H:i:s', strtotime($currentTime) + 30 * 60);
-        
-        // Filtra gli orari per rimuovere quelli già passati
-        $simplifiedSlots = array_filter($simplifiedSlots, function($time) use ($minTime) {
-            return $time > $minTime;
-        });
-        
-        // Reindexing array
-        $simplifiedSlots = array_values($simplifiedSlots);
+        $simplifiedSlots = array_map(function ($slot) {
+            return $slot['orario'];
+        }, $availableSlots);
+
+        // Verifica se la data selezionata è oggi
+        $today = date('Y-m-d');
+        if ($date === $today) {
+            // Ottieni l'ora corrente
+            $currentTime = date('H:i:s');
+
+            // Aggiungi un buffer di 30 minuti per la preparazione
+            $minTime = date('H:i:s', strtotime($currentTime) + 30 * 60);
+
+            // Filtra gli orari per rimuovere quelli già passati
+            $simplifiedSlots = array_filter($simplifiedSlots, function ($time) use ($minTime) {
+                return $time > $minTime;
+            });
+
+            // Reindexing array
+            $simplifiedSlots = array_values($simplifiedSlots);
+        }
+
+        return $simplifiedSlots;
     }
-    
-    return $simplifiedSlots;
-}
 
     public function getAllQuantitiesInCart($idordine)
     {

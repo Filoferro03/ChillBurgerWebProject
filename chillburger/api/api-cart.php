@@ -121,7 +121,7 @@ if (isset($_POST["action"])) {
             break;
 
         case "createCart":
-            if (isset($_SESSION["idutente"])) {
+            if (isset($_SESSION["idutente"]) && isUserClient()) {
                 if ($dbh->hasUncompletedOrder($_SESSION["idutente"])) {
                     $cart = $dbh->getUncompletedOrder($_SESSION["idutente"]);
                     $result['createCart'] = true;
