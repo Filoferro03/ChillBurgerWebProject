@@ -22,7 +22,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'login' && isset($_POST["logi
 
         if ($_POST['registerpassword'] === $_POST['confirmpassword']) {
 
-            $registration = $dbh->registerUser($_POST["registerusername"], $_POST["registerpassword"], $_POST["nome"], $_POST["cognome"], "client");
+            $registration = $dbh->registerUser($_POST["registerusername"], $_POST["registerpassword"], $_POST["nome"], $_POST["cognome"], "cliente");
 
             if ($registration) {
                 $result['registerresult'] = true;

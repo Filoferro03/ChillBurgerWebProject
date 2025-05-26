@@ -174,3 +174,10 @@
 </body>
 
 </html>
+
+<?php
+
+var_dump($_SESSION);
+
+
+?>
