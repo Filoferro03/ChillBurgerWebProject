@@ -96,23 +96,37 @@
                     </li>
                 </ul>
                 <div>
-                    <?php if (isUserLoggedIn()): ?>
-                        <!-- Mostra i link del profilo e delle notifiche se l'utente è loggato -->
+                    <?php if (isUserLoggedIn() && isUserClient()): ?>
+                        <!-- Mostra i link del profilo e delle notifiche se l'utente è un client loggato -->
                         <a class="text-decoration-none" href="profile.php">
                             <i class="fa-solid fa-user text-black fs-2"></i>
                         </a>
                         <a href="notifications.php" class="text-decoration-none mx-4">
-                            <i class="fa-regular fa-bell text-black fs-2"></i>
+                            <i class="fa-solid fa-bell text-black fs-2"></i>
                         </a>
                         <a href="cart.php" class="text-decoration-none">
                             <i class="fa-solid fa-cart-shopping text-black fs-2"></i>
                         </a>
+
+                    <?php elseif (isUserLoggedIn() && isUserAdmin()): ?>
+                        <!-- Mostra i link per l'admin loggato -->
+                        <a class="text-decoration-none" href="profile.php">
+                            <i class="fa-solid fa-user text-black fs-2"></i>
+                        </a>
+                        <a href="notifications.php" class="text-decoration-none mx-4">
+                            <i class="fa-solid fa-bell text-black fs-2"></i>
+                        </a>
+                        <a href="manager.php" class="text-decoration-none">
+                            <i class="fa-solid fa-user-tie text-black fs-2"></i>
+                        </a>
+
                     <?php else: ?>
                         <!-- Mostra il link per il login se l'utente non è loggato -->
                         <a href="login.php" class="text-decoration-none mx-4">
                             <i class="fa-solid fa-user text-black fs-2"></i>
                         </a>
                     <?php endif; ?>
+
                 </div>
             </div>
         </nav>

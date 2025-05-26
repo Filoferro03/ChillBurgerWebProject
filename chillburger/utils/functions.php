@@ -25,6 +25,11 @@ function isUserClient()
     return $_SESSION["tipo"] === "cliente";
 }
 
+function isUserAdmin()
+{
+    return $_SESSION["tipo"] === "venditore";
+}
+
 function logout()
 {
     session_unset();
