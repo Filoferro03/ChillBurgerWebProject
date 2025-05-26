@@ -143,7 +143,8 @@ class DatabaseHelper
         if ($totalOrders > 0 && $page <= $totalPages) {
             $query = "SELECT
                     o.idordine,
-                    o.timestamp_ordine,
+                    o.data_ordine,
+                    o.orario,
                     COALESCE(so.descrizione, 'Non disponibile') AS stato
                   FROM ordini o
                   LEFT JOIN (
@@ -156,7 +157,7 @@ class DatabaseHelper
                   ) ON o.idordine = ms.idordine
                   LEFT JOIN stati_ordine so ON ms.idstato = so.idstato
                   WHERE o.idutente = ? AND o.completato = TRUE
-                  ORDER BY o.timestamp_ordine DESC
+                  ORDER BY o.data_ordine DESC, o.orario DESC
                   LIMIT ? OFFSET ?";
 
             $stmt = $this->db->prepare($query);
@@ -666,10 +667,16 @@ class DatabaseHelper
         ];
     }
 
-    public function updateStatusToConfirmed($orderId)
+    public function updateOrderStatus($orderId)
     {
-        $insertQuery = "INSERT INTO modifiche_stato (idordine, idstato)
-                    VALUES (?, (SELECT idstato FROM stati_ordine WHERE descrizione = 'Confermato'))";
+        $insertQuery = "INSERT INTO modifiche_stato (idordine, idstato) VALUES (?, 
+        (SELECT idstato 
+         FROM stati_ordine 
+         WHERE idstato = (
+             SELECT COALESCE(MAX(ms.idstato), 0) + 1
+             FROM modifiche_stato ms 
+             WHERE ms.idordine = ?
+         )))";
         $stmt = $this->db->prepare($insertQuery);
 
         if (!$stmt) {
@@ -677,7 +684,7 @@ class DatabaseHelper
             return false;
         }
 
-        $stmt->bind_param('i', $orderId);
+        $stmt->bind_param('ii', $orderId, $orderId);
 
         if (!$stmt->execute()) {
             error_log("Errore esecuzione statement (insertQuery) in updateStatusToConfirmed per ordine ID $orderId: " . $stmt->error);
@@ -1089,15 +1096,81 @@ class DatabaseHelper
         return $success;
     }
 
-    public function updateStatusToPayed($idordine)
+    public function updateStatusToPayed($idordine, $deliveryDate, $deliveryTime)
     {
-        $updateQuery = "UPDATE ordini SET completato = TRUE WHERE idordine = ?";
+        $updateQuery = "UPDATE ordini SET data_ordine = ?, orario = ? WHERE idordine = ?";
+        $stmtUpdate = $this->db->prepare($updateQuery);
+        $stmtUpdate->bind_param('ssi', $deliveryDate, $deliveryTime, $idordine);
+        $success = $stmtUpdate->execute();
+        $stmtUpdate->close();
+
+        if (!$success) {
+            error_log("Failed to execute updateStatusToPayed for order ID $idordine");
+            return false;
+        }
+
+        $updateQuery = "UPDATE ordini SET completato = 1 WHERE idordine = ?";
         $stmtUpdate = $this->db->prepare($updateQuery);
         $stmtUpdate->bind_param('i', $idordine);
         $success = $stmtUpdate->execute();
         $stmtUpdate->close();
         return $success;
     }
+    
+    public function getAvailableTimeSlots($date)
+    {
+    $query = "SELECT orario
+              FROM fasce_orari
+              WHERE orario NOT IN (
+                  SELECT orario
+                  FROM ordini
+                  WHERE data_ordine = ?
+              )
+              ORDER BY orario"; // aggiunto ORDER BY per avere gli orari in ordine
+
+    $stmt = $this->db->prepare($query);
+    
+    if (!$stmt) {
+        error_log("Errore nella preparazione della query getAvailableTimeSlots: " . $this->db->error);
+        return false;
+    }
+
+    $stmt->bind_param('s', $date);
+    
+    if (!$stmt->execute()) {
+        error_log("Errore nell'esecuzione della query getAvailableTimeSlots: " . $stmt->error);
+        $stmt->close();
+        return false;
+    }
+
+    $result = $stmt->get_result();
+    $availableSlots = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    
+    $simplifiedSlots = array_map(function($slot) {
+        return $slot['orario'];
+    }, $availableSlots);
+    
+    // Verifica se la data selezionata è oggi
+    $today = date('Y-m-d');
+    if ($date === $today) {
+        // Ottieni l'ora corrente
+        $currentTime = date('H:i:s');
+        
+        // Aggiungi un buffer di 30 minuti per la preparazione
+        $minTime = date('H:i:s', strtotime($currentTime) + 30 * 60);
+        
+        // Filtra gli orari per rimuovere quelli già passati
+        $simplifiedSlots = array_filter($simplifiedSlots, function($time) use ($minTime) {
+            return $time > $minTime;
+        });
+        
+        // Reindexing array
+        $simplifiedSlots = array_values($simplifiedSlots);
+    }
+    
+    return $simplifiedSlots;
+}
 
     public function getAllQuantitiesInCart($idordine)
     {

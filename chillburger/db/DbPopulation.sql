@@ -79,14 +79,14 @@ INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, im
 ('Sprite', 3.00, 90, 3, 'sprite.png');
 
 -- Categoria: dolci (idcategoria = 4)
-INSERT INTO chillburgerdb.prodotti (nome, prezzo, idcategoria, image) VALUES
-('Tiramisù', 5.00, 4, 'tiramisu.png'),
-('Cheesecake ai Frutti di Bosco', 5.50, 4, 'cheesecake-frutti-di-bosco.png'),
-('Brownie al Cioccolato', 4.50, 4, 'brownie-cioccolato.png'),
-('Panna Cotta al Caramello', 4.00, 4, 'panna-cotta-caramello.png'),
-('Mousse al Cioccolato', 5.00, 4, 'mousse-cioccolato.png'),
-('Torta della Nonna', 5.50, 4, 'torta-della-nonna.png'),
-('Dolci Misti', 6.00, 4, 'dolci-misti.png');
+INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, image) VALUES
+('Tiramisù', 5.00, 2, 4, 'tiramisu.png'),
+('Cheesecake ai Frutti di Bosco', 5.50, 30, 4, 'cheesecake-frutti-di-bosco.png'),
+('Brownie al Cioccolato', 4.50, 15, 4, 'brownie-cioccolato.png'),
+('Panna Cotta al Caramello', 4.00, 25, 4, 'panna-cotta-caramello.png'),
+('Mousse al Cioccolato', 5.00, 35, 4, 'mousse-cioccolato.png'),
+('Torta della Nonna', 5.50, 45, 4, 'torta-della-nonna.png'),
+('Dolci Misti', 6.00, 30, 4, 'dolci-misti.png');
 
 
 -- Bacon Cheeseburger (idprodotto = 1)
@@ -208,17 +208,28 @@ INSERT INTO chillburgerdb.utenti (nome, cognome, username, password, tipo) VALUE
 ('Laura', 'Bruni', 'laura.bruni', 'hashed_password6', 'cliente'),
 ('Marco', 'Gallo', 'marco.gallo', 'hashed_password7', 'cliente');
 
--- Insert Ordini (timestamp_ordine è 'YYYY-MM-DD HH:MM:SS')
-INSERT INTO chillburgerdb.ordini (timestamp_ordine, idutente, completato) VALUES
-('2024-05-10 12:30:00', (SELECT idutente FROM utenti WHERE username = 'mario.rossi'), true),
-('2024-05-10 19:00:00', (SELECT idutente FROM utenti WHERE username = 'anna.verdi'), true),
-('2024-05-11 13:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), true),
-('2024-05-11 20:00:00', (SELECT idutente FROM utenti WHERE username = 'laura.bruni'), true),
-('2024-05-12 19:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), true),
-('2025-05-12 21:15:00', (SELECT idutente FROM utenti WHERE username = 'laura.bruni'), true),
-('2025-05-15 19:15:00', (SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), true),
-('2024-05-12 12:00:00', (SELECT idutente FROM utenti WHERE username = 'mario.rossi'), true);
+INSERT INTO chillburgerdb.fasce_orari (orario) VALUES
+('11:30:00'),('11:45:00'),
+('12:00:00'),('12:15:00'),('12:30:00'), ('12:45:00'),
+('13:00:00'), ('13:15:00'), ('13:30:00'), ('13:45:00'),
+('14:00:00'), ('14:15:00'), ('14:30:00'),
+('18:30:00'),('18:45:00'),
+('19:00:00'),('19:15:00'),('19:30:00'), ('19:45:00'), 
+('20:00:00'),('20:15:00'),('20:30:00'), ('20:45:00'), 
+('21:00:00'),('21:15:00'),('21:30:00'), ('21:45:00'),
+('22:00:00'),('22:15:00'),('22:30:00'); 
+ 
 
+-- Insert Ordini (timestamp_ordine è 'YYYY-MM-DD HH:MM:SS')
+INSERT INTO chillburgerdb.ordini (idutente, completato, data_ordine, orario) VALUES
+((SELECT idutente FROM utenti WHERE username = 'mario.rossi'), 1, '2024-05-10', '12:30:00'),
+((SELECT idutente FROM utenti WHERE username = 'anna.verdi'), 1, '2024-05-10', '19:00:00'),
+((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), 1, '2024-05-11', '13:15:00'),
+((SELECT idutente FROM utenti WHERE username = 'laura.bruni'), 1, '2024-05-11', '20:00:00'),
+((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), 1, '2024-05-12', '19:15:00'),
+((SELECT idutente FROM utenti WHERE username = 'laura.bruni'), 1, '2025-05-12', '21:15:00'),
+((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), 1, '2025-05-15', '19:15:00'),
+((SELECT idutente FROM utenti WHERE username = 'mario.rossi'), 1, '2024-05-12', '12:00:00');
 -- Esempio di popolamento manuale di modifiche_stato
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (1, 5, '2024-05-10 13:35:00');
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (2, 5, '2024-05-10 20:55:00');

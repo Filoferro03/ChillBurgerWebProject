@@ -21,3 +21,4 @@ if (isUserLoggedIn()) {
 
 
 require("template/base.php");
+?>
