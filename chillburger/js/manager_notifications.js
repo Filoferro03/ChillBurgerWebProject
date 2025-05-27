@@ -72,7 +72,7 @@ function generateNotifications(notes) {
               <p>${notes[i]["testo"] ?? "Testo mancante"}</p>
               <div class="d-flex flex-row justify-content-end">
                   <button type="button" class="btn m-1 read-notification" data-id="${idNotifica}" aria-label="Segna come letta">
-                      <i class="fa-solid fa-check fa-2x"></i>
+                      <span class="fa-solid fa-check fa-2x"></span>
                   </button>
               </div>
           </div>

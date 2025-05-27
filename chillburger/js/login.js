@@ -93,7 +93,7 @@ function arePasswordsMatching(password, confirmPassword) {
 function togglePasswordVisibility(button, passwordField) {
     const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
     passwordField.setAttribute("type", type);
-    const icon = button.querySelector('i');
+    const icon = button.querySelector('span');
     icon.classList.toggle("fa-eye");
     icon.classList.toggle("fa-eye-slash");
 }

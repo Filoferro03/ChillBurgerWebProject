@@ -102,10 +102,10 @@ async function getProductsInCart(order) {
                     <div class="d-flex flex-column w-100 m-1">
                         <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-center">
                             <div class="d-flex flex-column align-items-center">
-                                <h2 class="fs-3">${product.nome}</h2>
+                                <p class="fs-3">${product.nome}</p>
                             </div>
                             <div class="d-flex align-items-center">
-                                <h2 class="fs-3">${(price * quantita).toFixed(2)}€</h2>
+                                <p class="fs-3">${(price * quantita).toFixed(2)}€</p>
                             </div>
                             <div class="d-flex flex-column justify-content-center align-items-center">
                                 <div class="d-flex flex-row justify-content-between">
@@ -113,7 +113,7 @@ async function getProductsInCart(order) {
                                         onclick="modifyQuantity(${product.idprodotto}, -1)">
                                         <span class="fa-solid fa-circle-minus icon" aria-hidden="true"></span>
                                     </button>
-                                    <h2 class="fs-3"><span class="quantita">${quantita}</span></h2>
+                                    <p class="fs-3"><span class="quantita">${quantita}</span></p>
                                     <button type="button" class="btn p-1 p-md-3 md:m-1 btn-plus" 
                                         onclick="modifyQuantity(${product.idprodotto}, 1)">
                                         <span class="fa-solid fa-circle-plus icon" aria-hidden="true"></span>
@@ -149,10 +149,10 @@ result += `
             <div class="d-flex flex-column w-100">
                 <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-center">
                     <div class="d-flex flex-column align-items-center">
-                        <h2 class="fs-3">${personalization.nomeprodotto}</h2>
+                        <p class="fs-3">${personalization.nomeprodotto}</p>
                     </div>
                     <div class="d-flex align-items-center">
-                        <h2 class="fs-3">${(price * quantita).toFixed(2)}€</h2>
+                        <p class="fs-3">${(price * quantita).toFixed(2)}€</p>
                     </div>
                     <div class="d-flex flex-column align-items-center">
                         <div class="d-flex flex-row justify-content-between align-items-center">
@@ -160,7 +160,7 @@ result += `
                                 onclick="modifyPersonalizationQuantity(${personalization.idpersonalizzazione}, -1)">
                                 <span class="fa-solid fa-circle-minus icon" aria-hidden="true"></span>
                             </button>
-                            <h2 class="fs-3"><span class="quantita">${quantita}</span></h2>
+                            <p class="fs-3"><span class="quantita">${quantita}</span></p>
                             <button type="button" class="btn p-1 p-md-3 md:m-1"
                                 onclick="modifyPersonalizationQuantity(${personalization.idpersonalizzazione}, 1)">
                                 <span class="fa-solid fa-circle-plus icon" aria-hidden="true"></span>
@@ -195,12 +195,12 @@ result += `
     result += `
         <div class="d-flex flex-column w-100 mt-5">
             <div class="d-flex justify-content-between">
-                <h2 class="fs-3">SubTotale</h2>
-                <h2 class="fs-3">${(order[0].prezzo_totale - 2.50).toFixed(2)}€</h2>
+                <p class="fs-3">SubTotale</p>
+                <p class="fs-3">${(order[0].prezzo_totale - 2.50).toFixed(2)}€</p>
             </div>
             <div class="d-flex justify-content-between border-bottom border-dark mt-2">
-                <h2 class="fs-3">Spedizione</h2>
-                <h2 class="fs-3">2,50€</h2>
+                <p class="fs-3">Spedizione</p>
+                <p class="fs-3">2,50€</p>
             </div>
             <div class="d-flex justify-content-between mt-2">
                 <p class="fs-3">Totale</p>
