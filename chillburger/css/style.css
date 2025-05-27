@@ -401,3 +401,7 @@ html, body {
         width: 100% !important;
     }
 }
+
+.modal-content {
+    background-color: #e6ccb2;
+}

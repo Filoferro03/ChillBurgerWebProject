@@ -21,7 +21,7 @@ function generateReviewsHTML(reviews) { // Rinominata per chiarezza
     let result = "";
     reviews.forEach(review => {
         result += `
-            <div class="list-group-item mb-3 ms-4">
+            <div class="list-group-item mb-3 my-2">
                 <h3>${review.titolo || 'Recensione'}</h3>
                 <p class="star-rating">${generateStarRating(review.voto)}</p>
                 <p>${review.commento || ''}</p>

@@ -47,7 +47,7 @@ function generateOrdersHTML(orders) {
     let result = "";
     orders.forEach(order => {
         result += `
-            <div class="list-group-item mb-3 mt-2 d-flex justify-content-between align-items-center">
+            <div class="list-group-item p-1 mb-3 mt-2 d-flex justify-content-between align-items-center">
                 <div>
                     <h4> Ordine #${order.idordine}</h4>
                     <small>${(order.data_ordine.split('-')[2])}-${(order.data_ordine.split('-')[1])}-${(order.data_ordine.split('-')[0])} - ${order.orario.substring(0, 5)}</small><br>

@@ -22,13 +22,13 @@
         <!--Navbar for mobile-->
         <nav class="mobile navbar py-4">
             <div class="container-fluid">
-                <button class="navbar-toggler mx-2" type="button" data-bs-toggle="offcanvas"
+                <button class="navbar-toggler mx-1" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="d-flex align-items-center">
                     <a class="navbar-brand me-2 d-flex" href="index.php">
-                        <h1 class="chill-burger-title m-0">ChillBurger</h1>
+                        <h2 class="chill-burger-title m-0">ChillBurger</h2>
                     </a>
 
                 </div>
@@ -39,7 +39,7 @@
                         <a class="text-decoration-none" href="profile.php">
                             <i class="fa-solid fa-user text-black fs-2"></i>
                         </a>
-                        <a href="notifications.php" class="text-decoration-none mx-4">
+                        <a href="notifications.php" class="text-decoration-none mx-1">
                             <i class="fa-solid fa-bell text-black fs-2"></i>
                         </a>
                         <a href="cart.php" class="text-decoration-none">
@@ -51,7 +51,7 @@
                         <a class="text-decoration-none" href="profile.php">
                             <i class="fa-solid fa-user text-black fs-2"></i>
                         </a>
-                        <a href="notifications.php" class="text-decoration-none mx-4">
+                        <a href="notifications.php" class="text-decoration-none mx-1">
                             <i class="fa-solid fa-bell text-black fs-2"></i>
                         </a>
                         <a href="manager.php" class="text-decoration-none">
@@ -101,9 +101,11 @@
                     <li class="list-group-item">
                         <a class="nav-link header-menu fs-2" aria-current="page" href="menu.php">Menu</a>
                     </li>
-                    <li class="list-group-item">
-                        <a class="nav-link header-menu fs-2" href="order_now.php">Ordina ora</a>
-                    </li>
+                    <?php if (isUserClient()) { ?>
+                        <li class="list-group-item">
+                            <a class="nav-link header-menu fs-2" href="order_now.php">Ordina ora</a>
+                        </li>
+                    <?php } ?>
                     <li class="list-group-item">
                         <a class="nav-link header-menu fs-2" href="about_us.php">About us</a>
                     </li>
