@@ -30,7 +30,9 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
             http_response_code(403); // Forbidden
             $response = ['success' => false, 'error' => 'Accesso non autorizzato'];
         } else {
-            $activeOrders = $dbh->getActiveOrders();
+            $page = isset($_POST['page']) ? (int)$_POST['page'] : 1; // Get page from POST
+            $perPage = isset($_POST['perPage']) ? (int)$_POST['perPage'] : 5; // Get perPage from POST
+            $activeOrders = $dbh->getActiveOrdersPaginated($page, $perPage);
             $response['success'] = true;
             $response['data'] = $activeOrders;
         }
@@ -40,7 +42,9 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
             http_response_code(403); // Forbidden
             $response = ['success' => false, 'error' => 'Accesso non autorizzato'];
         } else {
-            $orderHistory = $dbh->getOrderHistory();
+            $page = isset($_POST['page']) ? (int)$_POST['page'] : 1; // Get page from POST
+            $perPage = isset($_POST['perPage']) ? (int)$_POST['perPage'] : 5; // Get perPage from POST
+            $orderHistory = $dbh->getOrderHistoryPaginated($page, $perPage);
             $response['success'] = true;
             $response['data'] = $orderHistory;
         }

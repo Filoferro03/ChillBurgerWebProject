@@ -28,66 +28,102 @@ async function fetchData(url, formData) {
 
 document.addEventListener('DOMContentLoaded', function() {
     // Carica gli ordini attivi e lo storico all'avvio della pagina
-    loadActiveOrders();
-    loadOrderHistory();
+    loadActiveOrders(1);
+    loadOrderHistory(1);
 });
 
 /**
  * Carica gli ordini attivi dal database
  */
-async function loadActiveOrders() {
+async function loadActiveOrders(page = 1, perPage = 4) { // Added pagination parameters
     const ordersGrid = document.getElementById('ordersGrid');
-    if (!ordersGrid) {
-        console.error("Elemento 'ordersGrid' non trovato.");
+    const paginationContainer = document.getElementById('activeOrdersPagination');
+    if (!ordersGrid || !paginationContainer) {
+        console.error("Elemento 'ordersGrid' o 'activeOrdersPagination' non trovato.");
         return;
     }
 
     // Mostra un indicatore di caricamento
     ordersGrid.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Caricamento ordini attuali...</span></div></div>';
+    paginationContainer.innerHTML = ''; // Clear existing pagination
 
     // Prepara i dati per la richiesta
     const url = 'api/api-orders.php';
     const formData = new FormData();
     formData.append('action', 'getActiveOrders');
+    formData.append('page', page); // Pass current page
+    formData.append('perPage', perPage); // Pass items per page
 
     try {
-        const activeOrders = await fetchData(url, formData); // Use the standardized fetchData
+        const responseData = await fetchData(url, formData); // responseData now contains { orders, currentPage, totalPages }
+        const activeOrders = responseData.orders;
+        const currentPage = responseData.currentPage;
+        const totalPages = responseData.totalPages;
 
         displayActiveOrders(activeOrders);
+
+        // Create and append pagination component
+        const paginationElement = createPaginationComponent(
+            currentPage,
+            totalPages,
+            (newPage) => loadActiveOrders(newPage, perPage) // Callback function for page click
+        );
+        if (paginationElement) {
+            paginationContainer.appendChild(paginationElement);
+        }
+
     } catch (error) {
         console.error('Errore nel caricamento degli ordini attivi:', error);
         ordersGrid.innerHTML = '<div class="col-12 text-center text-danger">Errore nel caricamento degli ordini attivi: ' + error.message + '</div>';
+        paginationContainer.innerHTML = ''; // Clear pagination on error
     }
 }
-
 /**
  * Carica lo storico degli ordini dal database
  */
-async function loadOrderHistory() {
+async function loadOrderHistory(page = 1, perPage = 4) { // Added pagination parameters
     const historyGrid = document.getElementById('historyGrid');
-    if (!historyGrid) {
-        console.error("Elemento 'historyGrid' non trovato.");
+    const paginationContainer = document.getElementById('historyOrdersPagination');
+    if (!historyGrid || !paginationContainer) {
+        console.error("Elemento 'historyGrid' o 'historyOrdersPagination' non trovato.");
         return;
     }
 
     // Mostra un indicatore di caricamento
     historyGrid.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Caricamento storico ordini...</span></div></div>';
+    paginationContainer.innerHTML = ''; // Clear existing pagination
 
     // Prepara i dati per la richiesta
     const url = 'api/api-orders.php';
     const formData = new FormData();
     formData.append('action', 'getOrderHistory');
+    formData.append('page', page); // Pass current page
+    formData.append('perPage', perPage); // Pass items per page
 
     try {
-        const orderHistory = await fetchData(url, formData); // Use the standardized fetchData
+        const responseData = await fetchData(url, formData); // responseData now contains { orders, currentPage, totalPages }
+        const orderHistory = responseData.orders;
+        const currentPage = responseData.currentPage;
+        const totalPages = responseData.totalPages;
 
         displayOrderHistory(orderHistory);
+
+        // Create and append pagination component
+        const paginationElement = createPaginationComponent(
+            currentPage,
+            totalPages,
+            (newPage) => loadOrderHistory(newPage, perPage) // Callback function for page click
+        );
+        if (paginationElement) {
+            paginationContainer.appendChild(paginationElement);
+        }
+
     } catch (error) {
         console.error('Errore nel caricamento dello storico ordini:', error);
         historyGrid.innerHTML = '<div class="col-12 text-center text-danger">Errore nel caricamento dello storico ordini: ' + error.message + '</div>';
+        paginationContainer.innerHTML = ''; // Clear pagination on error
     }
 }
-
 /**
  * Visualizza gli ordini attivi nella griglia
  * @param {Array} orders - Array di ordini attivi

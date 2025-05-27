@@ -7,13 +7,15 @@
 
     <h2 class="animate-underline mb-4">Ordini attuali</h2>
 
-    <div class="row g-4 mb-5" id="ordersGrid">
+<div class="row g-4 mb-5" id="ordersGrid">
         <div class="col-12 text-center">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Caricamento ordini attuali...</span>
             </div>
         </div>
     </div>
+    <div id="activeOrdersPagination" class="d-flex justify-content-center mt-3"></div>
+
 
     <h2 class="animate-underline mb-4">Storico ordini</h2>
 
@@ -24,5 +26,6 @@
             </div>
         </div>
     </div>
-
+    <div id="historyOrdersPagination" class="d-flex justify-content-center mt-3"></div>
+    
 </section>
