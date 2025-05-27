@@ -99,7 +99,7 @@ async function getProductsInCart(order) {
                 <img src="${product.image}" class="col-10 m-2 rounded-3" alt="${product.nome}">
                 </div>
                 <div class="d-flex w-100 h-100 flex-column justify-content-between p-1">
-                    <div class="d-flex flex-column w-100">
+                    <div class="d-flex flex-column w-100 m-1">
                         <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-center">
                             <div class="d-flex flex-column align-items-center">
                                 <h2 class="fs-3">${product.nome}</h2>
@@ -122,7 +122,7 @@ async function getProductsInCart(order) {
                             </div>
                         </div>
                     </div>
-                    <div class="d-none d-md-flex justify-content-end pb-3">
+                    <div class="d-flex justify-content-center justify-content-md-end pb-3">
                         <button class="btn btn-danger btn-remove" data-id="${product.idprodotto}" data-type="product" ${disableRemove}>
                             Rimuovi
                         </button>
@@ -138,7 +138,7 @@ async function getProductsInCart(order) {
         const quantita = personalization.quantita;
         subTotal += Number(price) * quantita;
         const disableMinusPers = quantita === 0 ? "disabled" : "";
-const disableRemovePers = quantita > 0 ? "disabled" : "";
+        const disableRemovePers = quantita > 0 ? "disabled" : "";
 
 result += `
     <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-between col-12 border-bottom border-dark mb-2">
@@ -168,21 +168,21 @@ result += `
                         </div>
                     </div>
                 </div>
-                <div class="d-flex justify-content-between d-md-none mt-2">
+                <div class="d-flex justify-content-between d-lg-none mt-2">
                     <a href="./edit-burger.php?id=${personalization.idpersonalizzazione}">
-                        <button class="btn btn-success w-10" data-id="${personalization.idpersonalizzazione}">Modifica</button>
+                        <button class="btn btn-success w-10" data-id="${personalization.idpersonalizzazione}" ${disableMinusPers}>Modifica</button>
                     </a>
-                    <button class="btn btn-danger" data-id="${personalization.idpersonalizzazione}" data-type="personalization" ${disableRemovePers}>
+                    <button class="btn btn-danger btn-remove" data-id="${personalization.idpersonalizzazione}" data-type="personalization" ${disableRemovePers}>
                         Rimuovi
                     </button>
                 </div>
-                <div class="d-none d-md-block mt-2">
+                <div class="d-none d-lg-block mt-2">
                     <a href="./edit-burger.php?id=${personalization.idpersonalizzazione}">
-                        <button class="btn btn-success w-10" data-id="${personalization.idpersonalizzazione}">Modifica</button>
+                        <button class="btn btn-success w-10" data-id="${personalization.idpersonalizzazione}" ${disableMinusPers}>Modifica</button>
                     </a>
                 </div>
             </div>
-            <div class="d-none d-md-flex justify-content-end pb-3">
+            <div class="d-none d-lg-flex justify-content-end pb-3">
                 <button class="btn btn-danger btn-remove" data-id="${personalization.idpersonalizzazione}" data-type="personalization" ${disableRemovePers}>
                     Rimuovi
                 </button>
@@ -212,7 +212,7 @@ result += `
         </div>
         
         <!-- Modal Conferma Rimozione -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" >
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
