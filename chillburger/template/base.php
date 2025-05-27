@@ -101,7 +101,7 @@
                     <li class="list-group-item">
                         <a class="nav-link header-menu fs-2" aria-current="page" href="menu.php">Menu</a>
                     </li>
-                    <?php if (isUserClient()) { ?>
+                    <?php if (isUserLoggedIn() && isUserClient()) { ?>
                         <li class="list-group-item">
                             <a class="nav-link header-menu fs-2" href="order_now.php">Ordina ora</a>
                         </li>
