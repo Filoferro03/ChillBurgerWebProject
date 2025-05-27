@@ -229,7 +229,7 @@ INSERT INTO chillburgerdb.ordini (idutente, completato, data_ordine, orario) VAL
 ((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), 1, '2024-05-12', '19:15:00'),
 ((SELECT idutente FROM utenti WHERE username = 'laura.bruni'), 1, '2025-05-12', '21:15:00'),
 ((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), 1, '2025-05-15', '19:15:00'),
-((SELECT idutente FROM utenti WHERE username = 'mario.rossi'), 1, '2024-05-12', '12:00:00');
+((SELECT idutente FROM utenti WHERE username = 'mario.rossi'), 1, '2025-05-20', '12:00:00');
 -- Esempio di popolamento manuale di modifiche_stato
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (1, 5, '2024-05-10 13:35:00');
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (2, 5, '2024-05-10 20:55:00');
