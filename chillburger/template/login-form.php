@@ -22,7 +22,7 @@
                         <p id="login-message" class="m-1"></p>
 
                         <div class="text-center">
-                            <input type="submit" value="Login" class="m-2">
+                            <input type="submit" value="Login" class="m-2 rounded">
                         </div>
                     </fieldset>
                 </form>
@@ -65,7 +65,7 @@
 
 
                         <div class="text-center">
-                            <input type="submit" value="Registrati" class="m-2">
+                            <input type="submit" value="Registrati" class="m-2 rounded">
                         </div>
 
                     </fieldset>
