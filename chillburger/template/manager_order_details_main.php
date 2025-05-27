@@ -1,9 +1,17 @@
-<section class="container py-5">
-
-    <!-- Titolo principale -->
-    <h2 class="display-4 custom-title text-center mb-3">
-        <span class="txt">Order Details</span>
-        <span class="emoji">🔍</span>
-    </h2>
+<section>
+    <div class="container-fluid d-flex justify-content-center">
+        <div class="card w-75 mt-4 mb-4">
+            <div class="card-header text-center">
+                 <h1 class="card-title">Dettaglio Ordine</h1>
+            </div>
+            <div class="card-body p-4" id="orderDetailsContainer">
+                <p class="text-center">Caricamento dettagli ordine...</p>
+            </div>
+                
+            <div class="card-footer text-center">
+                <a href="manager_orders.php" class="btn order-button">Torna Indietro</a>
+            </div>
+        </div>
+    </div>
 
 </section>

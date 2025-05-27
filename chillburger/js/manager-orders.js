@@ -153,7 +153,7 @@ function displayActiveOrders(orders) {
                 <div class="card h-100 text-center shadow-sm hover-up">
                     <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}">
                     <div class="card-body">
-                        <h5 class="card-title">Order #${order.idordine}</h5>
+                        <h5 class="card-title">Ordine #${order.idordine}</h5>
                         <p class="card-text small text-muted">${formattedDate} - ${formattedTime}</p>
                         <p class="card-text small text-muted">Stato: ${order.stato}</p>
                     </div>

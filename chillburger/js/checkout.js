@@ -47,8 +47,11 @@ data.orderCustom.forEach(item => {
                         <h5 class="card-title">${customProduct.productName}</h5>`;
 
             if (customProduct.modifiche.length > 0 && customProduct.modifiche[0].ingredientName != '') {
+                result += `<ul class="list-unstyled ms-3">`;
+            }
+
+            if (customProduct.modifiche.length > 0 && customProduct.modifiche[0].ingredientName != '') {
                 customProduct.modifiche.forEach(mod => {
-                    result += `<ul class="list-unstyled ms-3">`;
 
                     let prefix = '';
                     let actionText = mod.action; // Testo dell'azione da visualizzare (es. 'aggiunto', 'rimosso')
