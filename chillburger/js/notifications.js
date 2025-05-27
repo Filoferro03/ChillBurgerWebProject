@@ -81,11 +81,10 @@ function addNotificationListeners() {
           const idNotification = this.getAttribute('data-id');
           tryRead(idNotification);
           setTimeout(function() {
-            getManagerNotifications();
+            getNotificationsData();
         }, 1000);
         });
     });
-  
   }
 
 async function getNotificationsData() {
