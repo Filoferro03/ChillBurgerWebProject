@@ -27,5 +27,24 @@
         </div>
     </div>
     <div id="historyOrdersPagination" class="d-flex justify-content-center mt-3"></div>
-    
+
+    <div class="modal fade" id="confirmStatusModal" tabindex="-1" aria-labelledby="confirmStatusModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmStatusModalLabel">Conferma Aggiornamento Stato</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Sei sicuro di voler aggiornare lo stato dell'ordine #<span id="modalOrderId"></span>? <br/>
+                    Il nuovo stato sarà: <strong id="modalNewStatus"></strong>.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn order-button" id="confirmUpdateStatusBtn">Conferma Aggiornamento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </section>

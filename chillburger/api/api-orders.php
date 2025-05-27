@@ -59,7 +59,7 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
         $response['success'] = true;
         $response['data'] = $allOrders;
         
-    } else if(isset($_POST['action']) && $_POST['action'] == 'confirm') {
+    } else if(isset($_POST['action']) && $_POST['action'] == 'update') {
         $idordine = $_POST['idordine'];
         $result = $dbh->updateOrderStatus($idordine);
         if(!$result){

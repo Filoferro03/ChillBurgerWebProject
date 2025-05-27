@@ -147,7 +147,7 @@ async function logout() {
 async function updateOrderStatus(idOrdine) {
     const url = "api/api-orders.php";
     const formData = new FormData();
-    formData.append('action', 'confirm');
+    formData.append('action', 'update');
     formData.append('idordine', idOrdine);
     const json = await fetchData(url, formData); 
 
@@ -203,37 +203,4 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
         });
     }
-
-    /*const confirmReviewButton = document.getElementById('confirm-review-button');
-    if (confirmReviewButton) {
-        confirmReviewButton.addEventListener('click', () => {
-            if (!currentOrderIdToReview) {
-                alert("Errore: ID ordine non specificato per la recensione."); // Questo è un errore di sistema
-                return;
-            }
-
-            if (validateReviewForm()) { // Chiama la funzione di validazione
-                // Se la validazione passa, prendi i valori e invia
-                const title = document.getElementById('review-title').value.trim();
-                const rating = document.getElementById('review-rating').value;
-                const comment = document.getElementById('review-textarea').value.trim();
-                submitReview(currentOrderIdToReview, title, rating, comment);
-            }
-            // Se validateReviewForm() ritorna false, non fa nulla,
-            // i messaggi di errore sono già mostrati e il modale rimane aperto.
-        });
-    }
-
-    const cancelReviewButton = document.getElementById('cancel-review-button');
-    if (cancelReviewButton) {
-        cancelReviewButton.addEventListener('click', async () => {
-            await loadUserOrders(currentOrdersPage);
-            // Assicurati che i campi di errore siano puliti quando il modale viene chiuso con "No, grazie"
-            document.getElementById('reviewForm').reset();
-            document.getElementById('review-title').classList.remove('is-invalid');
-            document.getElementById('review-rating').classList.remove('is-invalid');
-            document.getElementById('review-title-error').textContent = '';
-            document.getElementById('review-rating-error').textContent = '';
-        });
-    }*/
 });
