@@ -165,10 +165,6 @@ async function loadOrderHistory(page = 1, perPage = 4) { // Added pagination par
         paginationContainer.innerHTML = ''; // Clear pagination on error
     }
 }
-/**
- * Visualizza gli ordini attivi nella griglia, includendo i bottoni di aggiornamento stato.
- * @param {Array} orders - Array di ordini attivi
- */
 function displayActiveOrders(orders) {
     const ordersGrid = document.getElementById('ordersGrid');
 
@@ -180,79 +176,78 @@ function displayActiveOrders(orders) {
     let html = '';
 
     orders.forEach(order => {
-        // Formatta la data e l'ora
         const orderDate = new Date(order.data_ordine + ' ' + order.orario);
         const formattedDate = orderDate.toLocaleDateString('it-IT');
         const formattedTime = orderDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-
-        // Formatta il prezzo
         const formattedPrice = parseFloat(order.prezzo_totale).toFixed(2).replace('.', ',') + ' €';
 
-        // Determina il prossimo stato e il testo del bottone
-        let nextStatusId;
-        let nextStatusText;
-        let nextStatus;
-        let buttonClass = "order-button"; // Default class
+        let nextStatusId, nextStatusText, nextStatus;
+        let buttonClass = "order-button";
 
         switch (order.stato) {
             case 'In attesa':
-                nextStatusId = 2; // In preparazione
+                nextStatusId = 2;
                 nextStatusText = 'Metti In Preparazione';
                 nextStatus = 'In preparazione';
                 break;
             case 'In preparazione':
-                nextStatusId = 3; // In consegna
+                nextStatusId = 3;
                 nextStatusText = 'Metti In Consegna';
                 nextStatus = 'In consegna';
                 break;
             case 'In consegna':
-                nextStatusId = 4; // Consegnato (in attesa di conferma dal cliente)
+                nextStatusId = 4;
                 nextStatusText = 'Segna Come Consegnato';
                 nextStatus = 'Consegnato';
                 break;
             default:
-                // Se lo stato è "Consegnato" o "Confermato" non mostriamo il bottone di aggiornamento qui
                 nextStatusId = null;
                 nextStatusText = '';
-                nextStatus ='';
+                nextStatus = '';
                 buttonClass = "";
                 break;
         }
 
+        // --- INIZIO MODIFICA CLASSI COLONNA CARD ---
         html += `
-        <div class="col-6 col-md-4 col-lg-3">
-            <div class="card text-center shadow-sm hover-up">
-                <a href="manager_order_details.php?id=${order.idordine}" class="text-decoration-none" style="color:inherit;">
-                    <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}">
-                    <div class="card-body">
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4"> 
+            <div class="card text-center shadow-sm h-100 hover-up">
+                <a href="manager_order_details.php?id=${order.idordine}" class="text-decoration-none d-flex flex-column h-100" style="color:inherit;">
+                    <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;">
+                    <div class="card-body d-flex flex-column">
                         <h5 class="card-title">Ordine #${order.idordine}</h5>
                         <p class="card-text small text-muted">${formattedDate} - ${formattedTime}</p>
                         <p class="card-text small text-muted">Stato: ${order.stato}</p>
+                        <div class="mt-auto"> {/* Per spingere il footer in basso */}
+                            <span class="fw-bold d-block mt-2">${formattedPrice}</span> 
+                        </div>
                     </div>
-                    <div class="card-footer bg-white border-0">
-                        <span class="fw-bold">${formattedPrice}</span>
-                    </div>
-                </a>`; // Chiusura del tag <a> spostata qui
+                </a>`;
+        // --- FINE MODIFICA CLASSI COLONNA CARD ---
 
-        // Aggiungi il bottone solo se è definito un prossimo stato
         if (nextStatusId !== null) {
-            html += `<button type="button"
-                             class="btn ${buttonClass} my-1 w-75 d-flex justify-content-center align-items-center mx-auto update-status-btn"
-                             data-order-id="${order.idordine}"
-                             data-next-status-id="${nextStatusId}"
-                             data-next-status-text="${nextStatusText}"
-                             data-next-status="${nextStatus}"
-                             data-bs-toggle="modal"
-                             data-bs-target="#confirmStatusModal">
-                        ${nextStatusText}
-                    </button>`;
+            // --- INIZIO MODIFICA BOTTONE ---
+            html += `<div class="px-2 pb-3 pt-1">
+                        <button type="button"
+                                class="btn btn-sm ${buttonClass} w-100 update-status-btn"
+                                data-order-id="${order.idordine}"
+                                data-next-status-id="${nextStatusId}"
+                                data-next-status-text="${nextStatusText}"
+                                data-next-status="${nextStatus}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#confirmStatusModal">
+                            ${nextStatusText}
+                        </button>
+                     </div>`;
+        } else {
+             html += `<div class="pb-1"></div>`;
         }
 
-        html += `</div></div>`; // Chiusura dei div card e col
+        html += `</div></div>`;
     });
 
     ordersGrid.innerHTML = html;
-    addUpdateStatusButtonListeners(); // Chiama la funzione per aggiungere i listener
+    addUpdateStatusButtonListeners();
 }
 
 /**
@@ -270,25 +265,22 @@ function displayOrderHistory(orders) {
     let html = '';
 
     orders.forEach(order => {
-        // Formatta la data e l'ora
         const orderDate = new Date(order.data_ordine + ' ' + order.orario);
         const formattedDate = orderDate.toLocaleDateString('it-IT');
         const formattedTime = orderDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-
-        // Formatta il prezzo
         const formattedPrice = parseFloat(order.prezzo_totale).toFixed(2).replace('.', ',') + ' €';
 
         html += `
-        <div class="col-6 col-md-4 col-lg-3">
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4"> 
             <a href="manager_order_details.php?id=${order.idordine}" class="text-decoration-none" style="color:inherit;">
-                <div class="card h-100 text-center shadow-sm hover-up">
-                    <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}">
-                    <div class="card-body">
+                <div class="card h-100 text-center shadow-sm hover-up"> 
+                    <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;"> 
+                    <div class="card-body d-flex flex-column">
                         <h5 class="card-title">Ordine #${order.idordine}</h5>
                         <p class="card-text small text-muted">${formattedDate} - ${formattedTime}</p>
-                    </div>
-                    <div class="card-footer bg-white border-0">
-                        <span class="fw-bold">${formattedPrice}</span>
+                        <div class="mt-auto">
+                           <span class="fw-bold d-block mt-2">${formattedPrice}</span>
+                        </div>
                     </div>
                 </div>
             </a>
