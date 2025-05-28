@@ -1,0 +1,86 @@
+  /* Stili personalizzati per lo stato della scorta */
+.status-in-stock {
+    background-color: #d4edda; /* Verde chiaro per "In Magazzino" */
+    color: #155724; /* Testo verde scuro */
+    padding: .35em .65em; /* Padding per badge */
+    font-size: .75em; /* Dimensione del font per badge */
+    font-weight: 700; /* Grassetto per badge */
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .375rem; /* Bordi arrotondati */
+}
+
+.status-low-stock {
+    background-color: #fff3cd; /* Giallo chiaro per "Bassa Scorta" */
+    color: #856404; /* Testo giallo scuro */
+    padding: .35em .65em;
+    font-size: .75em;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .375rem;
+}
+
+.status-out-of-stock {
+    background-color: #f8d7da; /* Rosso chiaro per "Esaurito" */
+    color: #721c24; /* Testo rosso scuro */
+    padding: .35em .65em;
+    font-size: .75em;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .375rem;
+}
+
+/* Stili per le immagini dei prodotti nella tabella */
+.table img {
+    border: 1px solid #dee2e6; /* Bordo sottile per le immagini */
+}
+
+/* Stili per il titolo personalizzato */
+.custom-title .txt {
+    color: #343a40; /* Colore scuro per il testo */
+    font-weight: bold;
+}
+
+.custom-title .emoji {
+    font-size: 0.8em; /* Rendi l'emoji leggermente più piccola */
+    margin-left: 0.5rem; /* Spazio tra testo ed emoji */
+}
+
+/* Stili per l'animazione sottolineata */
+.animate-underline {
+    position: relative;
+    display: inline-block; /* Per applicare l'animazione solo al testo */
+    padding-bottom: 5px; /* Spazio per la sottolineatura */
+    margin-left: 15px; /* Spazio dal bordo sinistro */
+}
+
+.animate-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    height: 3px; /* Spessore della sottolineatura */
+    background-color: #DDB892; /* Colore della sottolineatura (blu Bootstrap) */
+    transition: width 0.3s ease-out; /* Animazione fluida */
+}
+
+/* Esempio di come l'animazione potrebbe essere attivata (es. su hover o scroll) */
+/* Per un'animazione sempre visibile, puoi rimuovere la transizione e impostare width: 100%; */
+/* Per un'animazione su hover, potresti fare: */
+/* .animate-underline:hover::after {
+    width: 100%;
+} */
+/* Per ora, la lascio come base per un'implementazione JS futura o per indicare un effetto */
+/* Se vuoi che la sottolineatura sia sempre presente, imposta width: 100%; qui */
+.animate-underline::after {
+    width: 100%; /* La sottolineatura è sempre visibile */
+}
