@@ -92,34 +92,34 @@
         </nav>
 
         <!--Navbar for desktop-->
-        <nav class="desktop navbar py-4 px-4">
+        <nav class="desktop navbar py-4 px-1">
             <div class="container-fluid">
                 <a href="index.php"><img src="./resources/ChillBurgerLogo.png" alt="ChillBurger Logo" class="logo" /></a>
-                <ul class="list-group list-group-horizontal d-flex justify-content-center gap-4">
+                <ul class="list-group list-group-horizontal d-flex justify-content-center gap-2">
                     <li class="list-group-item">
-                        <a class="nav-link header-menu fs-2" aria-current="page" href="menu.php">Menu</a>
+                        <a class="nav-link header-menu fs-3" aria-current="page" href="menu.php">Menu</a>
                     </li>
                     <li class="list-group-item">
-                        <a class="nav-link header-menu fs-2" href="order_now.php">Ordina ora</a>
+                        <a class="nav-link header-menu fs-3" href="order_now.php">Ordina ora</a>
                     </li>
                     <li class="list-group-item">
-                        <a class="nav-link header-menu fs-2" href="about_us.php">About us</a>
+                        <a class="nav-link header-menu fs-3" href="about_us.php">About us</a>
                     </li>
                     <li class="list-group-item">
-                        <a class="nav-link header-menu fs-2" href="reviews.php">Recensioni</a>
+                        <a class="nav-link header-menu fs-3" href="reviews.php">Recensioni</a>
                     </li>
                 </ul>
                 <div>
                     <?php if (isUserLoggedIn() && isUserClient()): ?>
                         <!-- Mostra i link del profilo e delle notifiche se l'utente è un client loggato -->
                         <a class="text-decoration-none" href="profile.php">
-                            <i class="fa-solid fa-user text-black fs-2"></i>
+                            <i class="fa-solid fa-user text-black fs-3"></i>
                         </a>
-                        <a href="notifications.php" class="text-decoration-none mx-4">
-                            <i class="fa-solid fa-bell text-black fs-2"></i>
+                        <a href="notifications.php" class="text-decoration-none mx-2">
+                            <i class="fa-solid fa-bell text-black fs-3"></i>
                         </a>
                         <a href="cart.php" class="text-decoration-none">
-                            <i class="fa-solid fa-cart-shopping text-black fs-2"></i>
+                            <i class="fa-solid fa-cart-shopping text-black fs-3"></i>
                         </a>
 
                     <?php elseif (isUserLoggedIn() && isUserAdmin()): ?>
