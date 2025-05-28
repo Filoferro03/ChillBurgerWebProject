@@ -39,55 +39,38 @@ data.orderCustom.forEach(item => {
         });
 
         // 2. Itera sulla mappa dei prodotti personalizzati raggruppati e genera l'HTML
-        customProductsMap.forEach(customProduct => {
+customProductsMap.forEach(customProduct => {
             result += `
-                <div class="card shadow-sm">
-                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
-                        <div class="d-flex flex-column w-25">
-                        <h5 class="card-title">${customProduct.productName}</h5>`;
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body d-flex flex-column flex-md-row justify-content-md-between align-items-md-center text-center text-md-start">
+                        <div class="w-100 w-md-50 mb-2 mb-md-0">
+                            <h5 class="card-title">${customProduct.productName}</h5>`;
 
             if (customProduct.modifiche.length > 0 && customProduct.modifiche[0].ingredientName != '') {
-                result += `<ul class="list-unstyled ms-3">`;
-            }
-
-            if (customProduct.modifiche.length > 0 && customProduct.modifiche[0].ingredientName != '') {
+                result += `<ul class="list-unstyled ms-md-3 small">`;
                 customProduct.modifiche.forEach(mod => {
-
                     let prefix = '';
-                    let actionText = mod.action; // Testo dell'azione da visualizzare (es. 'aggiunto', 'rimosso')
-
-                    if (mod.action === 'aggiunto') {
-                        prefix = '+ ';
-                    } else if (mod.action === 'rimosso') {
-                        prefix = '- ';
-                    }
+                    if (mod.action === 'aggiunto') prefix = '+ ';
+                    else if (mod.action === 'rimosso') prefix = '- ';
                     result += `<li>${prefix}${mod.ingredientName}</li>`;
                 });
-                result += `
-                        </ul>
-                        </div>
-                        <p class="card-text m-0">
-                            <strong>Quantità:</strong> ${customProduct.productQuantity}
-                        </p>
-                        <p class="card-text">
-                            €${customProduct.productPrice}
-                        </p>
-                    </div>
-                </div>`;
-            } else {
-                result += `</div>
-                        <p class="card-text mb-1">
-                            <strong>Quantità:</strong> ${customProduct.productQuantity}
-                        </p>
-                        <p class="card-text">
-                            € ${customProduct.productPrice}
-                        </p>
-                    </div>
-                </div>`;
+                result += `</ul>`;
             }
+            result += `</div>
+                        <div class="d-flex flex-column align-items-center align-items-md-end w-100 w-md-auto mt-2 mt-md-0">
+                            <p class="card-text m-0 mb-1">
+                                <strong>Q.tà:</strong> ${customProduct.productQuantity}
+                            </p>
+                            <p class="card-text m-0 fw-bold">
+                                €${customProduct.productPrice}
+                            </p>
+                        </div>
+                    </div>
+                </div>`;
         });
     }
-        // ---- SEZIONE PRODOTTI STANDARD ----
+
+    // ---- SEZIONE PRODOTTI STANDARD ----
     if (data.orderStock && data.orderStock.length > 0) {
         data.orderStock.forEach(stockElement => {
             const productName = stockElement.nome || 'Nome Prodotto N/D';
@@ -95,31 +78,32 @@ data.orderCustom.forEach(item => {
             const price = stockElement.prezzo !== undefined ? parseFloat(stockElement.prezzo).toFixed(2) : 'N/D';
 
             result += `
-                <div class="card shadow-sm">
-                    <div class="card-body d-flex flex-row justify-content-between align-items-center">
-                        <h5 class="card-title w-25 mb-0">${productName}</h5>
-                        <p class="card-text m-0">
-                            <strong>Quantità:</strong> ${quantity}
-                        </p>
-                        <p class="card-text m-0">
-                            € ${price}
-                        </p>
+                <div class="card shadow-sm mb-3">
+                    <div class="card-body d-flex flex-column flex-md-row justify-content-md-between align-items-md-center text-center text-md-start">
+                        <h5 class="card-title w-100 w-md-50 mb-2 mb-md-0">${productName}</h5>
+                        <div class="d-flex flex-column align-items-center align-items-md-end w-100 w-md-auto mt-2 mt-md-0">
+                            <p class="card-text m-0 mb-1">
+                                <strong>Q.tà:</strong> ${quantity}
+                            </p>
+                            <p class="card-text m-0 fw-bold">
+                                € ${price}
+                            </p>
+                        </div>
                     </div>
                 </div>`;
         });
     }
 
-    result += `<div class="d-flex flex-row justify-content-between align-items-center mt-3 pt-2 ms-3 me-3">
-                        <h5 class="card-title w-50 mb-0">Spedizione:</h5>
-                        <p class="card-text mb-0">
-                        </p>
-                        <p class="card-text mb-0">
+    // Spedizione e Totale
+    result += `<div class="mt-3 pt-2 border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Spedizione:</h5>
+                        <p class="card-text mb-0 fw-bold">
                             € 2.50
                         </p>
                     </div>
-                `;
+                </div>`;
 
-    // ---- PREZZO TOTALE ----
     if (data.totalPrice !== undefined && data.totalPrice !== null) {
         const totalPriceFormatted = parseFloat(data.totalPrice).toFixed(2);
         result += `
@@ -132,7 +116,6 @@ data.orderCustom.forEach(item => {
 
     return result;
 }
-
 async function loadOrderDetails() {
     const orderDetailsContainer = document.getElementById('orderDetailsContainer');
     if (!orderDetailsContainer) {
