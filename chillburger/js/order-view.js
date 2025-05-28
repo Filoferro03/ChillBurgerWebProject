@@ -71,7 +71,7 @@ function displayOrderDetails(data) {
                 <div class="card shadow-sm mb-3"> 
                     <div class="card-body d-flex flex-column flex-md-row justify-content-md-between align-items-md-center text-center text-md-start">
                         <div class="w-100 w-md-50 mb-2 mb-md-0"> 
-                            <h5 class="card-title">${customProduct.productName}</h5>`;
+                        <p class="fs-5 fw-bold mb-1">${customProduct.productName}</p>`;
 
             if (customProduct.modifiche.length > 0 && customProduct.modifiche[0].ingredientName != '') {
                 result += `<ul class="list-unstyled ms-md-3 small">`; 
@@ -107,7 +107,7 @@ function displayOrderDetails(data) {
  result += `
                 <div class="card shadow-sm mb-3"> 
                     <div class="card-body d-flex flex-column flex-md-row justify-content-md-between align-items-md-center text-center text-md-start">
-                        <h5 class="card-title w-100 w-md-50 mb-2 mb-md-0">${productName}</h5>
+                        <p class="fs-5 fw-bold mb-2 mb-md-0 w-100 w-md-50">${productName}</h3>
                         <div class="d-flex flex-column align-items-center align-items-md-end w-100 w-md-auto mt-2 mt-md-0">
                             <p class="card-text m-0 mb-1"> 
                                 <strong>Q.tà:</strong> ${quantity}
@@ -123,7 +123,7 @@ function displayOrderDetails(data) {
 
     result += `<div class="mt-3 pt-2 border-top">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Spedizione:</h5>
+                        <p class="fs-5 fw-bold mb-0">Spedizione:</p>
                         <p class="card-text mb-0 fw-bold">
                             € 2.50
                         </p>
@@ -134,7 +134,7 @@ function displayOrderDetails(data) {
         const totalPriceFormatted = parseFloat(data.totalPrice).toFixed(2);
         result += `
             <div class="text-end mt-3 pt-3 border-top">
-                <h4><strong>Totale: €${totalPriceFormatted}</strong></h4>
+                <p class="fw-bold"><strong>Totale: €${totalPriceFormatted}</strong></p>
             </div>`;
     } else {
         result += '<p class="text-muted mt-4 text-end">Prezzo totale non disponibile.</p>';
@@ -194,7 +194,7 @@ async function getReview(orderid) {
         currentReviewData = reviewData;
         reviewContainer.innerHTML += `
             <div class="d-flex flex-column align-items-center text-center flex-md-row justify-content-md-between align-items-md-center mt-2 px-3">
-                <h4 class="card-title mb-1 mb-md-0">${reviewData.titolo}</h4>
+                <h3 class="card-title mb-1 mb-md-0">${reviewData.titolo}</h3>
                 <p class="star-rating">${generateStarRating(reviewData.voto)}</p>
             </div>
             <p class="card-text mt-2 text-center text-md-start px-3">${reviewData.commento}</p>

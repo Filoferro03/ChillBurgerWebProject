@@ -1,8 +1,8 @@
 <section class="container-md m-auto py-4 text-center">
-    <h2 class="display-4 custom-title text-center mb-3">
+    <h1 class="display-4 custom-title text-center mb-3">
         <span class="txt">Recensioni</span>
         <span class="emoji">✍🏻</span>
-    </h2>
+    </h1>
 
     <div class="card reviews-card-fluid">
         <div class="card-header my-3">

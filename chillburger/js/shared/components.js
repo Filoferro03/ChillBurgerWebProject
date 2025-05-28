@@ -1,14 +1,6 @@
-/**
- * Crea e restituisce l'elemento DOM del componente di paginazione con logica ellissi.
- * @param {number} currentPage - La pagina attualmente attiva (basata su 1).
- * @param {number} totalPages - Il numero totale di pagine.
- * @param {function} onPageClick - La funzione da chiamare quando si clicca su un link di pagina (riceve il numero di pagina come argomento).
- * @param {number} [visiblePages=5] - Numero massimo di link di pagina numerati visibili (inclusi primo/ultimo se necessario, ma non le ellissi). Deve essere dispari preferibilmente.
- * @returns {HTMLElement|null} L'elemento NAV della paginazione o null se non necessaria.
- */
 function createPaginationComponent(currentPage, totalPages, onPageClick, visiblePages = 5) {
     if (totalPages <= 1) {
-        return null; // No pagination needed
+        return null; 
     }
 
     const nav = document.createElement('nav');
@@ -17,30 +9,21 @@ function createPaginationComponent(currentPage, totalPages, onPageClick, visible
     const ul = document.createElement('ul');
     ul.className = 'pagination justify-content-center'; // Classi Bootstrap
 
-    // --- Helper Functions ---
     const createPageItem = (pageNumber, label, isEnabled, isActive, ariaLabel, isEllipsis = false) => {
         const li = document.createElement('li');
-        // Le ellissi sono tecnicamente disabilitate ma non ricevono la classe 'disabled' di Bootstrap
         li.className = `page-item ${!isEnabled && !isEllipsis ? 'disabled' : ''} ${isActive ? 'active' : ''}`;
 
         if (isEllipsis) {
-            // Elemento per le ellissi non cliccabile
             const span = document.createElement('span');
             span.className = 'page-link';
             span.innerHTML = '...';
             span.setAttribute('aria-hidden', 'true');
             li.appendChild(span);
         } else {
-            // Link di pagina normale o disabilitato
             const a = document.createElement('a');
             a.className = 'page-link';
-            a.href = '#'; // Previene il salto della pagina
-             // Usiamo textContent per i numeri per sicurezza, innerHTML per le frecce
-            if (typeof label === 'number') {
-                 a.textContent = label;
-            } else {
-                 a.innerHTML = `<span aria-hidden="true">${label}</span>`; // Per &laquo; e &raquo;
-            }
+            a.innerHTML = (typeof label === 'number') ? label : `<span aria-hidden="true">${label}</span>`;
+
 
             if (ariaLabel) {
                 a.setAttribute('aria-label', ariaLabel);
@@ -48,9 +31,10 @@ function createPaginationComponent(currentPage, totalPages, onPageClick, visible
             }
 
             if (isEnabled) {
+                a.href = '#'; 
                 a.addEventListener('click', (event) => {
                     event.preventDefault();
-                    if (currentPage !== pageNumber) { // Evita ricarica stessa pagina
+                    if (currentPage !== pageNumber) { 
                         onPageClick(pageNumber);
                     }
                 });

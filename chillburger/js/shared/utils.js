@@ -27,8 +27,8 @@ function formatTimeFromTimestamp(timestampStr) {
  * @returns {string} HTML delle stelle
  */
 function generateStarRating(rating) {
-    const fullStar = '<i class="fas fa-star"></i>';
-    const emptyStar = '<i class="far fa-star"></i>';
+    const fullStar = '<strong class="fas fa-star"></strong>';
+    const emptyStar = '<strong class="far fa-star"></strong>';
     let stars = '';
     const maxStars = 5;
     const fullStarsCount = Math.round(rating); // Arrotonda per gestire mezzi voti se necessario

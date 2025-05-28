@@ -49,7 +49,7 @@ function generateOrdersHTML(orders) {
         result += `
             <div class="list-group-item p-3 mb-3 d-flex flex-column align-items-center text-center flex-md-row justify-content-md-between align-items-md-center text-md-start shadow-sm rounded">
                 <div class="mb-2 mb-md-0">
-                    <h5 class="h6 mb-0"> Ordine #${order.idordine}</h5>
+                    <h4 class="mb-0"> Ordine #${order.idordine}</h4>
                     <small class="text-muted">${(order.data_ordine.split('-')[2])}-${(order.data_ordine.split('-')[1])}-${(order.data_ordine.split('-')[0])} - ${order.orario.substring(0, 5)}</small>
                 </div>
                 <div class="mb-2 mb-md-0"> 

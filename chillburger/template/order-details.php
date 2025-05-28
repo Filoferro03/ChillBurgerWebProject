@@ -2,14 +2,14 @@
     <div class="container-fluid d-flex justify-content-center">
         <div class="card col-12 col-md-10 col-lg-8 mx-auto mt-4 mb-4">
             <div class="card-header text-center">
-                 <h3 class="card-title">Dettaglio Ordine</h3>
+                 <h1 class="card-title">Dettaglio Ordine</h1>
             </div>
             <div class="card-body p-3 p-md-4" id="orderDetailsContainer">
                 <p class="text-center">Caricamento dettagli ordine...</p>
             </div>
             <div class="card-body p-3 p-md-4 text-center">
                 <div class="card col-12 col-md-10 col-lg-9 mx-auto" id="reviewContainer">
-                    <h4 class="card-header align-items-center">La tua Recensione</h4>
+                    <h2 class="card-header align-items-center">La tua Recensione</h2>
                 </div>
                 
             </div>
@@ -23,6 +23,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content w-100 mx-auto">
       <div class="modal-header">
+        <h3 class="modal-title" id="reviewModalLabel">Lascia una Recensione</h3>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -56,6 +57,7 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content w-75 mx-auto">
       <div class="modal-header">
+        <h3 class="modal-title" id="deleteModalLabel">Elimina Recensione</h3>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">

@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $templateParams["titolo"]; ?></title>
 
-    <!-- CSS “core” -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
         rel="stylesheet"
         integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
@@ -19,7 +18,6 @@
 
 <body class="d-flex flex-column min-vh-100">
     <header>
-        <!--Navbar for mobile-->
         <nav class="mobile navbar py-4">
             <div class="container-fluid">
                 <button class="navbar-toggler mx-1" type="button" data-bs-toggle="offcanvas"
@@ -28,46 +26,50 @@
                 </button>
                 <div class="d-flex align-items-center">
                     <a class="navbar-brand me-2 d-flex" href="index.php">
-                        <h2 class="chill-burger-title m-0">ChillBurger</h2>
+                        <p class="chill-burger-title m-0">ChillBurger</p>
                     </a>
-
                 </div>
 
                 <div>
                     <?php if (isUserLoggedIn() && isUserClient()): ?>
-                        <!-- Mostra i link del profilo e delle notifiche se l'utente è un client loggato -->
-                        <a class="text-decoration-none" href="profile.php">
-                            <i class="fa-solid fa-user text-black fs-2"></i>
+                        <a class="text-decoration-none" href="profile.php" aria-label="Profilo">
+                            <strong class="fa-solid fa-user text-black fs-2" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Profilo</span>
                         </a>
-                        <a href="notifications.php" class="text-decoration-none mx-1">
-                            <i class="fa-solid fa-bell text-black fs-2"></i>
+                        <a href="notifications.php" class="text-decoration-none mx-1" aria-label="Notifiche">
+                            <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Notifiche</span>
                         </a>
-                        <a href="cart.php" class="text-decoration-none">
-                            <i class="fa-solid fa-cart-shopping text-black fs-2"></i>
+                        <a href="cart.php" class="text-decoration-none" aria-label="Carrello">
+                            <strong class="fa-solid fa-cart-shopping text-black fs-2" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Carrello</span>
                         </a>
 
                     <?php elseif (isUserLoggedIn() && isUserAdmin()): ?>
-                        <!-- Mostra i link per l'admin loggato -->
-                        <a class="text-decoration-none" href="profile.php">
-                            <i class="fa-solid fa-user text-black fs-2"></i>
+                        <a class="text-decoration-none" href="profile.php" aria-label="Profilo">
+                            <strong class="fa-solid fa-user text-black fs-2" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Profilo</span>
                         </a>
-                        <a href="notifications.php" class="text-decoration-none mx-1">
-                            <i class="fa-solid fa-bell text-black fs-2"></i>
+                        <a href="notifications.php" class="text-decoration-none mx-1" aria-label="Notifiche">
+                            <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Notifiche</span>
                         </a>
-                        <a href="manager.php" class="text-decoration-none">
-                            <i class="fa-solid fa-user-tie text-black fs-2"></i>
+                        <a href="manager.php" class="text-decoration-none" aria-label="Manager">
+                            <strong class="fa-solid fa-user-tie text-black fs-2" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Manager</span>
                         </a>
 
                     <?php else: ?>
-                        <!-- Mostra il link per il login se l'utente non è loggato -->
-                        <a href="login.php" class="text-decoration-none mx-4">
-                            <i class="fa-solid fa-user text-black fs-2"></i>
+                        <a href="login.php" class="text-decoration-none mx-4" aria-label="Login">
+                            <strong class="fa-solid fa-user text-black fs-2" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Login</span>
                         </a>
                     <?php endif; ?>
                 </div>
                 <div class="offcanvas offcanvas-start w-50" tabindex="-1" id="offcanvasNavbar"
                     aria-labelledby="offcanvasNavbarLabel">
                     <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">ChillBurger</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                     <div class="offcanvas-body">
@@ -78,7 +80,6 @@
                             <li class="nav-item">
                                 <a class="nav-link fs-3" href="order_now.php">Ordina ora</a>
                             </li>
-
                             <li class="nav-item">
                                 <a class="nav-link fs-3" href="about_us.php">About us</a>
                             </li>
@@ -91,7 +92,6 @@
             </div>
         </nav>
 
-        <!--Navbar for desktop-->
         <nav class="desktop navbar py-4 px-1">
             <div class="container-fluid">
                 <a href="index.php"><img src="./resources/ChillBurgerLogo.png" alt="ChillBurger Logo" class="logo" /></a>
@@ -111,36 +111,39 @@
                 </ul>
                 <div>
                     <?php if (isUserLoggedIn() && isUserClient()): ?>
-                        <!-- Mostra i link del profilo e delle notifiche se l'utente è un client loggato -->
-                        <a class="text-decoration-none" href="profile.php">
-                            <i class="fa-solid fa-user text-black fs-3"></i>
+                        <a class="text-decoration-none" href="profile.php" aria-label="Profilo">
+                            <strong class="fa-solid fa-user text-black fs-3" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Profilo</span>
                         </a>
-                        <a href="notifications.php" class="text-decoration-none mx-2">
-                            <i class="fa-solid fa-bell text-black fs-3"></i>
+                        <a href="notifications.php" class="text-decoration-none mx-2" aria-label="Notifiche">
+                            <strong class="fa-solid fa-bell text-black fs-3" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Notifiche</span>
                         </a>
-                        <a href="cart.php" class="text-decoration-none">
-                            <i class="fa-solid fa-cart-shopping text-black fs-3"></i>
+                        <a href="cart.php" class="text-decoration-none" aria-label="Carrello">
+                            <strong class="fa-solid fa-cart-shopping text-black fs-3" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Carrello</span>
                         </a>
 
                     <?php elseif (isUserLoggedIn() && isUserAdmin()): ?>
-                        <!-- Mostra i link per l'admin loggato -->
-                        <a class="text-decoration-none" href="profile.php">
-                            <i class="fa-solid fa-user text-black fs-2"></i>
+                        <a class="text-decoration-none" href="profile.php" aria-label="Profilo">
+                            <strong class="fa-solid fa-user text-black fs-2" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Profilo</span>
                         </a>
-                        <a href="notifications.php" class="text-decoration-none mx-4">
-                            <i class="fa-solid fa-bell text-black fs-2"></i>
+                        <a href="notifications.php" class="text-decoration-none mx-4" aria-label="Notifiche">
+                            <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Notifiche</span>
                         </a>
-                        <a href="manager.php" class="text-decoration-none">
-                            <i class="fa-solid fa-user-tie text-black fs-2"></i>
+                        <a href="manager.php" class="text-decoration-none" aria-label="Manager">
+                            <strong class="fa-solid fa-user-tie text-black fs-2" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Manager</span>
                         </a>
 
                     <?php else: ?>
-                        <!-- Mostra il link per il login se l'utente non è loggato -->
-                        <a href="login.php" class="text-decoration-none mx-4">
-                            <i class="fa-solid fa-user text-black fs-2"></i>
+                        <a href="login.php" class="text-decoration-none mx-4" aria-label="Login">
+                            <strong class="fa-solid fa-user text-black fs-2" aria-hidden="true"></strong>
+                            <span class="visually-hidden">Login</span>
                         </a>
                     <?php endif; ?>
-
                 </div>
             </div>
         </nav>
@@ -159,25 +162,24 @@
             <div class="d-flex flex-column">
                 <div class=" d-flex justify-content-center mt-2">
                     <a href="https://www.facebook.com/" class=" me-3"
-                        title="visualizza la nostra pagina facebook per restare aggioranato"><strong
-                            class="fab fa-facebook fa-2x text-black"></strong></a>
+                        title="visualizza la nostra pagina facebook per restare aggioranato" aria-label="Visita la nostra pagina Facebook"><strong
+                            class="fab fa-facebook fa-2x text-black" aria-hidden="true"></strong></a>
                     <a href="https://www.instagram.com/" class=" me-3"
-                        title="visualizza la nostra pagina instagram per restare aggioranato"><strong
-                            class="fab fa-instagram fa-2x text-black"></strong></a>
+                        title="visualizza la nostra pagina instagram per restare aggioranato" aria-label="Visita la nostra pagina Instagram"><strong
+                            class="fab fa-instagram fa-2x text-black" aria-hidden="true"></strong></a>
                     <a href="https://x.com/home" class=""
-                        title="visualizza la nostra pagina twitter per restare aggioranato"><strong
-                            class="fab fa-square-x-twitter fa-2x text-black"></strong></a>
+                        title="visualizza la nostra pagina twitter per restare aggioranato" aria-label="Visita la nostra pagina X (Twitter)"><strong
+                            class="fab fa-square-x-twitter fa-2x text-black" aria-hidden="true"></strong></a>
                 </div>
             </div>
         </div>
         <div>
-            <p class="text-center my-2">&copy; 2023 ChillBurger. Tutti i diritti riservati.</p>
+            <p class="text-center my-2">&copy; <?php echo date("Y"); ?> ChillBurger. Tutti i diritti riservati.</p>
         </div>
     </footer>
 
     <script src="js/shared/components.js"></script>
     <script src="js/shared/utils.js"></script>
-
 
     <?php
     if (isset($templateParams["css"])):
@@ -200,5 +202,4 @@
         integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
         crossorigin="anonymous"></script>
 </body>
-
 </html>
