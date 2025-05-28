@@ -47,23 +47,26 @@ function generateOrdersHTML(orders) {
     let result = "";
     orders.forEach(order => {
         result += `
-            <div class="list-group-item p-1 mb-3 mt-2 d-flex justify-content-between align-items-center">
-                <div>
-                    <h4> Ordine #${order.idordine}</h4>
-                    <small>${(order.data_ordine.split('-')[2])}-${(order.data_ordine.split('-')[1])}-${(order.data_ordine.split('-')[0])} - ${order.orario.substring(0, 5)}</small><br>
+            <div class="list-group-item p-3 mb-3 d-flex flex-column align-items-center text-center flex-md-row justify-content-md-between align-items-md-center text-md-start shadow-sm rounded">
+                <div class="mb-2 mb-md-0">
+                    <h5 class="h6 mb-0"> Ordine #${order.idordine}</h5>
+                    <small class="text-muted">${(order.data_ordine.split('-')[2])}-${(order.data_ordine.split('-')[1])}-${(order.data_ordine.split('-')[0])} - ${order.orario.substring(0, 5)}</small>
                 </div>
-                <p><strong>Stato:</strong><br> ${order.stato}<p>
-                <a href="order-view.php?idordine=${order.idordine}" class="order-button btn">Dettagli</a>`;
-            if (order.stato == "Consegnato") {
-                result += `
-                    <button type="button" id="${order.idordine}" class="btn order-button" data-bs-toggle="modal" data-bs-target="#stateModal">Conferma</button>
-                `;
-            }
-            result += '</div>';
+                <div class="mb-2 mb-md-0"> 
+                    <p class="mb-0"><strong>Stato:</strong> ${order.stato}</p>
+                </div>
+                <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch align-items-sm-center mt-2 mt-md-0"> 
+                    <a href="order-view.php?idordine=${order.idordine}" class="btn btn-sm order-button">Dettagli</a>`;
+        if (order.stato == "Consegnato") {
+            result += `
+                    <button type="button" id="${order.idordine}" class="btn btn-sm order-button" data-bs-toggle="modal" data-bs-target="#stateModal">Conferma</button>
+            `;
+        }
+        result += `   </div>
+            </div>`;
     });
     return result;
 }
-
 
 let currentOrdersPage = 1; // Tiene traccia della pagina corrente
 

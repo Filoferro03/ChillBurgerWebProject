@@ -2,26 +2,26 @@
     <h2 class="display-4 custom-title text-center mb-3">
         <span class="txt">Dettaglio Profilo</span>
     </h2>
-    <div class="container-fluid d-flex flex-row align-items-center" id="profile-container">
-    <div id="profile-data-area" class="card w-25 m-auto p-3 text-start">
-        <h3 class="mb-3"> Dati Utente</h3>
-        <div class="list-group mb-3">
-        <p class="list-group-item mb-3 mt-3"><strong>Nome:</strong> <span id="profile-nome">Caricamento...</span></p>
-        <p class="list-group-item mb-3"><strong>Cognome:</strong> <span id="profile-cognome">Caricamento...</span></p>
-        <p class="list-group-item mb-3"><strong>Username:</strong> <span id="profile-username">Caricamento...</span></p>
+
+    <div class="container-fluid d-flex flex-column flex-lg-row align-items-center" id="profile-container">
+
+        <div id="profile-data-area" class="card w-100 w-md-50 w-lg-33 mb-4 mb-lg-0 p-3 text-center ms-1">
+            <h4 class="mb-3">Dati Utente</h4> 
+            <div class="list-group list-group-flush mb-3">
+                <p class="list-group-item py-1"><strong>Nome:</strong> <span id="profile-nome">Caricamento...</span></p>
+                <p class="list-group-item py-1"><strong>Cognome:</strong> <span id="profile-cognome">Caricamento...</span></p>
+                <p class="list-group-item py-1"><strong>Username:</strong> <span id="profile-username">Caricamento...</span></p>
+            </div>
+            <button type="button" id="logout-button" class="btn btn-sm btn-danger mx-auto" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button> 
         </div>
 
-        <button type="button" id="logout-button" class="btn btn-danger m-auto" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button>
-    </div>
-
-    <div id="order-history-area" class="card w-50 m-auto mt-4 p-3">
-        <h3 class="text-center mb-3">Storico Ordini</h3>
-        <div id="orders-list" class="list-group mb-3">
-            <p class="text-center">Caricamento ordini...</p>
+        <div id="order-history-area" class="card w-100 w-lg-66 p-3 ms-lg-4">
+            <h4 class="text-center mb-3">Storico Ordini</h4> 
+            <div id="orders-list" class="list-group list-group-flush">
+                <p class="text-center">Caricamento ordini...</p>
+            </div>
+            <div id="orders-pagination" class="d-flex justify-content-center mt-3"></div>
         </div>
-
-        <div id="orders-pagination" class="d-flex justify-content-center"></div>
-    </div>
     </div>
 
     <!-- Modal -->

@@ -396,12 +396,6 @@ html, body {
     opacity: 0.8;
 }
 
-@media (max-width:768px) {
-    .card {
-        width: 100% !important;
-    }
-}
-
 .modal-content {
     background-color: #e6ccb2;
 }
