@@ -215,7 +215,7 @@ function displayActiveOrders(orders) {
                 <a href="manager_order_details.php?id=${order.idordine}" class="text-decoration-none d-flex flex-column h-100" style="color:inherit;">
                     <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;">
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Ordine #${order.idordine}</h5>
+                        <p class="card-title fs-3">Ordine #${order.idordine}</p>
                         <p class="card-text small text-muted">${formattedDate} - ${formattedTime}</p>
                         <p class="card-text small text-muted">Stato: ${order.stato}</p>
                         <div class="mt-auto"> {/* Per spingere il footer in basso */}
@@ -276,7 +276,7 @@ function displayOrderHistory(orders) {
                 <div class="card h-100 text-center shadow-sm hover-up"> 
                     <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;"> 
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Ordine #${order.idordine}</h5>
+                        <p class="card-title fs-3">Ordine #${order.idordine}</p>
                         <p class="card-text small text-muted">${formattedDate} - ${formattedTime}</p>
                         <div class="mt-auto">
                            <span class="fw-bold d-block mt-2">${formattedPrice}</span>

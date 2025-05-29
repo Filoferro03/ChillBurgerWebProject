@@ -3,15 +3,15 @@
         <span class="txt">Dettaglio Profilo</span>
     </h1>
 
-    <div class="container-fluid d-flex flex-column flex-lg-row align-items-center align-items-lg-start" id="profile-container">
-        <div id="profile-data-area" class="card w-100 w-lg-33 mb-4 mb-lg-0 p-3 text-center text-lg-start">
+    <div class="container-fluid d-flex flex-column flex-lg-row align-items-center" id="profile-container">
+        <div id="profile-data-area" class="card w-100 w-lg-33 mb-4 mb-lg-0 p-3 text-center">
             <h2 class="mb-3"> Dati Utente</h2>
             <div class="list-group list-group-flush mb-3">
                 <p class="list-group-item py-1"><strong>Nome:</strong> <span id="profile-nome">Caricamento...</span></p>
                 <p class="list-group-item py-1"><strong>Cognome:</strong> <span id="profile-cognome">Caricamento...</span></p>
                 <p class="list-group-item py-1"><strong>Username:</strong> <span id="profile-username">Caricamento...</span></p>
             </div>
-            <button type="button" id="logout-button" class="btn btn-sm btn-danger mx-auto ms-lg-0" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button>
+            <button type="button" id="logout-button" class="btn btn-sm btn-danger mx-auto" data-bs-toggle="modal" data-bs-target="#logoutModal">Logout</button>
         </div>
 
         <div id="order-history-area" class="card w-100 w-lg-66 p-3 ms-lg-4">

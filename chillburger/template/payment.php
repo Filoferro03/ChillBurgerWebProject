@@ -1,12 +1,12 @@
 <section>
     <div class="container-fluid d-flex justify-content-center flex-column">
-        <h2 class="display-4 custom-title text-center mb-3 mt-2">
+        <h1 class="display-4 custom-title text-center mb-3 mt-2">
             <span class="txt">Checkout</span>
-        </h2>
+        </h1>
         
         <div class="card col-12 col-md-10 col-lg-8 mx-auto my-4">
             <div class="card-header text-center">
-                <h3 class="card-title h4">Riepilogo Ordine</h3>
+                <h2 class="card-title">Riepilogo Ordine</h2>
             </div>
             <div class="card-body p-3 p-md-4" id="orderDetailsContainer">
                 <p class="text-center">Caricamento dettagli ordine...</p>
@@ -15,13 +15,13 @@
         
         <div class="card col-12 col-md-10 col-lg-8 mx-auto my-4">
             <div class="card-header text-center">
-                <h3 class="card-title h4">Pagamento</h3>
+                <h3 class="card-title">Pagamento</h3>
             </div>
             <div class="card-body p-3 p-md-4 col-12 col-lg-10 mx-auto" id="paymentContainer">
-                <h5 class="text-center mb-4">Inserisci i tuoi dati di pagamento</h5>
+                <p class="fs-5 text-center mb-4">Inserisci i tuoi dati di pagamento</p>
                 <form id="paymentForm" novalidate>
                     <div class="card mb-4 p-3 border-light shadow-sm">
-                        <h6 class="card-title mb-3">Seleziona data e ora di consegna</h6>
+                        <p class="card-title mb-3 text-center">Seleziona data e ora di consegna</p>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="delivery-date" class="form-label">Data di consegna</label>
