@@ -1,6 +1,9 @@
-// manager_stock.js
-let allProducts = [];
 const LOW_STOCK_THRESHOLD = 10;
+let allProducts = [];
+let currentFiltered = [];
+let currentPage     = 1;
+const PRODUCTS_PER_PAGE = 10;
+
 
 async function fetchData(url, formData) {
   try {
@@ -145,9 +148,9 @@ async function getProductsStock() {
   allProducts = products; 
 
   console.log("products array unito:", products, Array.isArray(products));  // dovrebbe essere true
-  applyFilters(); 
 
-  updateSummaryCards(products);
+  updateSummaryCards(allProducts);
+  applyFilters();
 }
 
 // Prende il <select>
@@ -159,17 +162,13 @@ categoryFilter.addEventListener('change', applyFilters);
 statusFilter.addEventListener('change', applyFilters);
 
 function applyFilters() {
-  const cat   = categoryFilter.value;   // "", "ingrediente", "bevanda"
-  const stat  = statusFilter.value;     // "", "out-stock", "low-stock", "in-stock"
-
+  const cat  = categoryFilter.value;
+  const stat = statusFilter.value;
   let filtered = allProducts;
 
-  // filtro categoria
   if (cat) {
     filtered = filtered.filter(p => p.tipo === cat);
   }
-
-  // filtro stato giacenza
   if (stat === "out-stock") {
     filtered = filtered.filter(p => p.giacenza === 0);
   } else if (stat === "low-stock") {
@@ -178,7 +177,69 @@ function applyFilters() {
     filtered = filtered.filter(p => p.giacenza > LOW_STOCK_THRESHOLD);
   }
 
-  generateProducts(filtered);
+  currentPage = 1;
+  displayPage(filtered);
+}
+
+function displayPage(products) {
+  // aggiorna l’array filtrato
+  currentFiltered = products;
+  // calcola gli indici
+  const start = (currentPage - 1) * PRODUCTS_PER_PAGE;
+  const end   = start + PRODUCTS_PER_PAGE;
+  // mostra solo il sotto‐insieme
+  generateProducts(products.slice(start, end));
+  // aggiorna la barra di navigazione
+  setupPager(products.length);
+}
+
+function setupPager(totalItems) {
+  const pager = document.getElementById('pager');
+  pager.innerHTML = ''; 
+  const totalPages = Math.ceil(totalItems / PRODUCTS_PER_PAGE);
+  const ul = document.createElement('ul');
+  ul.className = 'pagination mb-0';
+
+  // PREV
+  const prev = document.createElement('li');
+  prev.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+  prev.innerHTML = `<a class="page-link" href="#">«</a>`;
+  prev.addEventListener('click', e => {
+    e.preventDefault();
+    if (currentPage > 1) {
+      currentPage--;
+      displayPage(currentFiltered);
+    }
+  });
+  ul.append(prev);
+
+  // NUMERI
+  for (let i = 1; i <= totalPages; i++) {
+    const li = document.createElement('li');
+    li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+    li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+    li.addEventListener('click', e => {
+      e.preventDefault();
+      currentPage = i;
+      displayPage(currentFiltered);
+    });
+    ul.append(li);
+  }
+
+  // NEXT
+  const next = document.createElement('li');
+  next.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+  next.innerHTML = `<a class="page-link" href="#">»</a>`;
+  next.addEventListener('click', e => {
+    e.preventDefault();
+    if (currentPage < totalPages) {
+      currentPage++;
+      displayPage(currentFiltered);
+    }
+  });
+  ul.append(next);
+
+  pager.appendChild(ul);
 }
 
 
