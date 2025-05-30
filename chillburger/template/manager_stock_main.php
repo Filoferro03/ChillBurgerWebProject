@@ -44,8 +44,8 @@
           <label for="category-filter" class="form-label small text-secondary mb-1">Categoria</label>
           <select id="category-filter" class="form-select rounded-2 shadow-sm">
             <option value="">Tutte le Categorie</option>
-            <option value="1">Alimenti</option>
-            <option value="2">Bevande</option>
+            <option value="ingrediente">Ingredienti</option>
+            <option value="bevanda">Bevande</option>
           </select>
         </div>
 

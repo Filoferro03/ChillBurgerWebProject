@@ -1,4 +1,5 @@
 // manager_stock.js
+let allProducts = [];
 
 async function fetchData(url, formData) {
   try {
@@ -140,6 +141,7 @@ async function getProductsStock() {
 
   // Unione in un unico array
   const products = [...ingredients, ...drinks];
+  allProducts = products; 
 
   console.log("products array unito:", products, Array.isArray(products));  // dovrebbe essere true
 
@@ -147,6 +149,20 @@ async function getProductsStock() {
   generateProducts(products);
 }
 
+// Prende il <select>
+const categoryFilter = document.getElementById('category-filter');
+categoryFilter.addEventListener('change', applyFilters);
+
+function applyFilters() {
+  const sel = categoryFilter.value;       // "" | "ingrediente" | "bevanda"
+  
+  // Se non hai selezionato nulla, mostra tutto
+  const filtered = sel
+    ? allProducts.filter(p => p.tipo === sel)
+    : allProducts;
+
+  generateProducts(filtered);
+}
 
 
 // Avvio
