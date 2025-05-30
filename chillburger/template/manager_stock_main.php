@@ -80,7 +80,7 @@
       </div>
 
       <!-- ===== Pagination (filled by JS) =================================== -->
-      <nav id="pager"
+      <nav id="pager" class="mt-4 d-flex justify-content-center align-items-center"
            class="d-flex justify-content-between align-items-center mt-4 p-3 bg-white rounded-bottom-3 border-top"
            aria-label="Paginazione">
       </nav>
