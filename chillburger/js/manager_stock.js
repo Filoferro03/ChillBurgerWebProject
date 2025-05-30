@@ -32,8 +32,9 @@ async function updateIngredientStock(idingrediente, quantita) {
   formData.append('idingrediente', idingrediente);
   formData.append('quantita', quantita);  // ⬅️ corretto
 
+  // TODO all'inizio era 1000
   await fetchData(url, formData);
-  setTimeout(getProductsStock, 1000);
+  setTimeout(getProductsStock, 5);
 }
 
 async function updateDrinkStock(idprodotto, quantita) {
@@ -44,7 +45,8 @@ async function updateDrinkStock(idprodotto, quantita) {
   formData.append('quantita', quantita);  // ⬅️ corretto
 
   await fetchData(url, formData);
-  setTimeout(getProductsStock, 1000);
+  // TODO all'inizio era 1000
+  setTimeout(getProductsStock, 5);
 }
 
 const IMG_DIR = "/ChillBurgerWebProject/chillburger/resources/ingredients";
