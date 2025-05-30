@@ -97,6 +97,19 @@ function generateProducts(products) {
   });
 }
 
+function updateSummaryCards(products) {
+  const total     = products.length;
+  const outStock  = products.filter(p => p.giacenza === 0).length;
+  const lowStock  = products.filter(p => p.giacenza > 0 && p.giacenza <= 10).length;
+  const inStock   = products.filter(p => p.giacenza > 10).length;
+
+  document.getElementById('card-total').textContent    = total;
+  document.getElementById('card-outstock').textContent = outStock;
+  document.getElementById('card-lowstock').textContent = lowStock;
+  document.getElementById('card-instock').textContent  = inStock;
+}
+
+
 async function getProductsStock() {
   const url = "api/api-manager-stock.php";
   const formData = new FormData();
@@ -129,8 +142,12 @@ async function getProductsStock() {
   const products = [...ingredients, ...drinks];
 
   console.log("products array unito:", products, Array.isArray(products));  // dovrebbe essere true
+
+  updateSummaryCards(products);
   generateProducts(products);
 }
+
+
 
 // Avvio
 getProductsStock();
