@@ -80,6 +80,31 @@
         </table>
       </div>
 
+      <!-- Modal per Modifica Quantità -->
+      <div class="modal fade" id="qtyModal" tabindex="-1" aria-labelledby="qtyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title fw-bold" id="qtyModalLabel">Modifica Quantità</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
+            </div>
+            <div class="modal-body">
+              <p id="modalProductName" class="fw-medium mb-3"></p>
+              <div class="input-group">
+                <button class="btn btn-outline-secondary" id="decrementBtn">−</button>
+                <input type="number" class="form-control text-center" id="qtyInput" value="0" min="0">
+                <button class="btn btn-outline-secondary" id="incrementBtn">+</button>
+              </div>
+              <small class="text-muted">Puoi anche digitare direttamente il valore.</small>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+              <button type="button" class="btn btn-primary" id="saveQtyBtn">Salva</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ===== Pagination (filled by JS) =================================== -->
       <nav id="pager" class="mt-4 d-flex justify-content-center align-items-center"
            class="d-flex justify-content-between align-items-center mt-4 p-3 bg-white rounded-bottom-3 border-top"
