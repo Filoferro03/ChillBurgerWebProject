@@ -1221,8 +1221,8 @@ class DatabaseHelper
 
         return $stmt->num_rows > 0;
     }
-    
-/**
+
+    /**
      * Ottiene tutti gli ordini attivi (non completati)
      * @return array Array di ordini attivi
      */
@@ -1272,27 +1272,27 @@ class DatabaseHelper
                   WHERE ms.idstato != 5 AND o.completato = 1
                   ORDER BY o.data_ordine DESC, o.orario DESC
                   LIMIT ? OFFSET ?";
-                  
+
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
             error_log("Errore preparazione statement getActiveOrdersPaginated: " . $this->db->error);
             return ['orders' => [], 'currentPage' => $page, 'totalPages' => $totalPages, 'error_db' => $this->db->error];
         }
-        
+
         $stmt->bind_param('ii', $perPage, $offset);
         $stmt->execute();
         $result = $stmt->get_result();
         $orders = $result->fetch_all(MYSQLI_ASSOC);
         $result->free();
         $stmt->close();
-        
+
         return [
             'orders' => $orders,
             'currentPage' => $page,
             'totalPages' => $totalPages
         ];
     }
-    
+
     /**
      * Ottiene lo storico degli ordini (completati)
      * @return array Array di ordini completati
@@ -1343,24 +1343,55 @@ class DatabaseHelper
                   WHERE ms.idstato = 5
                   ORDER BY o.data_ordine DESC, o.orario DESC
                   LIMIT ? OFFSET ?";
-                  
+
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
             error_log("Errore preparazione statement getOrderHistoryPaginated: " . $this->db->error);
             return ['orders' => [], 'currentPage' => $page, 'totalPages' => $totalPages, 'error_db' => $this->db->error];
         }
-        
+
         $stmt->bind_param('ii', $perPage, $offset);
         $stmt->execute();
         $result = $stmt->get_result();
         $orders = $result->fetch_all(MYSQLI_ASSOC);
         $result->free();
         $stmt->close();
-        
+
         return [
             'orders' => $orders,
             'currentPage' => $page,
             'totalPages' => $totalPages
         ];
+    }
+
+    public function getAllDrinks()
+    {
+        $query = "SELECT * FROM prodotti WHERE idcategoria = 3";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $drinks = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $drinks;
+    }
+
+    public function modifyQuantityDrink($idprodotto, $quantita)
+    {
+        $query = "UPDATE prodotti SET disponibilita = disponibilita - ? WHERE idprodotto = ?";
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            throw new Exception("Errore nella preparazione della query: " . $this->db->error);
+        }
+
+        $stmt->bind_param("ii", $quantita, $idprodotto);
+        $success = $stmt->execute();
+
+        if (!$success) {
+            throw new Exception("Errore nell'esecuzione della query: " . $stmt->error);
+        }
+
+        $stmt->close();
+        return $success;
     }
 }

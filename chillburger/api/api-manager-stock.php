@@ -1,34 +1,53 @@
 <?php
-require_once __DIR__ . '../bootstrap.php';
-session_start();
 
-$managerId = $_SESSION['idutente'] ?? 0;
-if (!$managerId) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Non autenticato']);
-    exit;
+require("../bootstrap.php");
+
+$result = ["success" => false, "error" => null];
+
+try {
+    if (!isset($_POST["action"])) {
+        throw new Exception("Azione non specificata dans.");
+    }
+
+    $action = $_POST["action"];
+
+    switch ($action) {
+        case "getallproducts":
+            $ingredients = $dbh->getAllIngredients();
+            $drinks = $dbh->getAllDrinks();
+            $result["success"] = true;
+            $result["data"] = [
+                "ingredients" => $dbh->getAllIngredients(),
+                "drinks" => $dbh->getAllDrinks()
+            ];
+            break;
+
+        case "updateingredientquantity":
+            if (isset($_POST["idingrediente"]) && isset($_POST["quantita"])) {
+                $dbh->updateIngredientQuantity($_POST["idingrediente"], $_POST["quantita"]);
+                $result["success"] = true;
+            } else {
+                $result["success"] = false;
+            }
+            break;
+
+        case "updatedrinkquantity":
+            if (isset($_POST["idprodotto"]) && isset($_POST["quantita"])) {
+                $dbh->modifyQuantityDrink($_POST["idprodotto"], $_POST["quantita"]);
+                $result["success"] = true;
+            } else {
+                $result["success"] = false;
+            }
+            break;
+
+
+
+        default:
+            throw new Exception("Azione non riconosciuta.");
+    }
+} catch (Exception $e) {
+    $result["error"] = $e->getMessage();
 }
 
-// Recupera prodotti in stock (>0)
-$stmtInStock = $pdo->query("
-    SELECT idprodotto, nome, prezzo, disponibilita, image
-    FROM prodotti
-    WHERE disponibilita > 0
-    ORDER BY nome
-");
-$prodottiInStock = $stmtInStock->fetchAll(PDO::FETCH_ASSOC);
-
-// Recupera prodotti out of stock (=0)
-$stmtOutStock = $pdo->query("
-    SELECT idprodotto, nome, prezzo, disponibilita, image
-    FROM prodotti
-    WHERE disponibilita = 0
-    ORDER BY nome
-");
-$prodottiOutStock = $stmtOutStock->fetchAll(PDO::FETCH_ASSOC);
-
-echo json_encode([
-    'success' => true,
-    'inStock' => $prodottiInStock,
-    'outStock' => $prodottiOutStock
-]);
+header("Content-Type: application/json");
+echo json_encode($result);

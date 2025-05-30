@@ -6,7 +6,7 @@ $templateParams = [
     "nome"   => "template/manager_stock_main.php",
     "css"    => [
         "css/style.css",
-        "css/manager_stock.css",
+        "css/manager_stock_style.css",
     ],
     "js"     => ["js/manager_stock.js"]
 ];
