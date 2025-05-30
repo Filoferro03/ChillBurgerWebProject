@@ -1364,34 +1364,104 @@ class DatabaseHelper
         ];
     }
 
-    public function getAllDrinks()
+        /**  Low-stock threshold you consider “dangerous” (default 2) */
+    private const LOW_STOCK = 2;
+
+    /** 1-line summary for the four coloured cards */
+    public function getProductStockSummary(): array
     {
-        $query = "SELECT * FROM prodotti WHERE idcategoria = 3";
-        $stmt = $this->db->prepare($query);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $drinks = $result->fetch_all(MYSQLI_ASSOC);
-        $result->free();
-        $stmt->close();
-        return $drinks;
+        $q = "
+            SELECT
+                COUNT(*)                        AS total,
+                SUM(CASE WHEN giacenza  >  " . self::LOW_STOCK . " THEN 1 END) AS inStock,
+                SUM(CASE WHEN giacenza BETWEEN 1 AND " . self::LOW_STOCK . " THEN 1 END) AS lowStock,
+                SUM(CASE WHEN giacenza  =  0 THEN 1 END)                           AS outStock
+            FROM prodotti";
+        return $this->db->query($q)->fetch_assoc();
     }
 
-    public function modifyQuantityDrink($idprodotto, $quantita)
+    /**
+     * Modifica la quantità di un prodotto (positivo o negativo)
+     * @param int $idprodotto ID del prodotto da modificare
+     * @param int $delta Quantità da aggiungere o sottrarre (può essere negativo)
+     * @return bool True se l'operazione è riuscita, false altrimenti
+     *//** Table list with optional filters + pagination */
+    public function getProductsForStock(?int $category,
+    string $status,
+    int $page = 1,
+    int $perPage = 10): array
     {
-        $query = "UPDATE prodotti SET disponibilita = disponibilita - ? WHERE idprodotto = ?";
-        $stmt = $this->db->prepare($query);
-        if (!$stmt) {
-            throw new Exception("Errore nella preparazione della query: " . $this->db->error);
-        }
+    /* ---------- build dynamic WHERE ------------------------------------ */
+    $where = [];
+    $types = '';
+    $bind  = [];
 
-        $stmt->bind_param("ii", $quantita, $idprodotto);
-        $success = $stmt->execute();
-
-        if (!$success) {
-            throw new Exception("Errore nell'esecuzione della query: " . $stmt->error);
-        }
-
-        $stmt->close();
-        return $success;
+    if ($category) {
+    $where[] = 'p.idcategoria = ?';
+    $types  .= 'i';
+    $bind[]  = $category;
     }
+
+    if ($status !== 'all') {
+    if ($status === 'in-stock')  { $where[] = 'p.giacenza > ' . self::LOW_STOCK; }
+    if ($status === 'low-stock') { $where[] = 'p.giacenza BETWEEN 1 AND ' . self::LOW_STOCK; }
+    if ($status === 'out-stock') { $where[] = 'p.giacenza = 0'; }
+    }
+
+    $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+    /* ---------- total rows (for pagination) ----------------------------- */
+    $countSql = "SELECT COUNT(*) AS c FROM prodotti p $whereSql";
+    if ($types) {
+    $cntStmt = $this->db->prepare($countSql);
+    $cntStmt->bind_param($types, ...$bind);
+    $cntStmt->execute();
+    $total = $cntStmt->get_result()->fetch_assoc()['c'];
+    $cntStmt->close();
+    } else {
+    $total = $this->db->query($countSql)->fetch_assoc()['c'];
+    }
+
+    /* ---------- paged list --------------------------------------------- */
+    $offset   = ($page - 1) * $perPage;
+    $listSql  = "
+    SELECT p.idprodotto,
+    p.nome,
+    p.image,
+    p.giacenza,
+    c.descrizione AS categoria
+    FROM   prodotti p
+    JOIN   categorie c USING(idcategoria)
+    $whereSql
+    ORDER BY c.descrizione, p.nome
+    LIMIT  ? OFFSET ?";
+
+    $stmt       = $this->db->prepare($listSql);
+
+    // merge page params *before* unpacking
+    $paramTypes = $types . 'ii';                                // always ends with two ints
+    $bindValues = array_merge($bind, [$perPage, $offset]);
+
+    $stmt->bind_param($paramTypes, ...$bindValues);
+    $stmt->execute();
+    $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+
+    return [
+    'items'       => $rows,
+    'currentPage' => $page,
+    'totalPages'  => max(1, (int)ceil($total / $perPage)),
+    ];
+    }
+
+
+    /** PATCH product quantity (positive or negative diff) */
+    public function changeProductQuantity(int $idprodotto, int $delta): bool
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE prodotti SET giacenza = GREATEST(giacenza + ?, 0) WHERE idprodotto = ?");
+        $stmt->bind_param('ii', $delta, $idprodotto);
+        return $stmt->execute();
+    }
+
 }
