@@ -19,7 +19,7 @@
             <div class="col">
             <a href="manager_orders.php" class="manager-link">
                 <span class="h1">📦</span>
-                <span class="h3 a-underline light">Orders</span>
+                <span class="h3 a-underline light">Ordini</span>
             </a>
             </div>
 
@@ -35,7 +35,7 @@
             <div class="col">
             <a href="manager_stock.php" class="manager-link">
                 <span class="h1">✍🏻</span>
-                <span class="h3 a-underline light">Stock</span>
+                <span class="h3 a-underline light">Magazzino</span>
             </a>
             </div>
 
@@ -43,7 +43,7 @@
             <div class="col">
             <a href="manager_notifications.php" class="manager-link">
                 <span class="h1">🔔</span>
-                <span class="h3 a-underline light">Notification</span>
+                <span class="h3 a-underline light">Notifiche</span>
             </a>
             </div>
 
