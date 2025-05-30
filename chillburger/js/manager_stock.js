@@ -47,12 +47,12 @@ const IMG_DIR = "chillburger/resources/products";
 
 function statusClass(q) {
   return q === 0 ? "text-danger"
-       : q <= 2 ? "text-warning"
+       : q <= 10 ? "text-warning"
        :          "text-success";
 }
 function statusLabel(q) {
   return q === 0 ? "Esaurito"
-       : q <= 2 ? "Bassa Scorta"
+       : q <= 10 ? "Bassa Scorta"
        :          "In Magazzino";
 }
 
@@ -153,6 +153,10 @@ async function getProductsStock() {
 const categoryFilter = document.getElementById('category-filter');
 categoryFilter.addEventListener('change', applyFilters);
 
+const statusFilter   = document.getElementById('status-filter');
+statusFilter.addEventListener('change', applyFiltersStatus);
+
+
 function applyFilters() {
   const sel = categoryFilter.value;       // "" | "ingrediente" | "bevanda"
   
@@ -164,6 +168,22 @@ function applyFilters() {
   generateProducts(filtered);
 }
 
+function applyFiltersStatus() {
+  const sel = statusFilter.value;  // "" | "outstock" | "lowstock" | "instock"
+
+  let filtered = allProducts;
+  if (sel === "out-stock") {
+    filtered = allProducts.filter(p => p.giacenza === 0);
+  } else if (sel === "low-stock") {
+    filtered = allProducts.filter(p => p.giacenza > 0 && p.giacenza <= 10);
+  } else if (sel === "in-stock") {
+    filtered = allProducts.filter(p => p.giacenza > 10);
+  } else if (sel === "all") {
+    filtered = allProducts;
+  }
+
+  generateProducts(filtered);
+}
 
 // Avvio
 getProductsStock();
