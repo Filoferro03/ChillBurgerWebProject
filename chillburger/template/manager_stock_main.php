@@ -16,21 +16,21 @@
 
       <div class="col-12 col-sm-6 col-md-3">
         <div class="bg-success-subtle p-3 rounded-3 d-flex align-items-center justify-content-between">
-          <span class="text-success fw-semibold">In magazzino:</span>
+          <span class="text-success fw-semibold">Prodotti in magazzino:</span>
           <span id="card-instock" class="text-success-emphasis fs-4 fw-bold"></span>
         </div>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
         <div class="bg-warning-subtle p-3 rounded-3 d-flex align-items-center justify-content-between">
-          <span class="text-warning fw-semibold">Bassa Scorta:</span>
+          <span class="text-warning fw-semibold">Prodotti con bassa Scorta:</span>
           <span id="card-lowstock" class="text-warning-emphasis fs-4 fw-bold"></span>
         </div>
       </div>
 
       <div class="col-12 col-sm-6 col-md-3">
         <div class="bg-danger-subtle p-3 rounded-3 d-flex align-items-center justify-content-between">
-          <span class="text-danger fw-semibold">Esauriti:</span>
+          <span class="text-danger fw-semibold">Prodotti esauriti:</span>
           <span id="card-outstock" class="text-danger-emphasis fs-4 fw-bold"></span>
         </div>
       </div>
@@ -44,10 +44,8 @@
           <label for="category-filter" class="form-label small text-secondary mb-1">Categoria</label>
           <select id="category-filter" class="form-select rounded-2 shadow-sm">
             <option value="">Tutte le Categorie</option>
-            <option value="1">Panini</option>
+            <option value="1">Alimenti</option>
             <option value="2">Bevande</option>
-            <option value="3">Fritti</option>
-            <option value="4">Dolci</option>
           </select>
         </div>
 
@@ -70,7 +68,7 @@
         <table class="table table-hover mb-0">
           <thead class="table-light">
             <tr>
-              <th scope="col" class="py-3 px-4 text-start text-uppercase small text-secondary">Categoria</th>
+              <th scope="col" class="py-3 px-4 text-start text-uppercase small text-secondary">Prodotto</th>
               <th scope="col" class="py-3 px-4 text-start text-uppercase small text-secondary">Quantità</th>
               <th scope="col" class="py-3 px-4 text-start text-uppercase small text-secondary">Stato</th>
               <th scope="col" class="py-3 px-4 text-start text-uppercase small text-secondary">Azione</th>

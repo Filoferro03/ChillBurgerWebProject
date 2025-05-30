@@ -88,9 +88,9 @@ function generateProducts(products) {
       const delta = parseInt(prompt("Incremento positivo o negativo (es. 5 / -3):"), 10);
       if (Number.isNaN(delta)) return;
       if (tipo === "bevanda") {
-        await updateDrinkStock(id, delta);
+        await updateDrinkStock(id, -delta);
       } else {
-        await updateIngredientStock(id, delta);
+        await updateIngredientStock(id, -delta);
       }
     });
     tbody.appendChild(tr);
