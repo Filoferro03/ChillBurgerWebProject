@@ -145,46 +145,42 @@ async function getProductsStock() {
   allProducts = products; 
 
   console.log("products array unito:", products, Array.isArray(products));  // dovrebbe essere true
+  applyFilters(); 
 
   updateSummaryCards(products);
-  generateProducts(products);
 }
 
 // Prende il <select>
 const categoryFilter = document.getElementById('category-filter');
-categoryFilter.addEventListener('change', applyFilters);
-
 const statusFilter   = document.getElementById('status-filter');
-statusFilter.addEventListener('change', applyFiltersStatus);
 
+// listener
+categoryFilter.addEventListener('change', applyFilters);
+statusFilter.addEventListener('change', applyFilters);
 
 function applyFilters() {
-  const sel = categoryFilter.value;       // "" | "ingrediente" | "bevanda"
-  
-  // Se non hai selezionato nulla, mostra tutto
-  const filtered = sel
-    ? allProducts.filter(p => p.tipo === sel)
-    : allProducts;
-
-  generateProducts(filtered);
-}
-
-function applyFiltersStatus() {
-  const sel = statusFilter.value;  // "" | "outstock" | "lowstock" | "instock"
+  const cat   = categoryFilter.value;   // "", "ingrediente", "bevanda"
+  const stat  = statusFilter.value;     // "", "out-stock", "low-stock", "in-stock"
 
   let filtered = allProducts;
-  if (sel === "out-stock") {
-    filtered = allProducts.filter(p => p.giacenza === 0);
-  } else if (sel === "low-stock") {
-    filtered = allProducts.filter(p => p.giacenza > 0 && p.giacenza <= LOW_STOCK_THRESHOLD);
-  } else if (sel === "in-stock") {
-    filtered = allProducts.filter(p => p.giacenza > LOW_STOCK_THRESHOLD);
-  } else if (sel === "all") {
-    filtered = allProducts;
+
+  // filtro categoria
+  if (cat) {
+    filtered = filtered.filter(p => p.tipo === cat);
+  }
+
+  // filtro stato giacenza
+  if (stat === "out-stock") {
+    filtered = filtered.filter(p => p.giacenza === 0);
+  } else if (stat === "low-stock") {
+    filtered = filtered.filter(p => p.giacenza > 0 && p.giacenza <= LOW_STOCK_THRESHOLD);
+  } else if (stat === "in-stock") {
+    filtered = filtered.filter(p => p.giacenza > LOW_STOCK_THRESHOLD);
   }
 
   generateProducts(filtered);
 }
+
 
 // Avvio
 getProductsStock();
