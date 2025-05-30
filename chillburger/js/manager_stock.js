@@ -13,6 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentId, currentType;
 
+  qtyInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();   // blocca eventuali submit di form
+      saveQtyBtn.click();   // richiama la logica già presente
+    }
+  });
+
 
   async function fetchData(url, formData) {
     try {
