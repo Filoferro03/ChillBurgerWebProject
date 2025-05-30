@@ -47,7 +47,7 @@ async function updateDrinkStock(idprodotto, quantita) {
   setTimeout(getProductsStock, 1000);
 }
 
-const IMG_DIR = "chillburger/resources/products";
+const IMG_DIR = "/ChillBurgerWebProject/chillburger/resources/ingredients";
 
 function statusClass(q) {
   return q === 0 ? "text-danger"
