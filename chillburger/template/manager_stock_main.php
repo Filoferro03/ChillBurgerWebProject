@@ -71,6 +71,7 @@
               <th scope="col" class="py-3 px-4 text-start text-uppercase small text-secondary">Prodotto</th>
               <th scope="col" class="py-3 px-4 text-start text-uppercase small text-secondary">Quantità</th>
               <th scope="col" class="py-3 px-4 text-start text-uppercase small text-secondary">Stato</th>
+              <th scope="col" class="py-3 px-4 text-start text-uppercase small text-secondary">Rimuovi/Aggiungi</th>
               <th scope="col" class="py-3 px-4 text-start text-uppercase small text-secondary">Azione</th>
             </tr>
           </thead>

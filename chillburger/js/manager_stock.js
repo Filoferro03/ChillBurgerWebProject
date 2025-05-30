@@ -83,24 +83,46 @@ function generateProducts(products) {
         ${statusLabel(p.giacenza)}
       </td>
       <td class="py-3 px-4">
+        <button class="btn btn-sm btn-outline-success me-2 btn-plus"
+                data-id="${p.idprodotto}" data-type="${p.tipo}">+</button>
+        <button class="btn btn-sm btn-outline-danger btn-minus"
+                data-id="${p.idprodotto}" data-type="${p.tipo}">−</button>
+      </td>
+      <td class="py-3 px-4">
         <a href="#" class="changeQty" data-id="${p.idprodotto}"
            data-type="${p.tipo}">Modifica Quantità</a>
       </td>`;
+
+    // '+' → +1
+    tr.querySelector('.btn-plus').addEventListener('click', async e => {
+      e.preventDefault();
+      const { id, type } = e.currentTarget.dataset;
+      if (type === "bevanda") await updateDrinkStock(id, -1);
+      else                await updateIngredientStock(id, -1);
+    });
+
+    // '−' → -1
+    tr.querySelector('.btn-minus').addEventListener('click', async e => {
+      e.preventDefault();
+      const { id, type } = e.currentTarget.dataset;
+      if (type === "bevanda") await updateDrinkStock(id, +1);
+      else                await updateIngredientStock(id, +1);
+    });
+
+    // “Modifica Quantità” prompt esistente
     tr.querySelector(".changeQty").addEventListener("click", async e => {
       e.preventDefault();
-      const id    = e.currentTarget.dataset.id;
-      const tipo  = e.currentTarget.dataset.type;  
+      const { id, type } = e.currentTarget.dataset;
       const delta = parseInt(prompt("Incremento positivo o negativo (es. 5 / -3):"), 10);
       if (Number.isNaN(delta)) return;
-      if (tipo === "bevanda") {
-        await updateDrinkStock(id, -delta);
-      } else {
-        await updateIngredientStock(id, -delta);
-      }
+      if (type === "bevanda") await updateDrinkStock(id, -delta);
+      else                     await updateIngredientStock(id, -delta);
     });
+
     tbody.appendChild(tr);
   });
 }
+
 
 function updateSummaryCards(products) {
   const total     = products.length;
