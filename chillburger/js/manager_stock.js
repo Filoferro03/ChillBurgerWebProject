@@ -1,5 +1,6 @@
 // manager_stock.js
 let allProducts = [];
+const LOW_STOCK_THRESHOLD = 10;
 
 async function fetchData(url, formData) {
   try {
@@ -47,12 +48,12 @@ const IMG_DIR = "chillburger/resources/products";
 
 function statusClass(q) {
   return q === 0 ? "text-danger"
-       : q <= 10 ? "text-warning"
+       : q <= LOW_STOCK_THRESHOLD ? "text-warning"
        :          "text-success";
 }
 function statusLabel(q) {
   return q === 0 ? "Esaurito"
-       : q <= 10 ? "Bassa Scorta"
+       : q <= LOW_STOCK_THRESHOLD ? "Bassa Scorta"
        :          "In Magazzino";
 }
 
@@ -101,8 +102,8 @@ function generateProducts(products) {
 function updateSummaryCards(products) {
   const total     = products.length;
   const outStock  = products.filter(p => p.giacenza === 0).length;
-  const lowStock  = products.filter(p => p.giacenza > 0 && p.giacenza <= 10).length;
-  const inStock   = products.filter(p => p.giacenza > 10).length;
+  const lowStock  = products.filter(p => p.giacenza > 0 && p.giacenza <= LOW_STOCK_THRESHOLD).length;
+  const inStock   = products.filter(p => p.giacenza > LOW_STOCK_THRESHOLD).length;
 
   document.getElementById('card-total').textContent    = total;
   document.getElementById('card-outstock').textContent = outStock;
@@ -175,9 +176,9 @@ function applyFiltersStatus() {
   if (sel === "out-stock") {
     filtered = allProducts.filter(p => p.giacenza === 0);
   } else if (sel === "low-stock") {
-    filtered = allProducts.filter(p => p.giacenza > 0 && p.giacenza <= 10);
+    filtered = allProducts.filter(p => p.giacenza > 0 && p.giacenza <= LOW_STOCK_THRESHOLD);
   } else if (sel === "in-stock") {
-    filtered = allProducts.filter(p => p.giacenza > 10);
+    filtered = allProducts.filter(p => p.giacenza > LOW_STOCK_THRESHOLD);
   } else if (sel === "all") {
     filtered = allProducts;
   }
