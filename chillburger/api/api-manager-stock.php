@@ -47,7 +47,10 @@ try {
 
         case "getallburgers":
             $compositions = $dbh->getAllBurgersCompositions();
-            $result["data"] = $compositions;
+            $result["data"] = [
+                "compositions" => $compositions,
+            ];
+            $result["success"] = true;
             break;
         default:
             throw new Exception("Azione non riconosciuta.");
