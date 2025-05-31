@@ -4,13 +4,6 @@
         <span class="emoji">📋</span>
     </h2>
 
-
-  <?php /* Navbar riusabile del sito */
-  if (file_exists(__DIR__.'/template/navbar.php')) {
-      include __DIR__.'/template/navbar.php';
-  }
-  ?>
-
   <main class='flex-1 container mx-auto p-4 space-y-10'>
 
     <!-- Elenco prodotti -->
