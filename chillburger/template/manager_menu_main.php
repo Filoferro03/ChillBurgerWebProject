@@ -58,5 +58,5 @@
   <!-- Script JS -->
   <script src='js/manager_menu.js'></script>
 
-  </section>
-</html>
+</section>
+
