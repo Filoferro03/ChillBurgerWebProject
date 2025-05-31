@@ -1,12 +1,3 @@
-<?php
-/**
- * manager_menu_main.php
- * Pagina di gestione del menu per i manager – solo markup e link a risorse esterne.
- */
-require_once __DIR__.'/../bootstrap.php';
-// TODO: Verifica che l'utente sia un manager autenticato
-?>
-
 <section class="container py-5">
     <h2 class="display-4 custom-title text-center mb-3">
         <span class="txt">Gestione Menu</span>
