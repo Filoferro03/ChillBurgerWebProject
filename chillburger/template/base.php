@@ -53,10 +53,6 @@
                         </a>
 
                     <?php elseif (isUserLoggedIn() && isUserAdmin()): ?>
-                        <a class="text-decoration-none" href="profile.php" aria-label="Profilo">
-                            <strong class="fa-solid fa-user text-black fs-2" aria-hidden="true"></strong>
-                            <span class="visually-hidden">Profilo</span>
-                        </a>
                         <a href="notifications.php" class="text-decoration-none mx-1" aria-label="Notifiche">
                             <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
                             <span class="visually-hidden">Notifiche</span>
@@ -132,10 +128,6 @@
                         </a>
 
                     <?php elseif (isUserLoggedIn() && isUserAdmin()): ?>
-                        <a class="text-decoration-none" href="profile.php" aria-label="Profilo">
-                            <strong class="fa-solid fa-user text-black fs-2" aria-hidden="true"></strong>
-                            <span class="visually-hidden">Profilo</span>
-                        </a>
                         <a href="notifications.php" class="text-decoration-none mx-4" aria-label="Notifiche">
                             <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
                             <span class="visually-hidden">Notifiche</span>
