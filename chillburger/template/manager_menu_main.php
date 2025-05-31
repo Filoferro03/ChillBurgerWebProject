@@ -15,14 +15,15 @@
 
     <!-- Elenco prodotti -->
     <section>
-      <h2 class='text-2xl font-semibold mb-2'>Prodotti attuali</h2>
+      <h2 class='text-2xl animate-underline mb-6'>Prodotti attuali</h2>
       <div id='product-list' class='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'></div>
     </section>
 
     <!-- Aggiunta nuovo prodotto -->
     <section>
-      <h2 class='text-2xl font-semibold mb-2'>Aggiungi nuovo prodotto</h2>
-      <form id='add-product-form' class='bg-white shadow rounded-lg p-6 space-y-4'>
+      <h2 class='text-2xl animate-underline mb-6'>Aggiungi nuovo prodotto</h2>
+
+      <form id='add-product-form' class='bg-white shadow rounded-lg p-6 space-y-6'>
         <div>
           <label for='name' class='block font-medium mb-1'>Nome prodotto</label>
           <input id='name' name='name' type='text' class='input-field' required>
