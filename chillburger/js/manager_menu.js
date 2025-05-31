@@ -1,63 +1,10 @@
 // manager_menu.js
-// Script di gestione CRUD prodotti e ingredienti – simulazione lato client
+// Script di gestione CRUD prodotti e ingredienti – ora usa i dati reali dal backend
 
-async function fetchData(url, formData) {
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      body: formData,
-    });
-    if (!response.ok) {
-      throw new Error(`Errore HTTP: ${response.status}`);
-    }
-    const json = await response.json();
-    if (!json.success) {
-      throw new Error(json.error || "Errore sconosciuto dal server.");
-    }
-    return json.data; // { ingredients: [...], drinks: [...] }
-  } catch (error) {
-    console.error("Errore durante la fetch:", error.message);
-    return null;
-  }
-}
-// TODO
-/* === DATI SIMULATI === */
-const ingredients = [
-  "Hamburger di manzo",
-  "Pane",
-  "Cheddar",
-  "Bacon",
-  "Insalata",
-  "Pomodoro",
-  "Salsa barbecue",
-];
-
-let products = [
-  {
-    id: 1,
-    name: "Bacon Cheeseburger",
-    description: "Burger di manzo con bacon croccante e cheddar fuso.",
-    price: 9.5,
-    image: "resources/products/bacon-cheeseburger.png",
-    ingredients: [
-      "Hamburger di manzo",
-      "Pane",
-      "Cheddar",
-      "Bacon",
-      "Salsa barbecue",
-    ],
-  },
-  {
-    id: 2,
-    name: "Green Garden",
-    description: "Burger vegetariano con verdure fresche.",
-    price: 8.0,
-    image: "resources/products/green-garden.png",
-    ingredients: ["Hamburger vegano", "Pane", "Insalata", "Pomodoro"],
-  },
-];
-
-let nextId = products.length + 1;
+/* === STATE === */
+let ingredients = [];
+let products = [];
+let nextId = 1;
 
 /* === HELPERS === */
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -68,9 +15,44 @@ const createEl = (tag, cls = "", html = "") => {
   return el;
 };
 
+/* === DATA LOADING === */
+async function loadInitialData() {
+  try {
+    // Recupera prodotti e categorie dal backend pubblico
+    const resMenu = await fetch("api/api-menu.php");
+    if (!resMenu.ok)
+      throw new Error(
+        "Impossibile caricare i prodotti (" + resMenu.status + ")"
+      );
+    const menuJson = await resMenu.json();
+    products = menuJson.products ?? [];
+    nextId = products.length
+      ? Math.max(...products.map((p) => p.idcategoria)) + 1
+      : 1;
+
+    // Ricava l'elenco ingredienti unico dai prodotti oppure recuperalo da un endpoint dedicato
+    const allIngs = new Set();
+    products.forEach((p) =>
+      (p.ingredients || []).forEach((i) => allIngs.add(i))
+    );
+    ingredients = [...allIngs];
+
+    // TODO
+    // Se esiste un endpoint dedicato agli ingredienti, decommenta questo blocco:
+    // const resIng = await fetch('api/api-ingredients.php');
+    // if (resIng.ok) ingredients = await resIng.json();
+
+    renderIngredientSelect();
+    renderProducts();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 /* === RENDERING === */
 function renderIngredientSelect() {
   const container = $("#ingredient-select");
+  if (!container) return;
   container.innerHTML = "";
   ingredients.forEach((ing) => {
     const label = createEl("label", "flex items-center space-x-1");
@@ -87,15 +69,19 @@ function createProductCard(prod) {
   const card = createEl("div", "card");
   const img = createEl("img");
   img.src = prod.image;
-  img.alt = prod.name;
+  img.alt = prod.nome;
   card.appendChild(img);
 
   const body = createEl("div", "card-body");
-  body.appendChild(createEl("h3", "text-lg font-semibold mb-1", prod.name));
+  body.appendChild(createEl("h3", "text-lg font-semibold mb-1", prod.nome));
   body.appendChild(
-    createEl("p", "text-sm text-gray-600 mb-2", "€ " + prod.price.toFixed(2))
+    createEl(
+      "p",
+      "text-sm text-gray-600 mb-2",
+      "€ " + Number(prod.prezzo).toFixed(2)
+    )
   );
-  body.appendChild(createEl("p", "text-sm", prod.description));
+  body.appendChild(createEl("p", "text-sm", prod.descrizione));
   card.appendChild(body);
 
   const actions = createEl("div", "card-actions");
@@ -105,8 +91,8 @@ function createProductCard(prod) {
     "bg-red-600 text-white rounded-lg px-3 py-2 hover:bg-red-700 transition",
     "Elimina"
   );
-  editBtn.addEventListener("click", () => openEditModal(prod.id));
-  delBtn.addEventListener("click", () => openDeleteModal(prod.id));
+  editBtn.addEventListener("click", () => openEditModal(prod.idcategoria));
+  delBtn.addEventListener("click", () => openDeleteModal(prod.idcategoria));
   actions.appendChild(editBtn);
   actions.appendChild(delBtn);
   card.appendChild(actions);
@@ -116,49 +102,62 @@ function createProductCard(prod) {
 
 function renderProducts() {
   const list = $("#product-list");
+  if (!list) return;
   list.innerHTML = "";
   products.forEach((p) => list.appendChild(createProductCard(p)));
 }
 
 /* === AGGIUNTA === */
-$("#add-product-form").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const newProduct = {
-    id: nextId++,
-    name: formData.get("name").trim(),
-    description: formData.get("description").trim(),
-    price: parseFloat(formData.get("price")),
-    image: "#", // Placeholder – gestire upload lato server
-    ingredients: [
-      ...document.querySelectorAll("#ingredient-select input:checked"),
-    ].map((i) => i.value),
-  };
-  fetch("/api/api-manager-menu.php", {
-    method: "POST",
-    body: JSON.stringify(newProduct),
-  });
-  products.push(newProduct);
-  renderProducts();
-  e.target.reset();
-  $("#image-preview").classList.add("hidden");
-});
+const addForm = $("#add-product-form");
+if (addForm) {
+  addForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const newProduct = {
+      idcategoria: nextId++,
+      nome: fd.get("nome").trim(),
+      description: fd.get("description").trim(),
+      prezzo: parseFloat(fd.get("prezzo")),
+      image: "#", // gestire upload lato server
+      ingredients: [
+        ...document.querySelectorAll("#ingredient-select input:checked"),
+      ].map((i) => i.value),
+    };
 
-$("#image").addEventListener("change", (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const preview = $("#image-preview");
-  preview.src = URL.createObjectURL(file);
-  preview.classList.remove("hidden");
-});
+    try {
+      await fetch("api/api-manager-menu.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProduct),
+      });
+      products.push(newProduct);
+      renderProducts();
+      e.target.reset();
+      $("#image-preview").classList.add("hidden");
+    } catch (err) {
+      console.error(err);
+    }
+  });
+}
+
+const imageInput = $("#image");
+if (imageInput) {
+  imageInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const preview = $("#image-preview");
+    preview.src = URL.createObjectURL(file);
+    preview.classList.remove("hidden");
+  });
+}
 
 /* === MODALI === */
 function closeModal() {
   $("#modal-overlay").classList.add("hidden");
 }
 
-function openEditModal(id) {
-  const prod = products.find((p) => p.id === id);
+function openEditModal(idcategoria) {
+  const prod = products.find((p) => p.idcategoria === idcategoria);
   const overlay = $("#modal-overlay");
   const box = $("#modal-box");
   box.innerHTML = "";
@@ -167,13 +166,13 @@ function openEditModal(id) {
   );
 
   const nameIn = createEl("input", "input-field mb-2");
-  nameIn.value = prod.name;
+  nameIn.value = prod.nome;
   const descIn = createEl("textarea", "input-field mb-2");
   descIn.value = prod.description;
   const priceIn = createEl("input", "input-field mb-2");
   priceIn.type = "number";
   priceIn.step = "0.01";
-  priceIn.value = prod.price;
+  priceIn.value = prod.prezzo;
 
   const save = createEl("button", "btn-primary mr-2", "Salva");
   const cancel = createEl("button", "bg-gray-300 px-4 py-2 rounded", "Annulla");
@@ -184,19 +183,28 @@ function openEditModal(id) {
   box.appendChild(save);
   box.appendChild(cancel);
 
-  save.addEventListener("click", () => {
-    prod.name = nameIn.value.trim();
+  save.addEventListener("click", async () => {
+    prod.nome = nameIn.value.trim();
     prod.description = descIn.value.trim();
-    prod.price = parseFloat(priceIn.value);
-    // TODO: fetch PUT
-    renderProducts();
-    closeModal();
+    prod.prezzo = parseFloat(priceIn.value);
+
+    try {
+      await fetch("api/api-manager-menu.php?idcategoria=" + prod.idcategoria, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(prod),
+      });
+      renderProducts();
+      closeModal();
+    } catch (err) {
+      console.error(err);
+    }
   });
   cancel.addEventListener("click", closeModal);
   overlay.classList.remove("hidden");
 }
 
-function openDeleteModal(id) {
+function openDeleteModal(idcategoria) {
   const overlay = $("#modal-overlay");
   const box = $("#modal-box");
   box.innerHTML = "";
@@ -207,26 +215,22 @@ function openDeleteModal(id) {
   const cancel = createEl("button", "bg-gray-300 px-4 py-2 rounded", "Annulla");
   box.appendChild(confirm);
   box.appendChild(cancel);
-  confirm.addEventListener("click", () => {
-    products = products.filter((p) => p.id !== id);
-    // TODO: fetch DELETE
-    renderProducts();
-    closeModal();
+
+  confirm.addEventListener("click", async () => {
+    try {
+      await fetch("api/api-manager-menu.php?id=" + idcategoria, {
+        method: "DELETE",
+      });
+      products = products.filter((p) => p.idcategoria !== idcategoria);
+      renderProducts();
+      closeModal();
+    } catch (err) {
+      console.error(err);
+    }
   });
   cancel.addEventListener("click", closeModal);
   overlay.classList.remove("hidden");
 }
 
-async function getAllCompositions() {
-  const url = "api/api-manager-stock.php";
-  const formData = new FormData();
-  formData.append("action", "getallburgers");
-
-  const data = await fetchData(url, formData);
-  console.log("prodotti:", data);
-}
-
-/* === INIT === */
-renderIngredientSelect();
-renderProducts();
-getAllCompositions();
+/* === BOOTSTRAP === */
+window.addEventListener("DOMContentLoaded", loadInitialData);
