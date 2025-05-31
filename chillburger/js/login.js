@@ -39,7 +39,11 @@ async function tryLogin(username, password) {
 
     if (json?.loginresult) {
         getUserCart();
-        window.location.reload();
+        if (json.currentuser && json.currentuser.tipo === "venditore") { // "venditore" è l'admin
+            window.location.href = 'manager.php'; // Reindirizza alla pagina manager
+        } else {
+            window.location.href = 'index.php'; // O altra pagina di default per il cliente
+        }
     } else {
         updateMessage("login-message", json?.loginmsg || "Errore generico durante il login.", false);
     }

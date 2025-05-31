@@ -8,7 +8,7 @@ $templateParams = [
         "css/style.css",
         "css/manager_style.css"
     ],
-    "js"     => ["js/profile.js"]
+    "js" => ["js/manager.js"]
 ];
 
 require "template/base.php";

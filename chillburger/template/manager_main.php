@@ -8,8 +8,8 @@
     <div class="row justify-content-center mb-5">
 
         <div class="col-lg-5 mb-4 mb-lg-0">
-            <div id="profile-data-area" class="card shadow-sm p-3 text-center bg-light h-100">
-                <h3 class="mb-3 dark-brown-text">I tuoi Dati</h3>
+            <div id="profile-data-area" class="card shadow-sm p-3 text-center bg-dark h-100">
+                <h3 class="mb-3 black-text">I tuoi Dati</h3>
                 <div class="list-group list-group-flush mb-3 text-start">
                     <p class="list-group-item py-1 bg-transparent"><strong>Nome:</strong> <span id="profile-nome">Caricamento...</span></p>
                     <p class="list-group-item py-1 bg-transparent"><strong>Cognome:</strong> <span id="profile-cognome">Caricamento...</span></p>
@@ -50,9 +50,6 @@
             </div>
         </div>
     </div>
-
-    <h1 class="dark-brown-text animate-underline ">Come utilizzare questa pagina</h1>
-    <h3 class="text-center text-muted mt-4"> Clicca sui pulsanti sopra per gestire ordini, menu, scorte o notifiche. Ogni sezione ti guiderà nelle operazioni necessarie alla gestione di <span class="dark-brown-logo">Chill Burger</span>.</h3>
 
     <div class="modal overlay" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel">
       <div class="modal-dialog modal-dialog-centered">
