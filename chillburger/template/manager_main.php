@@ -25,7 +25,7 @@
 
             <!-- Menu -->
             <div class="col">
-            <a href="menu_admin.php" class="manager-link">
+            <a href="manager_menu.php" class="manager-link">
                 <span class="h1">🍔</span>
                 <span class="h3 a-underline light">Menu</span>
             </a>
