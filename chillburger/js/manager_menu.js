@@ -23,13 +23,14 @@ async function loadInitialData () {
     if (!resMenu.ok) throw new Error('Impossibile caricare i prodotti (' + resMenu.status + ')');
     const menuJson = await resMenu.json();
     products       = menuJson.products ?? [];
-    nextId         = products.length ? Math.max(...products.map(p => p.id)) + 1 : 1;
+    nextId         = products.length ? Math.max(...products.map(p => p.idcategoria)) + 1 : 1;
 
     // Ricava l'elenco ingredienti unico dai prodotti oppure recuperalo da un endpoint dedicato
     const allIngs = new Set();
     products.forEach(p => (p.ingredients || []).forEach(i => allIngs.add(i)));
     ingredients = [...allIngs];
 
+    // TODO
     // Se esiste un endpoint dedicato agli ingredienti, decommenta questo blocco:
     // const resIng = await fetch('api/api-ingredients.php');
     // if (resIng.ok) ingredients = await resIng.json();
@@ -67,14 +68,14 @@ function createProductCard (prod) {
   const body = createEl('div', 'card-body');
   body.appendChild(createEl('h3', 'text-lg font-semibold mb-1', prod.nome));
   body.appendChild(createEl('p',  'text-sm text-gray-600 mb-2', '€ ' + Number(prod.prezzo).toFixed(2)));
-  body.appendChild(createEl('p',  'text-sm', prod.description));
+  body.appendChild(createEl('p',  'text-sm', prod.descrizione));
   card.appendChild(body);
 
   const actions = createEl('div', 'card-actions');
   const editBtn = createEl('button', 'btn-primary', 'Modifica');
   const delBtn  = createEl('button', 'bg-red-600 text-white rounded-lg px-3 py-2 hover:bg-red-700 transition', 'Elimina');
-  editBtn.addEventListener('click', () => openEditModal(prod.id));
-  delBtn .addEventListener('click', () => openDeleteModal(prod.id));
+  editBtn.addEventListener('click', () => openEditModal(prod.idcategoria));
+  delBtn .addEventListener('click', () => openDeleteModal(prod.idcategoria));
   actions.appendChild(editBtn);
   actions.appendChild(delBtn);
   card.appendChild(actions);
@@ -96,7 +97,7 @@ if (addForm) {
     e.preventDefault();
     const fd = new FormData(e.target);
     const newProduct = {
-      id: nextId++,
+      idcategoria: nextId++,
       nome: fd.get('nome').trim(),
       description: fd.get('description').trim(),
       prezzo: parseFloat(fd.get('prezzo')),
@@ -134,8 +135,8 @@ if (imageInput) {
 /* === MODALI === */
 function closeModal () { $('#modal-overlay').classList.add('hidden'); }
 
-function openEditModal (id) {
-  const prod = products.find(p => p.id === id);
+function openEditModal (idcategoria) {
+  const prod = products.find(p => p.idcategoria === idcategoria);
   const overlay = $('#modal-overlay');
   const box = $('#modal-box');
   box.innerHTML = '';
@@ -165,7 +166,7 @@ function openEditModal (id) {
     prod.prezzo       = parseFloat(priceIn.value);
 
     try {
-      await fetch('api/api-manager-menu.php?id=' + prod.id, {
+      await fetch('api/api-manager-menu.php?idcategoria=' + prod.idcategoria, {
         method: 'PUT',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(prod)
@@ -178,7 +179,7 @@ function openEditModal (id) {
   overlay.classList.remove('hidden');
 }
 
-function openDeleteModal (id) {
+function openDeleteModal (idcategoria) {
   const overlay = $('#modal-overlay');
   const box = $('#modal-box');
   box.innerHTML = '';
@@ -190,8 +191,8 @@ function openDeleteModal (id) {
 
   confirm.addEventListener('click', async () => {
     try {
-      await fetch('api/api-manager-menu.php?id=' + id, {method:'DELETE'});
-      products = products.filter(p => p.id !== id);
+      await fetch('api/api-manager-menu.php?id=' + idcategoria, {method:'DELETE'});
+      products = products.filter(p => p.idcategoria !== idcategoria);
       renderProducts();
       closeModal();
     } catch (err) { console.error(err); }
