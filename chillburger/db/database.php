@@ -1418,4 +1418,37 @@ class DatabaseHelper
         $stmt->close();
         return $success;
     }
+
+    public function getAllBurgersCompositions()
+    {
+        $query = "SELECT 
+        p.idprodotto,
+        p.nome AS nome_prodotto,
+        p.prezzo,
+        p.disponibilita,
+        p.image AS prodotto_image,
+        
+        c.idingrediente,
+        c.quantita AS quantita_necessaria,
+        c.essenziale,
+        
+        i.nome AS nome_ingrediente,
+        i.sovrapprezzo,
+        i.giacenza,
+        i.image AS ingrediente_image
+
+    FROM prodotti p
+    JOIN composizioni c ON p.idprodotto = c.idprodotto
+    JOIN ingredienti i ON c.idingrediente = i.idingrediente
+    WHERE p.idcategoria = 1
+    ORDER BY p.idprodotto, c.idingrediente";
+
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $compositions = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $compositions;
+    }
 }
