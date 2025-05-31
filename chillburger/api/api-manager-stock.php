@@ -15,10 +15,15 @@ try {
         case "getallproducts":
             $ingredients = $dbh->getAllIngredients();
             $drinks = $dbh->getAllDrinks();
+            $desserts = $dbh->getAllDessertes();
+            $friedFood = $dbh->getAllFrieds();
+
             $result["success"] = true;
             $result["data"] = [
-                "ingredients" => $dbh->getAllIngredients(),
-                "drinks" => $dbh->getAllDrinks()
+                "ingredients" => $ingredients,
+                "drinks" => $drinks,
+                "friedFood" => $friedFood,
+                "desserts" => $desserts
             ];
             break;
 

@@ -1376,6 +1376,30 @@ class DatabaseHelper
         return $drinks;
     }
 
+    public function getAllFrieds()
+    {
+        $query = "SELECT * FROM prodotti WHERE idcategoria = 2";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $drinks = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $drinks;
+    }
+
+    public function getAllDessertes()
+    {
+        $query = "SELECT * FROM prodotti WHERE idcategoria = 4";
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $drinks = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $drinks;
+    }
+
     public function modifyQuantityDrink($idprodotto, $quantita)
     {
         $query = "UPDATE prodotti SET disponibilita = disponibilita - ? WHERE idprodotto = ?";

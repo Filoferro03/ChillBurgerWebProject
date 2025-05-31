@@ -211,6 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
     formData.append("action", "getallproducts");
 
     const data = await fetchData(url, formData);
+    console.log("prodotti:" , data);
     if (!data) return;
 
     // Estrazione e mappatura ingredienti
