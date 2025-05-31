@@ -61,11 +61,11 @@ function createProductCard (prod) {
   const card = createEl('div', 'card');
   const img  = createEl('img');
   img.src    = prod.image;
-  img.alt    = prod.name;
+  img.alt    = prod.nome;
   card.appendChild(img);
 
   const body = createEl('div', 'card-body');
-  body.appendChild(createEl('h3', 'text-lg font-semibold mb-1', prod.name));
+  body.appendChild(createEl('h3', 'text-lg font-semibold mb-1', prod.nome));
   body.appendChild(createEl('p',  'text-sm text-gray-600 mb-2', '€ ' + Number(prod.prezzo).toFixed(2)));
   body.appendChild(createEl('p',  'text-sm', prod.description));
   card.appendChild(body);
@@ -97,7 +97,7 @@ if (addForm) {
     const fd = new FormData(e.target);
     const newProduct = {
       id: nextId++,
-      name: fd.get('name').trim(),
+      nome: fd.get('nome').trim(),
       description: fd.get('description').trim(),
       prezzo: parseFloat(fd.get('prezzo')),
       image: '#', // gestire upload lato server
@@ -142,7 +142,7 @@ function openEditModal (id) {
   box.appendChild(createEl('h2', 'text-xl font-semibold mb-4', 'Modifica prodotto'));
 
   const nameIn  = createEl('input', 'input-field mb-2');
-  nameIn.value  = prod.name;
+  nameIn.value  = prod.nome;
   const descIn  = createEl('textarea', 'input-field mb-2');
   descIn.value  = prod.description;
   const priceIn = createEl('input', 'input-field mb-2');
@@ -160,7 +160,7 @@ function openEditModal (id) {
   box.appendChild(cancel);
 
   save.addEventListener('click', async () => {
-    prod.name        = nameIn.value.trim();
+    prod.nome        = nameIn.value.trim();
     prod.description = descIn.value.trim();
     prod.prezzo       = parseFloat(priceIn.value);
 
