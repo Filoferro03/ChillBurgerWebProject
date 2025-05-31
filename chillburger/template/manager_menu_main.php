@@ -6,14 +6,6 @@
 require_once __DIR__.'/../bootstrap.php';
 // TODO: Verifica che l'utente sia un manager autenticato
 ?>
-<!DOCTYPE html>
-<html lang='it'>
-<head>
-  <meta charset='UTF-8'>
-  <script src='https://cdn.tailwindcss.com'></script>
-  <!-- Stili personalizzati -->
-  <link rel='stylesheet' href='css/manager_menu_style.css'>
-</head>
 
 <section class="container py-5">
     <h2 class="display-4 custom-title text-center mb-3">

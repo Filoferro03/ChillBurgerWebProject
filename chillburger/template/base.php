@@ -13,6 +13,13 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- TODO si utilizza in manager_menu_main.php, se si ha tempo guardare  -->
+    <?php if (isset($templateParams["head_js"])): ?>
+        <?php foreach ($templateParams["head_js"] as $src): ?>
+            <script src="<?= htmlspecialchars($src) ?>"></script>
+        <?php endforeach; ?>
+    <?php endif; ?>
 </head>
 
 
