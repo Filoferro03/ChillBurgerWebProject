@@ -8,7 +8,7 @@
                 <p class="text-center">Caricamento dettagli ordine...</p>
             </div>
             <div class="card-footer text-center">
-                <a href="manager_orders.php" class="btn order-button">Torna Indietro</a>
+                <button onclick="history.back()" class="btn order-button">Torna Indietro</button>
             </div>
         </div>
     </div>

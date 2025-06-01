@@ -23,9 +23,16 @@ function generateReviewsHTML(reviews) { // Rinominata per chiarezza
         result += `
             <div class="list-group-item mb-3 my-2">
                 <h3>${review.titolo || 'Recensione'}</h3>
+                <p>${review.nome} ${review.cognome} </p>
                 <p class="star-rating">${generateStarRating(review.voto)}</p>
                 <p>${review.commento || ''}</p>
-                <small class="text-muted">${formatDateFromTimestamp(review.timestamp_recensione) || 'N/D'} - ${formatTimeFromTimestamp(review.timestamp_recensione)}</small>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <small class="text-muted">${formatDateFromTimestamp(review.timestamp_recensione) || 'N/D'} - ${formatTimeFromTimestamp(review.timestamp_recensione)}</small>
+                    ${review.idordine ?
+                        `<a href="order-details.php?id=${review.idordine}" class="btn btn-sm order-button" style="background-color: #7f5539; color: white;">Vedi Ordine</a>`
+                        : ''
+                    }
+                </div>
             </div>`;
     });
     return result;

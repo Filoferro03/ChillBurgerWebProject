@@ -57,8 +57,10 @@ class DatabaseHelper
         $countStmt->close();
 
         // Poi ottieni le recensioni paginate
-        $query = "SELECT titolo, voto, commento, timestamp_recensione
-                  FROM chillburgerdb.recensioni 
+        $query = "SELECT r.titolo, r.voto, r.commento, r.timestamp_recensione, o.idordine, u.nome, u.cognome
+                  FROM recensioni r 
+                  JOIN ordini o ON o.idordine = r.idordine
+                  JOIN utenti u ON u.idutente = o.idutente 
                   ORDER BY timestamp_recensione DESC
                   LIMIT ? OFFSET ?";
 

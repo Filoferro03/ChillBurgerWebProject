@@ -212,7 +212,7 @@ function displayActiveOrders(orders) {
         html += `
         <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4"> 
             <div class="card text-center shadow-sm h-100 hover-up">
-                <a href="manager_order_details.php?id=${order.idordine}" class="text-decoration-none d-flex flex-column h-100" style="color:inherit;">
+                <a href="order-details.php?id=${order.idordine}" class="text-decoration-none d-flex flex-column h-100" style="color:inherit;">
                     <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;">
                     <div class="card-body d-flex flex-column">
                         <p class="card-title fs-3">Ordine #${order.idordine}</p>
@@ -272,7 +272,7 @@ function displayOrderHistory(orders) {
 
         html += `
         <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4"> 
-            <a href="manager_order_details.php?id=${order.idordine}" class="text-decoration-none" style="color:inherit;">
+            <a href="order-details.php?id=${order.idordine}" class="text-decoration-none" style="color:inherit;">
                 <div class="card h-100 text-center shadow-sm hover-up"> 
                     <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;"> 
                     <div class="card-body d-flex flex-column">
