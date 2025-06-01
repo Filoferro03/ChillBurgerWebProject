@@ -5,8 +5,17 @@ require_once '../bootstrap.php'; // Assicurati che il percorso sia corretto
 $response = [];
 error_log("api-orders.php - Azione richiesta: " . $_POST['action']);
 
-
-if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
+if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
+    $idOrdine = null;
+    if (isset($_GET['idordine'])) {
+        $idOrdine = $_GET['idordine'];
+    } else {
+        $idOrdine = $_SESSION['idordine'];
+    }
+    $allOrders = $dbh->getOrderDetails($idOrdine);
+    $response['success'] = true;
+    $response['data'] = $allOrders;
+} elseif (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
     http_response_code(401); // Unauthorized
     $response = ['success' => false, 'error' => 'Utente non autenticato o sessione non valida'];
 } else {
@@ -48,17 +57,6 @@ if (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
             $response['success'] = true;
             $response['data'] = $orderHistory;
         }
-    } else if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
-        $idOrdine = null;
-        if (isset($_GET['idordine'])) {
-            $idOrdine = $_GET['idordine'];
-        } else {
-            $idOrdine = $_SESSION['idordine'];
-        }
-        $allOrders = $dbh->getOrderDetails($idOrdine);
-        $response['success'] = true;
-        $response['data'] = $allOrders;
-        
     } else if(isset($_POST['action']) && $_POST['action'] == 'update') {
         $idordine = $_POST['idordine'];
         $result = $dbh->updateOrderStatus($idordine);
