@@ -1457,6 +1457,7 @@ class DatabaseHelper
             
         // DatabaseHelper.php
     public function getAllProductsWithIngredients() {
+        // TODO c.descrizione va eliminato a favore di c.categoria
         $sql = "
             SELECT 
                 p.idprodotto, p.nome, p.descrizione, p.prezzo, p.image,
