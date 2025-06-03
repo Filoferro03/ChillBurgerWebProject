@@ -1,92 +1,107 @@
 /* manager_menu_style.css */
-/* Stili personalizzati a complemento di Tailwind */
+/* ======================= */
+/* Stili personalizzati per Bootstrap 5 */
+/* ======================= */
 
-.input-field {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #d1d5db; /* gray-300 */
-    border-radius: 0.375rem;
-    background-color: #fff;
-    font-size: 1rem;
-    line-height: 1.5rem;
-  }
-  
-  .input-field:focus {
-    outline: none;
-    border-color: #4ade80; /* green-400 */
-    box-shadow: 0 0 0 3px rgba(74,222,128,0.4);
-  }
-  
-  .btn-primary {
-    background-color: #16a34a; /* green-600 */
-    color: #ffffff;
-    padding: 0.5rem 1.25rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    transition: background-color 0.2s;
-  }
-  
-  .btn-primary:hover {
-    background-color: #15803d; /* green-700 */
-  }
-  
-  .modal {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 50;
-  }
-  
-  .hidden {
-    display: none;
-  }
-  
-  .show {
-    display: flex;
-  }
-  
-  .tag {
-    background-color: #f1f5f9; /* gray-100 */
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-  }
-  
-  .tag button {
-    margin-left: 0.25rem;
-    font-weight: 700;
-  }
-  
-  .card {
-    background-color: #ffffff;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .card img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-  }
-  
-  .card-body {
-    padding: 1rem;
-    flex: 1 1 auto;
-  }
-  
-  .card-actions {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.75rem;
-  }
-  
-  .card-actions button {
-    flex: 1 1 auto;
-  }
-  
+/* 1. Variabili colore per Primary personalizzato (verde) */
+:root {
+  --bs-primary: #16a34a;
+  --bs-primary-hover: #15803d;
+}
+
+/* 2. Override per .btn-primary di Bootstrap */
+.btn.btn-primary {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+  color: #fff;
+  padding: 0.5rem 1.25rem;      /* simile a quello che avevi in Tailwind */
+  border-radius: 0.5rem;       /* per mantenere bordi arrotondati come prima */
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+.btn.btn-primary:hover,
+.btn.btn-primary:focus {
+  background-color: var(--bs-primary-hover);
+  border-color: var(--bs-primary-hover);
+}
+
+/* 3. Override per form-control (per replicare .input-field) */
+.form-control {
+  /* Di default Bootstrap gestisce padding e border, ma se vuoi lo stesso aspetto Tailwind: */
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;    /* gray-300 */
+  border-radius: 0.375rem;
+  background-color: #fff;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+.form-control:focus {
+  /* Colore di focus verde simile a .input-field di prima */
+  border-color: #4ade80;        /* green-400 */
+  box-shadow: 0 0 0 0.25rem rgba(74, 222, 128, 0.4);
+  outline: none;
+}
+
+/* 4. Modal personalizzata (anziché usare .modal di Bootstrap) */
+/*    Nota: l’HTML usa #modal-overlay con classe .d-none quando nascosta */
+#modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050; /* Allineato al livello z-index di Bootstrap Modal */
+}
+#modal-overlay.d-none {
+  display: none !important;
+}
+
+#modal-box {
+  background-color: #ffffff;
+  border-radius: 0.5rem;         /* rounded */
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;               /* p-6 simile a 1.5rem */
+  width: 100%;
+  max-width: 500px;              /* max-w-md ≈ 500px */
+}
+
+/* 5. Tag personalizzati (puoi anche usare .badge di Bootstrap, ma ecco la conversione diretta) */
+.tag {
+  background-color: #f1f5f9;     /* gray-100 */
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;           /* text-sm */
+  display: inline-flex;
+  align-items: center;
+}
+.tag button {
+  margin-left: 0.25rem;
+  font-weight: 700;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* 6. Card: sfruttiamo Bootstrap .card & .card-body, ma manteniamo altezza fissa immagine */
+/* .card img.card-img-top {
+  height: 180px;
+  object-fit: cover;
+} */
+
+/* 7. Rimozione di classi Tailwind (se ne restano) */
+/*    Non ci servono più .hidden, .show, .rounded-lg, .shadow ecc. perché Bootstrap li gestisce. */
+/*    Tuttavia, se vuoi mantenere .hidden come sinonimo di .d-none, puoi aggiungere: */
+.hidden {
+  display: none !important;
+}
+.show {
+  display: flex !important;
+}
+
+/* Fine del file CSS personalizzato */

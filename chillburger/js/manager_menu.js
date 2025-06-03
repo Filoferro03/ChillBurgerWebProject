@@ -1,17 +1,16 @@
-// Script di gestione CRUD prodotti e ingredienti – ora usa i dati reali dal backendAdd commentMore actions
-
-/* === STATE === 
-let ingredients = [];
-let products    = [];
-let nextId      = 1; */
 (() => {
   // === helpers isolati ===
   const $ = (s, r = document) => r.querySelector(s);
   const createEl = (t, c = '', h = '') =>
     Object.assign(document.createElement(t), { className: c, innerHTML: h });
 
+  /* === STATE === */
+  let ingredients = [];
+  let products    = [];
+  let nextId      = 1;
+
   /* === DATA LOADING === */
-  async function loadInitialData () {
+  async function loadInitialData() {
     try {
       // Recupera prodotti e categorie dal backend pubblico
       const resMenu = await fetch('api/api-menu.php');
@@ -25,8 +24,7 @@ let nextId      = 1; */
       products.forEach(p => (p.ingredients || []).forEach(i => allIngs.add(i)));
       ingredients = [...allIngs];
 
-      // TODO
-      // Se esiste un endpoint dedicato agli ingredienti, decommenta questo blocco:
+      // TODO: se esiste un endpoint dedicato agli ingredienti, decommenta questo blocco:
       // const resIng = await fetch('api/api-ingredients.php');
       // if (resIng.ok) ingredients = await resIng.json();
 
@@ -38,13 +36,15 @@ let nextId      = 1; */
   }
 
   /* === RENDERING === */
-  function renderIngredientSelect () {
+  function renderIngredientSelect() {
     const container = $('#ingredient-select');
     if (!container) return;
     container.innerHTML = '';
+
     ingredients.forEach(ing => {
-      const label = createEl('label', 'flex items-center space-x-1');
-      const input = createEl('input');
+      // Ogni checkbox per l'ingrediente
+      const label = createEl('label', 'form-check form-check-inline align-items-center');
+      const input = createEl('input', 'form-check-input me-1');
       input.type  = 'checkbox';
       input.value = ing;
       label.appendChild(input);
@@ -53,24 +53,29 @@ let nextId      = 1; */
     });
   }
 
-  function createProductCard (prod) {
-    const card = createEl('div', 'card');
-    const img  = createEl('img');
-    img.src    = prod.image;
-    img.alt    = prod.nome;
+  function createProductCard(prod) {
+    // Card wrapper
+    const card = createEl('div', 'card h-100');
+
+    // Immagine (se presente)
+    const img = createEl('img', 'card-img-top');
+    img.src = prod.image;
+    img.alt = prod.nome;
     card.appendChild(img);
 
+    // Corpo della card
     const body = createEl('div', 'card-body');
-    body.appendChild(createEl('h3', 'text-lg font-semibold mb-1', prod.nome));
-    body.appendChild(createEl('p',  'text-sm text-gray-600 mb-2', '€ ' + Number(prod.prezzo).toFixed(2)));
-    body.appendChild(createEl('p',  'text-sm', prod.descrizione));
+    body.appendChild(createEl('h5', 'card-title mb-1', prod.nome));
+    body.appendChild(createEl('p', 'card-text text-muted mb-2', '€ ' + Number(prod.prezzo).toFixed(2)));
+    body.appendChild(createEl('p', 'card-text', prod.descrizione));
     card.appendChild(body);
 
-    const actions = createEl('div', 'card-actions');
-    const editBtn = createEl('button', 'btn-primary', 'Modifica');
-    const delBtn  = createEl('button', 'bg-red-600 text-white rounded-lg px-3 py-2 hover:bg-red-700 transition', 'Elimina');
+    // Azioni (Modifica / Elimina)
+    const actions = createEl('div', 'card-body pt-0 d-flex justify-content-end gap-2');
+    const editBtn = createEl('button', 'btn btn-primary', 'Modifica');
+    const delBtn  = createEl('button', 'btn btn-danger', 'Elimina');
     editBtn.addEventListener('click', () => openEditModal(prod.idcategoria));
-    delBtn .addEventListener('click', () => openDeleteModal(prod.idcategoria));
+    delBtn.addEventListener('click',  () => openDeleteModal(prod.idcategoria));
     actions.appendChild(editBtn);
     actions.appendChild(delBtn);
     card.appendChild(actions);
@@ -78,11 +83,15 @@ let nextId      = 1; */
     return card;
   }
 
-  function renderProducts () {
+  function renderProducts() {
     const list = $('#product-list');
     if (!list) return;
     list.innerHTML = '';
-    products.forEach(p => list.appendChild(createProductCard(p)));
+    products.forEach(p => {
+      const wrapper = createEl('div', 'col');
+      wrapper.appendChild(createProductCard(p));
+      list.appendChild(wrapper);
+    });
   }
 
   /* === AGGIUNTA === */
@@ -92,7 +101,6 @@ let nextId      = 1; */
       e.preventDefault();
       const fd = new FormData(e.target);
       const newProduct = {
-
         idcategoria: nextId++,
         nome: fd.get('nome').trim(),
         description: fd.get('description').trim(),
@@ -104,18 +112,17 @@ let nextId      = 1; */
       try {
         await fetch('api/api-manager-menu.php', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newProduct)
         });
         products.push(newProduct);
         renderProducts();
         e.target.reset();
-        $('#image-preview').classList.add('hidden');
+        $('#image-preview').classList.add('d-none');
       } catch (err) {
         console.error(err);
       }
     });
-
   }
 
   const imageInput = $('#image');
@@ -125,32 +132,42 @@ let nextId      = 1; */
       if (!file) return;
       const preview = $('#image-preview');
       preview.src = URL.createObjectURL(file);
-      preview.classList.remove('hidden');
+      preview.classList.remove('d-none');
     });
-
   }
 
   /* === MODALI === */
-  function closeModal () { $('#modal-overlay').classList.add('hidden'); }
+  function closeModal() {
+    $('#modal-overlay').classList.add('d-none');
+  }
 
-  function openEditModal (idcategoria) {
+  function openEditModal(idcategoria) {
     const prod = products.find(p => p.idcategoria === idcategoria);
     const overlay = $('#modal-overlay');
     const box = $('#modal-box');
     box.innerHTML = '';
-    box.appendChild(createEl('h2', 'text-xl font-semibold mb-4', 'Modifica prodotto'));
 
-    const nameIn  = createEl('input', 'input-field mb-2');
-    nameIn.value  = prod.nome;
-    const descIn  = createEl('textarea', 'input-field mb-2');
-    descIn.value  = prod.description;
-    const priceIn = createEl('input', 'input-field mb-2');
+    // Titolo modale
+    box.appendChild(createEl('h4', 'mb-4', 'Modifica prodotto'));
+
+    // Input Nome
+    const nameIn = createEl('input', 'form-control mb-2');
+    nameIn.value = prod.nome;
+
+    // Input Descrizione
+    const descIn = createEl('textarea', 'form-control mb-2');
+    descIn.rows = 3;
+    descIn.value = prod.description;
+
+    // Input Prezzo
+    const priceIn = createEl('input', 'form-control mb-2');
     priceIn.type  = 'number';
     priceIn.step  = '0.01';
     priceIn.value = prod.prezzo;
 
-    const save   = createEl('button', 'btn-primary mr-2', 'Salva');
-    const cancel = createEl('button', 'bg-gray-300 px-4 py-2 rounded', 'Annulla');
+    // Pulsanti Salva / Annulla
+    const save   = createEl('button', 'btn btn-primary me-2', 'Salva');
+    const cancel = createEl('button', 'btn btn-secondary', 'Annulla');
 
     box.appendChild(nameIn);
     box.appendChild(descIn);
@@ -161,46 +178,52 @@ let nextId      = 1; */
     save.addEventListener('click', async () => {
       prod.nome        = nameIn.value.trim();
       prod.description = descIn.value.trim();
-      prod.prezzo       = parseFloat(priceIn.value);
+      prod.prezzo      = parseFloat(priceIn.value);
 
       try {
         await fetch('api/api-manager-menu.php?idcategoria=' + prod.idcategoria, {
           method: 'PUT',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(prod)
         });
         renderProducts();
         closeModal();
-
-      } catch (err) { console.error(err); }
+      } catch (err) {
+        console.error(err);
+      }
     });
+
     cancel.addEventListener('click', closeModal);
-    overlay.classList.remove('hidden');
+    overlay.classList.remove('d-none');
   }
 
-  function openDeleteModal (idcategoria) {
+  function openDeleteModal(idcategoria) {
     const overlay = $('#modal-overlay');
     const box = $('#modal-box');
     box.innerHTML = '';
-    box.appendChild(createEl('p', 'mb-4', 'Sei sicuro di voler eliminare questo prodotto?'));
-    const confirm = createEl('button', 'btn-primary mr-2', 'Conferma');
-    const cancel  = createEl('button', 'bg-gray-300 px-4 py-2 rounded', 'Annulla');
-    box.appendChild(confirm);
-    box.appendChild(cancel);
 
-    confirm.addEventListener('click', async () => {
+    box.appendChild(createEl('p', 'mb-4', 'Sei sicuro di voler eliminare questo prodotto?'));
+
+    const confirmBtn = createEl('button', 'btn btn-danger me-2', 'Conferma');
+    const cancelBtn  = createEl('button', 'btn btn-secondary', 'Annulla');
+    box.appendChild(confirmBtn);
+    box.appendChild(cancelBtn);
+
+    confirmBtn.addEventListener('click', async () => {
       try {
-        await fetch('api/api-manager-menu.php?id=' + idcategoria, {method:'DELETE'});
+        await fetch('api/api-manager-menu.php?id=' + idcategoria, { method: 'DELETE' });
         products = products.filter(p => p.idcategoria !== idcategoria);
         renderProducts();
         closeModal();
-
-      } catch (err) { console.error(err); }
+      } catch (err) {
+        console.error(err);
+      }
     });
-    cancel.addEventListener('click', closeModal);
-    overlay.classList.remove('hidden');
+
+    cancelBtn.addEventListener('click', closeModal);
+    overlay.classList.remove('d-none');
   }
 
-  /* === BOOTSTRAP === */
+  /* === BOOTSTRAP INIT === */
   window.addEventListener('DOMContentLoaded', loadInitialData);
 })();
