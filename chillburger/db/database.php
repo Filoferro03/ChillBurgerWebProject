@@ -1439,20 +1439,87 @@ class DatabaseHelper
         i.giacenza,
         i.image AS ingrediente_image
 
-    FROM prodotti p
-    JOIN composizioni c ON p.idprodotto = c.idprodotto
-    JOIN ingredienti i ON c.idingrediente = i.idingrediente
-    WHERE p.idcategoria = 1
-    ORDER BY p.idprodotto, c.idingrediente";
+        FROM prodotti p
+        JOIN composizioni c ON p.idprodotto = c.idprodotto
+        JOIN ingredienti i ON c.idingrediente = i.idingrediente
+        WHERE p.idcategoria = 1
+        ORDER BY p.idprodotto, c.idingrediente";
 
-        $stmt = $this->db->prepare($query);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $compositions = $result->fetch_all(MYSQLI_ASSOC);
-        $result->free();
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $compositions = $result->fetch_all(MYSQLI_ASSOC);
+            $result->free();
+            $stmt->close();
+            return $compositions;
+        }
+
+            
+        // DatabaseHelper.php
+    public function getAllProductsWithIngredients() {
+        $sql = "
+            SELECT 
+                p.idprodotto, p.nome, p.descrizione, p.prezzo, p.image,
+                c.descrizione  AS categoria,
+                i.idingrediente, i.nome AS nome_ingrediente,
+                cmp.quantita, cmp.essenziale
+            FROM prodotti p
+            JOIN categorie c        ON p.idcategoria = c.idcategoria
+            LEFT JOIN composizioni cmp ON p.idprodotto = cmp.idprodotto
+            LEFT JOIN ingredienti  i   ON cmp.idingrediente = i.idingrediente
+            ORDER BY p.idprodotto
+        ";
+        $res = $this->db->query($sql);
+        $rows = $res->fetch_all(MYSQLI_ASSOC);
+
+        // raggruppa per prodotto
+        $products = [];
+        foreach ($rows as $r) {
+            $id = $r['idprodotto'];
+            if (!isset($products[$id])) {
+                $products[$id] = [
+                    'idprodotto' => $id,
+                    'nome'       => $r['nome'],
+                    'prezzo'     => (float)$r['prezzo'],
+                    'image'      => $r['image'],
+                    'categoria'  => $r['categoria'],
+                    'ingredients'=> []
+                ];
+            }
+            if ($r['idingrediente']) {
+                $products[$id]['ingredients'][] = [
+                    'idingrediente'=> $r['idingrediente'],
+                    'nome'         => $r['nome_ingrediente'],
+                    'quantita'     => (int)$r['quantita'],
+                    'essenziale'   => (bool)$r['essenziale']
+                ];
+            }
+        }
+        return array_values($products);
+    }
+    
+    /* DatabaseHelper.php */
+    public function insertProduct($nome, $descrizione, $prezzo, $imgPath, $idcategoria = 1) {
+        $sql = "INSERT INTO prodotti
+                (nome, descrizione, prezzo, image, idcategoria, disponibilita)
+                VALUES (?,?,?,?,?, 999)";
+        $stmt = $this->db->prepare($sql);
+        $stmt->bind_param('ssdsi', $nome, $descrizione, $prezzo, $imgPath, $idcategoria);
+        $stmt->execute();                         // se fallisce lancia eccezione
+        $id = $this->db->insert_id;
         $stmt->close();
-        return $compositions;
+        return $id;
+    }
+    
+
+    public function addProductComposition($idprodotto, $idingrediente,
+                                        $quantita = 1, $essenziale = true) {
+        $sql = "INSERT INTO composizioni (idprodotto, idingrediente, quantita, essenziale)
+                VALUES (?,?,?,?)";
+        $stmt = $this->db->prepare($sql);
+        $essenziale = $essenziale ? 1 : 0;
+        $stmt->bind_param('iiii', $idprodotto, $idingrediente, $quantita, $essenziale);
+        return $stmt->execute();
     }
 
-    
 }

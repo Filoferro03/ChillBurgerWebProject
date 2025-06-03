@@ -1,6 +1,8 @@
 (() => {
   // === helpers isolati ===
   const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];   // ← nuovo
+
   const createEl = (t, c = '', h = '') =>
     Object.assign(document.createElement(t), { className: c, innerHTML: h });
 
@@ -42,15 +44,15 @@
     container.innerHTML = '';
 
     ingredients.forEach(ing => {
-      // Ogni checkbox per l'ingrediente
+      /* ing = { idingrediente, nome } */
       const label = createEl('label', 'form-check form-check-inline align-items-center');
       const input = createEl('input', 'form-check-input me-1');
       input.type  = 'checkbox';
-      input.value = ing;
+      input.value = ing.idingrediente;          // <-- ID!
       label.appendChild(input);
-      label.appendChild(createEl('span', '', ing));
+      label.appendChild(createEl('span', '', ing.nome));
       container.appendChild(label);
-    });
+    });    
   }
 
   function createProductCard(prod) {
@@ -67,15 +69,15 @@
     const body = createEl('div', 'card-body');
     body.appendChild(createEl('h5', 'card-title mb-1', prod.nome));
     body.appendChild(createEl('p', 'card-text text-muted mb-2', '€ ' + Number(prod.prezzo).toFixed(2)));
-
+    body.appendChild(createEl('p', 'card-text', prod.descrizione));
     card.appendChild(body);
 
     // Azioni (Modifica / Elimina)
     const actions = createEl('div', 'card-body pt-0 d-flex justify-content-end gap-2');
     const editBtn = createEl('button', 'btn btn-primary', 'Modifica');
     const delBtn  = createEl('button', 'btn btn-danger', 'Elimina');
-    editBtn.addEventListener('click', () => openEditModal(prod.idcategoria));
-    delBtn.addEventListener('click',  () => openDeleteModal(prod.idcategoria));
+    editBtn.addEventListener('click', () => openEditModal(prod.idprodotto));
+    delBtn.addEventListener('click',  () => openDeleteModal(prod.idprodotto));
     actions.appendChild(editBtn);
     actions.appendChild(delBtn);
     card.appendChild(actions);
@@ -99,29 +101,34 @@
   if (addForm) {
     addForm.addEventListener('submit', async e => {
       e.preventDefault();
+    
       const fd = new FormData(e.target);
-      const newProduct = {
-        idcategoria: nextId++,
-        nome: fd.get('nome').trim(),
-        prezzo: parseFloat(fd.get('prezzo')),
-        image: '#', // gestire upload lato server
-        ingredients: [...document.querySelectorAll('#ingredient-select input:checked')].map(i => i.value)
-      };
-
+      // ingredienti selezionati → array di id interi
+      const ingredients = $$('#ingredient-select input:checked')
+                        .map(i => parseInt(i.value,10));
+    
+      fd.append('ingredients', JSON.stringify(ingredients));
+      // (opzionale) fd.append('category', selectedCatId);
+    
       try {
-        await fetch('api/api-manager-menu.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newProduct)
-        });
-        products.push(newProduct);
+        const res = await fetch('api/api-manager-menu.php', { method:'POST', body: fd });
+        if (!res.ok){ 
+          const errJson = await res.json().catch(()=>null);
+          console.error('API-error payload:', errJson);
+          throw new Error('Errore creazione prodotto ('+res.status+')');
+        }
+          const json = await res.json();
+        if (!json.success) throw new Error(json.error || 'Errore sconosciuto');
+    
+        products.push(json.product);       // risposta già “shape” corretta
         renderProducts();
         e.target.reset();
         $('#image-preview').classList.add('d-none');
       } catch (err) {
         console.error(err);
+        alert('Creazione fallita: '+err.message);
       }
-    });
+    });    
   }
 
   const imageInput = $('#image');
@@ -140,10 +147,12 @@
     $('#modal-overlay').classList.add('d-none');
   }
 
-  function openEditModal(idcategoria) {
-    const prod = products.find(p => p.idcategoria === idcategoria);
+  function openEditModal(idprodotto) {
+    const prod = products.find(p => p.idprodotto === idprodotto);
     const overlay = $('#modal-overlay');
     const box = $('#modal-box');
+    const ingredients = $$('#ingredient-select input:checked')
+                      .map(i => parseInt(i.value, 10));
     box.innerHTML = '';
 
     // Titolo modale
@@ -171,18 +180,18 @@
     save.addEventListener('click', async () => {
       prod.nome        = nameIn.value.trim();
       prod.prezzo      = parseFloat(priceIn.value);
-
+      prod.descrizione = descIn.value.trim();
+    
       try {
-        await fetch('api/api-manager-menu.php?idcategoria=' + prod.idcategoria, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+        await fetch('api/api-manager-menu.php?idprodotto=' + prod.idprodotto, {
+          method:  'PUT',
+          headers: { 'Content-Type': 'application/json',
+                     'Credentials':'same-origin' },
           body: JSON.stringify(prod)
         });
         renderProducts();
         closeModal();
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) { console.error(err); }
     });
 
     cancel.addEventListener('click', closeModal);
