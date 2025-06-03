@@ -1453,4 +1453,6 @@ class DatabaseHelper
         $stmt->close();
         return $compositions;
     }
+
+    
 }
