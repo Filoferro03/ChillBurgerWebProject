@@ -67,7 +67,7 @@
     const body = createEl('div', 'card-body');
     body.appendChild(createEl('h5', 'card-title mb-1', prod.nome));
     body.appendChild(createEl('p', 'card-text text-muted mb-2', '€ ' + Number(prod.prezzo).toFixed(2)));
-    body.appendChild(createEl('p', 'card-text', prod.descrizione));
+
     card.appendChild(body);
 
     // Azioni (Modifica / Elimina)
@@ -103,7 +103,6 @@
       const newProduct = {
         idcategoria: nextId++,
         nome: fd.get('nome').trim(),
-        description: fd.get('description').trim(),
         prezzo: parseFloat(fd.get('prezzo')),
         image: '#', // gestire upload lato server
         ingredients: [...document.querySelectorAll('#ingredient-select input:checked')].map(i => i.value)
@@ -154,11 +153,6 @@
     const nameIn = createEl('input', 'form-control mb-2');
     nameIn.value = prod.nome;
 
-    // Input Descrizione
-    const descIn = createEl('textarea', 'form-control mb-2');
-    descIn.rows = 3;
-    descIn.value = prod.description;
-
     // Input Prezzo
     const priceIn = createEl('input', 'form-control mb-2');
     priceIn.type  = 'number';
@@ -170,14 +164,12 @@
     const cancel = createEl('button', 'btn btn-secondary', 'Annulla');
 
     box.appendChild(nameIn);
-    box.appendChild(descIn);
     box.appendChild(priceIn);
     box.appendChild(save);
     box.appendChild(cancel);
 
     save.addEventListener('click', async () => {
       prod.nome        = nameIn.value.trim();
-      prod.description = descIn.value.trim();
       prod.prezzo      = parseFloat(priceIn.value);
 
       try {
