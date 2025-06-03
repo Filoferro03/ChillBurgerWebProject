@@ -14,25 +14,6 @@ try {
     $method = $_SERVER['REQUEST_METHOD'];
 
     switch ($method) {
-        case 'GET':
-            try {
-                $dbh = new DatabaseHelper(DB_SERVER, DB_USER, DB_PASS, DB_NAME, DB_PORT);
-                $products = $dbh->getAllProductsWithIngredients();
-
-                echo json_encode([
-                    'success'  => true,
-                    'products' => $products
-                ]);
-            } catch (Throwable $e) {
-                http_response_code(500);
-                error_log($e);
-                echo json_encode([
-                    'success' => false,
-                    'error'   => 'Server error'
-                ]);
-            }
-            break;
-
         case 'POST':
             // La richiesta deve essere multipart/form-data
             if (strpos($_SERVER['CONTENT_TYPE'] ?? '', 'multipart/form-data') === false) {
