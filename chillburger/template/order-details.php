@@ -1,3 +1,5 @@
+<?php
+?>
 <section>
     <div class="container-fluid d-flex justify-content-center">
         <div class="card col-12 col-md-10 col-lg-8 mx-auto mt-4 mb-4">

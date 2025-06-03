@@ -1,3 +1,5 @@
+<?php
+?>
 <section class="hero-section d-flex flex-column justify-content-center align-items-center text-center">
     <div class="hero-overlay"></div>
     <div class="hero-content container">

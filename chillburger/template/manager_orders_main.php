@@ -1,3 +1,5 @@
+<?php
+?>
 <section class="container py-5">
 
     <h1 class="display-4 custom-title text-center mb-3">

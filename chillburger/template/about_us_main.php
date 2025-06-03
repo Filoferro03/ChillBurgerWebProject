@@ -1,5 +1,6 @@
 <!-- template/about_us_main.php -->
-
+<?php
+?>
 <section class="container py-5">
 
     <!-- Titolo principale  -->
