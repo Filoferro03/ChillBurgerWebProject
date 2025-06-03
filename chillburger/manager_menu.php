@@ -9,6 +9,7 @@ $templateParams = [
         "css/manager_menu_style.css"
     ],
     //  ⬇️  JS locali a fine pagina (come già fai)
+    "head_js" => ["https://cdn.tailwindcss.com"],
     "js" => ["js/manager_menu.js"]
 ];
 
