@@ -1,5 +1,3 @@
-<?php
-?>
 <section>
     <div class="container-fluid d-flex justify-content-center flex-column">
         <h1 class="display-4 custom-title text-center mb-3 mt-2">

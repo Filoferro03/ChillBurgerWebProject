@@ -1,5 +1,3 @@
-<?php
-?>
 <section class="container">
     <div class="container d-flex flex-column flex-md-row">
         <div class="container d-flex flex-column align-items-center ">

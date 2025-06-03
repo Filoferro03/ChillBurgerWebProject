@@ -1,5 +1,3 @@
-<?php
-?>
 <section class="container-md m-auto py-4 text-center">
     <h1 class="display-4 custom-title text-center mb-3">
         <span class="txt">Recensioni</span>

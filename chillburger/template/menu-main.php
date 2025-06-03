@@ -1,5 +1,4 @@
-<?php
-?>
+<!-- template/menu_main.php -->
 <section class="container py-5">
 
     <!-- Titolo principale -->
