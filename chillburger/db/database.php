@@ -1445,19 +1445,24 @@ class DatabaseHelper
         WHERE p.idcategoria = 1
         ORDER BY p.idprodotto, c.idingrediente";
 
-            $stmt = $this->db->prepare($query);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $compositions = $result->fetch_all(MYSQLI_ASSOC);
-            $result->free();
-            $stmt->close();
-            return $compositions;
-        }
+        $stmt = $this->db->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $compositions = $result->fetch_all(MYSQLI_ASSOC);
+        $result->free();
+        $stmt->close();
+        return $compositions;
+    }
 
-            
-        // DatabaseHelper.php
+    // TODO       
+    /* ===========================================================
+    * Codice da riguardare inizia qui. 
+    * ============================================================
+    */
+    // DatabaseHelper.php
     public function getAllProductsWithIngredients() {
-        // TODO c.descrizione va eliminato a favore di c.categoria
+
+        // TODO bisogna gestire la discrepanza tra idcategoria e descrizione
         $sql = "
             SELECT 
                 p.idprodotto, p.nome, p.descrizione, p.prezzo, p.image,
@@ -1496,6 +1501,7 @@ class DatabaseHelper
                 ];
             }
         }
+
         return array_values($products);
     }
     
@@ -1509,6 +1515,7 @@ class DatabaseHelper
         $stmt->execute();                         // se fallisce lancia eccezione
         $id = $this->db->insert_id;
         $stmt->close();
+
         return $id;
     }
     
@@ -1520,7 +1527,7 @@ class DatabaseHelper
         $stmt = $this->db->prepare($sql);
         $essenziale = $essenziale ? 1 : 0;
         $stmt->bind_param('iiii', $idprodotto, $idingrediente, $quantita, $essenziale);
+
         return $stmt->execute();
     }
-
 }

@@ -1,3 +1,10 @@
+// TODO
+/*
+* Bisogna gestire la discrepanza tra idcategoria e descrizione.
+* quale va inserita dall'utente? 
+* idcategoria è un numero, descrizione è una stringa.
+*/
+
 (() => {
   // === HELPERS ===
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -13,7 +20,6 @@
 
   // === API ENDPOINTS ===
   const API_MENU = 'api/api-menu.php';
-  const API_MANAGER = 'api/api-manager-menu.php';
 
   // === DATA LOADING ===
   async function loadInitialData() {
