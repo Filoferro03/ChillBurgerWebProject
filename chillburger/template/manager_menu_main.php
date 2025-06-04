@@ -14,7 +14,13 @@
       </h2>
 
       <!-- Gruppo pulsanti filtro (generato via JS) -->
-      <div id="filter-group" class="btn-group mb-4 flex-wrap" role="group"></div>
+      <div id="filter-group" class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+        <button class="btn btn-filter active" data-category="all">Tutto</button>
+        <button class="btn btn-filter" data-category="Panini">Panini</button>
+        <button class="btn btn-filter" data-category="Fritti">Fritti</button>
+        <button class="btn btn-filter" data-category="Bevande">Bevande</button>
+        <button class="btn btn-filter" data-category="Dolci">Dolci</button>
+    </div>
 
       <!-- Griglia prodotti -->
       <div id="product-list" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4"></div>
