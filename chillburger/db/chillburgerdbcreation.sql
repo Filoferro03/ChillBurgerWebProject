@@ -138,7 +138,8 @@ REFERENCES utenti (idutente);
 ALTER TABLE notifiche
 ADD CONSTRAINT fknotifica_prodotto
 FOREIGN KEY (idprodotto)
-REFERENCES prodotti (idprodotto);
+REFERENCES prodotti (idprodotto)
+ON DELETE CASCADE;
 
 ALTER TABLE notifiche
 ADD CONSTRAINT fknotifica_ingrediente
@@ -193,7 +194,8 @@ REFERENCES ingredienti (idingrediente);
 ALTER TABLE composizioni
 ADD CONSTRAINT fkcom_pro
 FOREIGN KEY (idprodotto)
-REFERENCES prodotti (idprodotto);
+REFERENCES prodotti (idprodotto)
+ON DELETE CASCADE;
 
 ALTER TABLE modifiche_stato
 ADD CONSTRAINT fkdi_ord

@@ -1506,16 +1506,28 @@ class DatabaseHelper
     }
     
     /* DatabaseHelper.php */
-    public function insertProduct($nome, $descrizione, $prezzo, $imgPath, $idcategoria = 1) {
+    public function insertProduct($nome, $prezzo, $imageFilenameForDb, $idcategoria) {
         $sql = "INSERT INTO prodotti
-                (nome, descrizione, prezzo, image, idcategoria, disponibilita)
-                VALUES (?,?,?,?,?, 999)";
+                (nome, prezzo, image, idcategoria, disponibilita)
+                VALUES (?, ?, ?, ?, 999)"; // 4 placeholders
         $stmt = $this->db->prepare($sql);
-        $stmt->bind_param('ssdsi', $nome, $descrizione, $prezzo, $imgPath, $idcategoria);
-        $stmt->execute();                         // se fallisce lancia eccezione
+        
+        if ($stmt === false) {
+            error_log("DatabaseHelper::insertProduct - Errore preparazione query: " . $this->db->error);
+            return false; 
+        }
+        
+        // Tipi di parametri: nome (s), prezzo (d), image (s), idcategoria (i)
+        $stmt->bind_param('sdsi', $nome, $prezzo, $imageFilenameForDb, $idcategoria);
+        
+        if (!$stmt->execute()) {
+            error_log("DatabaseHelper::insertProduct - Errore esecuzione query: " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
+        
         $id = $this->db->insert_id;
         $stmt->close();
-
         return $id;
     }
     
@@ -1529,5 +1541,174 @@ class DatabaseHelper
         $stmt->bind_param('iiii', $idprodotto, $idingrediente, $quantita, $essenziale);
 
         return $stmt->execute();
+    }
+
+    /**
+     * Recupera i dati di un prodotto specifico, inclusi gli ID dei suoi ingredienti.
+     * @param int $productId L'ID del prodotto.
+     * @return array|null Un array associativo con i dati del prodotto e un array 'ingredients' con gli ID, o null se non trovato.
+     */
+    public function getProductWithComposition($productId) {
+        $product = null;
+        $productBaseArray = $this->getProduct($productId); // getProduct esistente restituisce un array
+        if (!empty($productBaseArray)) {
+            $product = $productBaseArray[0]; // Prendiamo il primo (e unico atteso) prodotto
+        }
+
+        if (!$product) {
+            error_log("getProductWithComposition: Prodotto non trovato con ID: " . $productId);
+            return null;
+        }
+
+        $ingredientIds = [];
+        $query_comp = "SELECT idingrediente FROM composizioni WHERE idprodotto = ?";
+        $stmt_comp = $this->db->prepare($query_comp);
+        if ($stmt_comp) {
+            $stmt_comp->bind_param('i', $productId);
+            $stmt_comp->execute();
+            $result_comp = $stmt_comp->get_result();
+            while ($row_comp = $result_comp->fetch_assoc()) {
+                $ingredientIds[] = intval($row_comp['idingrediente']); // Assicura che siano interi
+            }
+            $stmt_comp->close();
+        } else {
+            error_log("Errore preparazione statement per composizione in getProductWithComposition: " . $this->db->error);
+        }
+        $product['ingredients'] = $ingredientIds;
+        return $product;
+    }
+
+    /**
+     * Aggiorna i dati di un prodotto esistente.
+     * @param int $idprodotto L'ID del prodotto da aggiornare.
+     * @param string $nome Il nuovo nome del prodotto.
+     * @param float $prezzo Il nuovo prezzo del prodotto.
+     * @param int $idcategoria Il nuovo ID della categoria.
+     * @param string|null $imageFilenameForDb Il nuovo nome del file immagine (o null per non cambiarlo).
+     * @return bool True se l'aggiornamento ha avuto successo, false altrimenti.
+     */
+    public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageFilenameForDb = null) {
+        if ($imageFilenameForDb) {
+            $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ?, image = ? WHERE idprodotto = ?";
+            $stmt = $this->db->prepare($sql);
+            if (!$stmt) {
+                error_log("Errore preparazione statement (con immagine) in updateProduct: " . $this->db->error);
+                return false;
+            }
+            // Tipi: string (nome), double (prezzo), int (idcategoria), string (image), int (idprodotto)
+            $stmt->bind_param('sdisi', $nome, $prezzo, $idcategoria, $imageFilenameForDb, $idprodotto);
+        } else {
+            $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ? WHERE idprodotto = ?";
+            $stmt = $this->db->prepare($sql);
+            if (!$stmt) {
+                error_log("Errore preparazione statement (senza immagine) in updateProduct: " . $this->db->error);
+                return false;
+            }
+            // Tipi: string (nome), double (prezzo), int (idcategoria), int (idprodotto)
+            $stmt->bind_param('sdsi', $nome, $prezzo, $idcategoria, $idprodotto);
+        }
+        $success = $stmt->execute();
+        if (!$success) {
+            error_log("Errore esecuzione statement in updateProduct: " . $stmt->error);
+        }
+        $stmt->close();
+        return $success;
+    }
+
+    /**
+     * Rimuove tutte le associazioni di ingredienti per un dato prodotto.
+     * @param int $idprodotto L'ID del prodotto.
+     * @return bool True se l'operazione ha avuto successo, false altrimenti.
+     */
+    public function deleteProductCompositions($idprodotto) {
+        $sql = "DELETE FROM composizioni WHERE idprodotto = ?";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            error_log("Errore preparazione statement in deleteProductCompositions: " . $this->db->error);
+            return false;
+        }
+        $stmt->bind_param('i', $idprodotto);
+        $success = $stmt->execute();
+        if (!$success) {
+            error_log("Errore esecuzione statement in deleteProductCompositions: " . $stmt->error);
+        }
+        $stmt->close();
+        return $success;
+    }
+
+    /**
+     * Rimuove un prodotto dalla tabella prodotti.
+     * ATTENZIONE: Chiamare questo metodo solo dopo aver gestito le dipendenze
+     * (es. cancellando da composizioni, personalizzazioni, ecc.) se non si usa ON DELETE CASCADE.
+     * @param int $idprodotto L'ID del prodotto da eliminare.
+     * @return bool True se l'eliminazione ha avuto successo, false altrimenti.
+     */
+    public function deleteProduct($idprodotto) {
+        // Se non si usa ON DELETE CASCADE, le cancellazioni delle dipendenze
+        // dovrebbero avvenire nell'API (api-manager-menu.php) prima di chiamare questo.
+        // Esempio di come potrebbe essere fatto qui se si volesse centralizzare:
+        // $this->deleteProductCompositions($idprodotto);
+        // $this->deleteProductPersonalizations($idprodotto); // Richiede implementazione
+        // $this->deleteProductFromCarts($idprodotto);       // Richiede implementazione
+        // $this->deleteProductNotifications($idprodotto);   // Richiede implementazione
+
+        $sql = "DELETE FROM prodotti WHERE idprodotto = ?";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            error_log("Errore preparazione statement in deleteProduct: " . $this->db->error);
+            return false;
+        }
+        $stmt->bind_param('i', $idprodotto);
+        $success = $stmt->execute();
+        if (!$success) {
+            error_log("Errore esecuzione statement in deleteProduct: " . $stmt->error);
+        }
+        $stmt->close();
+        return $success;
+    }
+
+    /**
+     * Recupera l'ID della categoria "Panini".
+     * @return int|null L'ID della categoria o null se non trovata.
+     */
+    public function getPaniniCategoryId() {
+        $query = "SELECT idcategoria FROM categorie WHERE LOWER(descrizione) = 'panini' LIMIT 1";
+        $stmt = $this->db->prepare($query);
+        if ($stmt) {
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($row = $result->fetch_assoc()) {
+                $stmt->close();
+                return intval($row['idcategoria']);
+            }
+            $stmt->close();
+            error_log("Categoria 'panini' non trovata nel database.");
+        } else {
+            error_log("Errore preparazione statement in getPaniniCategoryId: " . $this->db->error);
+        }
+        return null;
+    }
+
+    /**
+     * Recupera il nome del file immagine di un prodotto.
+     * @param int $productId L'ID del prodotto.
+     * @return string|null Il nome del file immagine o null se non trovato/non impostato.
+     */
+    public function getProductImageFilename($productId) {
+        $query = "SELECT image FROM prodotti WHERE idprodotto = ? LIMIT 1";
+        $stmt = $this->db->prepare($query);
+        if ($stmt) {
+            $stmt->bind_param('i', $productId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($row = $result->fetch_assoc()) {
+                $stmt->close();
+                return $row['image'];
+            }
+            $stmt->close();
+        } else {
+            error_log("Errore preparazione statement in getProductImageFilename: " . $this->db->error);
+        }
+        return null;
     }
 }

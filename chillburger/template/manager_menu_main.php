@@ -28,12 +28,14 @@
           <input id="name" name="name" type="text" class="form-control" required>
         </div>
         <div class="mb-3">
-          <label for="description" class="form-label">Descrizione</label>
-          <textarea id="description" name="description" rows="3" class="form-control" required></textarea>
-        </div>
-        <div class="mb-3">
           <label for="price" class="form-label">Prezzo (€)</label>
           <input id="price" name="price" type="number" step="0.01" min="0" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label for="category" class="form-label">Categoria <span class="text-danger">*</span></label>
+          <select id="category" name="category" class="form-select" required>
+            <option value="" disabled selected>Seleziona una categoria...</option>
+            </select>
         </div>
         <div class="mb-3">
           <label for="image" class="form-label">Immagine prodotto</label>
@@ -55,17 +57,8 @@
     </section>
   </main>
 
-  <!-- Modal riusato per modifica / conferme -->
-  <!-- “modal hidden” → d-none. Se preferisci usare il componente Modal nativo di Bootstrap, 
-       dovrai adattare anche lo script JS; qui, per mantenere la struttura JS invariata, 
-       ci limitiamo a sostituire hidden con d-none e le classi di stile. -->
-  <div id="modal-overlay" class="d-none">
-    <!-- “bg-white shadow rounded-lg p-6 w-full max-w-md” → bg-white, shadow, rounded, p-4, 
-         con un max-width in linea o tramite utilità Bootstrap (qui imposto inline style max-width:500px). -->
-    <div id="modal-box" class="bg-white shadow rounded p-4 mx-auto" style="max-width: 500px;"></div>
+  <div id="modal-overlay" class="d-none"> <div id="modal-box" class="bg-white shadow rounded p-4 mx-auto" style="max-width: 500px;">
+        </div>
   </div>
-
-  <!-- Script JS -->
-  <script src="js/manager_menu.js"></script>
 </section>
 
