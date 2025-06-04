@@ -29,7 +29,7 @@ function generateReviewsHTML(reviews) { // Rinominata per chiarezza
                 <div class="d-flex justify-content-between align-items-center mt-2">
                     <small class="text-muted">${formatDateFromTimestamp(review.timestamp_recensione) || 'N/D'} - ${formatTimeFromTimestamp(review.timestamp_recensione)}</small>
                     ${review.idordine ?
-                        `<a href="order-details.php?id=${review.idordine}" class="btn btn-sm order-button" style="background-color: #7f5539; color: white;">Vedi Ordine</a>`
+                        `<a href="public-order-items.php?idordine=${review.idordine}" class="btn btn-sm order-button" style="background-color: #7f5539; color: white;">Vedi Ordine</a>`
                         : ''
                     }
                 </div>
