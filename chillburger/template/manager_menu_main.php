@@ -1,3 +1,4 @@
+<!-- chillburger/manager_menu.php – markup rivisto con gruppo filtri -->
 <section class="container py-5">
   <h2 class="display-4 custom-title text-center mb-3">
     <span class="txt">Gestione Menu</span>
@@ -6,13 +7,16 @@
 
   <main class="container p-4">
 
-    <!-- Elenco prodotti -->
+    <!-- Elenco prodotti + filtri -->
     <section class="mb-5">
       <h2 class="h4 mb-4 position-relative animate-underline">
-        <!-- Per l’“underline animato” puoi mantenere la tua regola CSS custom animate-underline oppure usare ad esempio border-bottom -->
         <span>Prodotti attuali</span>
       </h2>
-      <!-- row-cols-1 sul xs, row-cols-sm-2 su ≥576px, row-cols-lg-3 su ≥992px; g-4 = gap 1.5rem circa -->
+
+      <!-- Gruppo pulsanti filtro (generato via JS) -->
+      <div id="filter-group" class="btn-group mb-4 flex-wrap" role="group"></div>
+
+      <!-- Griglia prodotti -->
       <div id="product-list" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4"></div>
     </section>
 
@@ -28,28 +32,24 @@
           <input id="name" name="name" type="text" class="form-control" required>
         </div>
         <div class="mb-3">
-          <label for="price" class="form-label">Prezzo (€)</label>
+          <label for="price" class="form-label">Prezzo (€/unità)</label>
           <input id="price" name="price" type="number" step="0.01" min="0" class="form-control" required>
         </div>
         <div class="mb-3">
           <label for="category" class="form-label">Categoria <span class="text-danger">*</span></label>
           <select id="category" name="category" class="form-select" required>
             <option value="" disabled selected>Seleziona una categoria...</option>
-            </select>
+          </select>
         </div>
         <div class="mb-3">
           <label for="image" class="form-label">Immagine prodotto</label>
           <input id="image" name="image" type="file" accept="image/*" class="form-control" required>
-          <!-- “hidden” diventa d-none, max-height e w-auto Bootstrap li gestisce internamente con img-fluid e classi di utilità -->
           <img id="image-preview" class="img-fluid mt-2 rounded d-none" alt="Anteprima immagine">
         </div>
         <div class="mb-3">
           <label class="form-label">Ingredienti</label>
-          <!-- flex flex-wrap gap-2 → d-flex flex-wrap gap-2 -->
           <div id="ingredient-select" class="d-flex flex-wrap gap-2"></div>
         </div>
-        <!-- w-full sm:w-auto → in Bootstrap si può usare d-grid per full-width e su sm “ridefinire” se serve,
-             ma qui, se vuoi che il bottone sia sempre full-width, ti basta btn-primary w-100. -->
         <div class="d-grid">
           <button type="submit" class="btn btn-primary">Aggiungi Prodotto</button>
         </div>
@@ -57,8 +57,8 @@
     </section>
   </main>
 
-  <div id="modal-overlay" class="d-none"> <div id="modal-box" class="bg-white shadow rounded p-4 mx-auto" style="max-width: 500px;">
-        </div>
+  <!-- Modal overlay -->
+  <div id="modal-overlay" class="d-none">
+    <div id="modal-box" class="bg-white shadow rounded p-4 mx-auto" style="max-width: 500px;"></div>
   </div>
 </section>
-

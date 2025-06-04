@@ -1,163 +1,161 @@
 // chillburger/js/manager_menu.js
+// chillburger/js/manager_menu.js – versione con filtro categorie
 (() => {
   // === HELPERS ===
-  const $ = (selector, root = document) => root.querySelector(selector);
-  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
-  const createEl = (tag, attributes = {}, innerHTML = '') => {
+  const $  = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const createEl = (tag, attrs = {}, html = "") => {
     const el = document.createElement(tag);
-    for (const key in attributes) {
-      el.setAttribute(key, attributes[key]);
-    }
-    if (innerHTML) el.innerHTML = innerHTML;
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    if (html) el.innerHTML = html;
     return el;
   };
 
   // === STATE ===
   let allAvailableIngredients = [];
-  let allAvailableCategories = [];
-  let productsToList = [];
-  let paniniCategoryId = null;
+  let allAvailableCategories  = [];
+  let productsToList          = [];
+  let paniniCategoryId        = null;
 
   // === API ENDPOINTS ===
-  const API_MENU_PAGE_DATA = 'api/api-menu.php'; // Per prodotti e categorie lista
-  const API_STOCK_DATA = 'api/api-manager-stock.php'; // Per tutti gli ingredienti disponibili
-  const API_MANAGER_PRODUCT_HANDLER = 'api/api-manager-menu.php'; // Per CRUD prodotti
+  const API_MENU_PAGE_DATA         = "api/api-menu.php";          // prodotti + categorie
+  const API_STOCK_DATA             = "api/api-manager-stock.php"; // ingredienti
+  const API_MANAGER_PRODUCT_HANDLER = "api/api-manager-menu.php"; // CRUD prodotti
 
-  // === GENERIC FETCH FUNCTION ===
+  // === GENERIC FETCH ===
   async function fetchData(url, options = {}) {
     try {
       const response = await fetch(url, options);
       if (!response.ok) {
-        let errorMsg = `Errore HTTP: ${response.status} - ${response.statusText}`;
-        try {
-            const errData = await response.json();
-            errorMsg = errData.error || errorMsg;
-        } catch (e) { /* Ignore if response is not JSON */ }
-        throw new Error(errorMsg);
+        let msg = `Errore HTTP ${response.status}`;
+        try { msg = (await response.json()).error || msg; } catch (_) {}
+        throw new Error(msg);
       }
-      // Controlla se il Content-Type è JSON prima di tentare il parsing
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.indexOf("application/json") !== -1) {
-          return await response.json();
-      } else {
-          // Se non è JSON, potrebbe essere testo semplice (es. per messaggi di successo semplici)
-          // o un errore inaspettato. Per ora, restituiamo il testo.
-          // Considera di gestire diversamente se ti aspetti sempre JSON.
-          return await response.text(); 
-      }
-    } catch (error) {
-      console.error(`Errore durante il fetch da ${url}:`, error);
-      throw error; // Rilancia per gestione a livello superiore
+      const ct = response.headers.get("content-type") || "";
+      return ct.includes("application/json") ? response.json() : response.text();
+    } catch (err) {
+      console.error(`fetch ${url}:`, err);
+      throw err;
     }
   }
-
 
   // === DATA LOADING ===
   async function loadInitialData() {
     try {
-      // 1. Carica prodotti e categorie per la visualizzazione della lista
-      const menuPageJson = await fetchData(API_MENU_PAGE_DATA);
+      // 1. prodotti + categorie
+      const menuJson = await fetchData(API_MENU_PAGE_DATA);
+      productsToList        = menuJson.products   || [];
+      allAvailableCategories = menuJson.categories || [];
 
-      productsToList = menuPageJson.products || [];
-      allAvailableCategories = menuPageJson.categories || [];
+      const paniniCat = allAvailableCategories.find(c => c.descrizione.toLowerCase() === "panini");
+      paniniCategoryId = paniniCat ? Number(paniniCat.idcategoria) : null;
 
-      const paniniCat = allAvailableCategories.find(cat => cat.descrizione.toLowerCase() === 'panini');
-      if (paniniCat) {
-        paniniCategoryId = parseInt(paniniCat.idcategoria, 10);
-      } else {
-        console.warn('Attenzione: Categoria "Panini" non trovata. La selezione degli ingredienti potrebbe non funzionare come previsto.');
-      }
+      // 2. ingredienti
+      const fd = new FormData();
+      fd.append("action", "getallproducts");
+      const ingJson = await fetchData(API_STOCK_DATA, { method: "POST", body: fd });
+      if (!ingJson.success) throw new Error(ingJson.error || "Errore ingredienti");
+      allAvailableIngredients = ingJson.data.ingredients.map(i => ({ idingrediente: Number(i.idingrediente), nome: i.nome }));
 
-      // 2. Carica tutti gli ingredienti disponibili
-      const ingredientsFormData = new FormData();
-      ingredientsFormData.append('action', 'getallproducts');
-      const ingredientsJson = await fetchData(API_STOCK_DATA, {
-        method: 'POST',
-        body: ingredientsFormData
-      });
-
-      if (ingredientsJson.success && ingredientsJson.data && ingredientsJson.data.ingredients) {
-        allAvailableIngredients = ingredientsJson.data.ingredients.map(ing => ({
-          idingrediente: parseInt(ing.idingrediente, 10),
-          nome: ing.nome
-        }));
-      } else {
-        throw new Error(ingredientsJson.error || 'Errore caricamento ingredienti da API_STOCK_DATA');
-      }
-
-      // 3. Renderizza
+      // 3. render UI
+      renderFilterButtons();
       renderProducts();
-      renderCategorySelect('#category'); // Per form aggiunta
-      renderIngredientSelect('#ingredient-select'); // Per form aggiunta
+      setupFiltering();
+      renderCategorySelect("#category");
+      renderIngredientSelect("#ingredient-select");
 
-      // 4. Event listener per select categoria (form aggiunta)
-      const categorySelectElement = $('#category');
-      if (categorySelectElement) {
-        categorySelectElement.addEventListener('change', handleCategoryChangeForAddForm);
-      }
-
-      // 5. Stato iniziale ingredienti (form aggiunta)
-      updateIngredientSelectUI(false, false, '#ingredient-select');
+      // 4. init select/ingredient toggle
+      const catSel = $("#category");
+      if (catSel) catSel.addEventListener("change", handleCategoryChangeForAddForm);
+      updateIngredientSelectUI(false, false, "#ingredient-select");
 
     } catch (err) {
-      console.error("Errore in loadInitialData:", err);
-      const productListEl = $('#product-list');
-      if (productListEl) productListEl.innerHTML = `<p class="text-danger">Errore caricamento dati: ${err.message}</p>`;
-      const categoryEl = $('#category');
-      if (categoryEl) categoryEl.innerHTML = '<option value="" disabled>Errore caricamento categorie</option>';
-      updateIngredientSelectUI(false, true, '#ingredient-select');
+      console.error("loadInitialData:", err);
+      const listEl = $("#product-list");
+      if (listEl) listEl.innerHTML = `<p class="text-danger">${err.message}</p>`;
     }
   }
 
-  // === RENDERING FUNCTIONS ===
-  function renderProducts() {
-    const listContainer = $('#product-list');
-    if (!listContainer) return;
-    listContainer.innerHTML = '';
-    if (productsToList.length === 0) {
-      listContainer.innerHTML = '<p class="text-muted">Nessun prodotto da visualizzare.</p>';
-      return;
-    }
-    productsToList.forEach(product => {
-      const col = createEl('div', { class: 'col' });
-      col.appendChild(createProductCard(product));
-      listContainer.appendChild(col);
+  // === RENDER FILTER BUTTONS ===
+  function renderFilterButtons() {
+    const cont = $("#filter-group");
+    if (!cont) return;
+    cont.innerHTML = "";
+
+    // "Tutti"
+    cont.appendChild(createEl("button", { class: "btn btn-outline-primary btn-filter active", "data-category": "all", type: "button" }, "Tutti"));
+
+    allAvailableCategories.forEach(cat => {
+      const slug = cat.descrizione.toLowerCase();
+      cont.appendChild(createEl("button", { class: "btn btn-outline-primary btn-filter", "data-category": slug, type: "button" }, cat.descrizione));
     });
   }
 
-  function createProductCard(product) {
-    const card = createEl('div', { class: 'card h-100 shadow-sm' });
-    const img = createEl('img', { class: 'card-img-top' });
-    
-    // product.image dovrebbe essere già il path corretto, es: "./resources/products/xyz.png"
-    img.src = product.image || './resources/placeholder.png'; // Fallback a placeholder
-    img.alt = product.nome;
-    img.style.height = '180px';
-    img.style.objectFit = 'cover';
-    card.append(img);
+  // === RENDER PRODUCTS ===
+  function renderProducts() {
+    const list = $("#product-list");
+    if (!list) return;
+    list.innerHTML = "";
 
-    const body = createEl('div', { class: 'card-body d-flex flex-column' });
-    body.append(createEl('h5', { class: 'card-title mb-1' }, product.nome));
-    body.append(createEl('p', { class: 'card-text text-muted mb-2' }, `€ ${Number(product.prezzo).toFixed(2)}`));
-
-    const categoryObj = allAvailableCategories.find(c => c.idcategoria == (product.idcategoria || product.categoria));
-    if (categoryObj) {
-      body.append(createEl('p', { class: 'card-text small text-info' }, `Categoria: ${categoryObj.descrizione}`));
+    if (!productsToList.length) {
+      list.innerHTML = "<p class='text-muted'>Nessun prodotto da visualizzare.</p>";
+      return;
     }
 
-    const footer = createEl('div', { class: 'mt-auto' });
-    const actions = createEl('div', { class: 'card-body pt-0 d-flex justify-content-end gap-2' });
-    const editBtn = createEl('button', { class: 'btn btn-sm btn-primary' }, 'Modifica');
-    const delBtn = createEl('button', { class: 'btn btn-sm btn-danger' }, 'Elimina');
+    productsToList.forEach(prod => {
+      const col  = createEl("div", { class: "col menu-item" });
+      const card = createProductCard(prod);
+      const cat  = allAvailableCategories.find(c => c.idcategoria == (prod.idcategoria || prod.categoria));
+      col.dataset.category = (cat ? cat.descrizione : "unk").toLowerCase();
+      col.appendChild(card);
+      list.appendChild(col);
+    });
+  }
 
-    editBtn.addEventListener('click', () => openEditModal(product.idprodotto));
-    delBtn.addEventListener('click', () => openDeleteModal(product.idprodotto));
+  // === PRODUCT CARD ===
+  function createProductCard(product) {
+    const card = createEl("div", { class: "card h-100 shadow-sm" });
 
-    actions.append(editBtn, delBtn);
-    footer.append(actions);
-    body.append(footer);
-    card.append(body);
+    const img = createEl("img", { class: "card-img-top", src: product.image || "./resources/placeholder.png", alt: product.nome });
+    img.style.height = "180px";
+    img.style.objectFit = "cover";
+    card.appendChild(img);
+
+    const body = createEl("div", { class: "card-body d-flex flex-column" });
+    body.appendChild(createEl("h5", { class: "card-title mb-1" }, product.nome));
+    body.appendChild(createEl("p", { class: "card-text text-muted mb-2" }, `€ ${Number(product.prezzo).toFixed(2)}`));
+
+    const catObj = allAvailableCategories.find(c => c.idcategoria == (product.idcategoria || product.categoria));
+    if (catObj) body.appendChild(createEl("p", { class: "card-text small text-info" }, `Categoria: ${catObj.descrizione}`));
+
+    const actions = createEl("div", { class: "mt-auto card-body pt-0 d-flex justify-content-end gap-2" });
+    const btnEdit = createEl("button", { class: "btn btn-sm btn-primary" }, "Modifica");
+    const btnDel  = createEl("button", { class: "btn btn-sm btn-danger"  }, "Elimina");
+    btnEdit.addEventListener("click", () => openEditModal(product.idprodotto));
+    btnDel .addEventListener("click", () => openDeleteModal(product.idprodotto));
+    actions.append(btnEdit, btnDel);
+    body.appendChild(actions);
+
+    card.appendChild(body);
     return card;
+  }
+
+  // === FILTER HANDLER ===
+  function setupFiltering() {
+    const buttons = $$(".btn-filter");
+    const items   = $$(".menu-item");
+    if (!buttons.length) return; // niente pulsanti → skip
+
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        buttons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const cat = btn.dataset.category;
+        items.forEach(it => {
+          it.style.display = (cat === "all" || it.dataset.category === cat) ? "" : "none";
+        });
+      });
+    });
   }
 
   function renderCategorySelect(selectElementSelector, selectedValue = null) {
@@ -535,6 +533,7 @@
     cancelBtn.addEventListener('click', closeModal);
     modalOverlay.classList.remove('d-none');
   }
+  
 
   // Esegui al caricamento del DOM
   window.addEventListener('DOMContentLoaded', () => {
