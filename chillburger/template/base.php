@@ -46,7 +46,7 @@
                         </a>
 
                     <?php elseif (isUserLoggedIn() && isUserAdmin()): ?>
-                        <a href="notifications.php" class="text-decoration-none mx-1" aria-label="Notifiche">
+                        <a href="manager_notifications.php" class="text-decoration-none mx-1" aria-label="Notifiche">
                             <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
                             <span class="visually-hidden">Notifiche</span>
                         </a>
@@ -121,7 +121,7 @@
                         </a>
 
                     <?php elseif (isUserLoggedIn() && isUserAdmin()): ?>
-                        <a href="notifications.php" class="text-decoration-none mx-4" aria-label="Notifiche">
+                        <a href="manager_notifications.php" class="text-decoration-none mx-4" aria-label="Notifiche">
                             <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
                             <span class="visually-hidden">Notifiche</span>
                         </a>
@@ -194,4 +194,5 @@
         integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
         crossorigin="anonymous"></script>
 </body>
+
 </html>
