@@ -189,7 +189,7 @@
       const catId = product.idcategoria || product.categoria;      // compatibilità vecchi nomi
       if (paniniCategoryId !== null && Number(catId) === paniniCategoryId) {
         // ➜ redirect a pagina dedicata
-        window.location.href = `edit-burger.php?id=${product.idprodotto}`;
+        window.location.href = `manager_edit_burger.php?id=${product.idprodotto}`;
       } else {
         // ➜ continua con la modale
         openEditModal(product.idprodotto);
@@ -449,7 +449,7 @@
     // Se è un panino, rimanda alla pagina e interrompi
     const paninoCheck = productsToList.find(p => p.idprodotto == productId);
     if (paninoCheck && Number(paninoCheck.idcategoria || paninoCheck.categoria) === paniniCategoryId) {
-      window.location.href = `edit-burger.php?id=${productId}`;
+      window.location.href = `manager_edit_burger.php?id=${productId}`;
       return;
     }
 
