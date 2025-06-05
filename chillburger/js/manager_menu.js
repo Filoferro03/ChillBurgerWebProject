@@ -381,13 +381,17 @@
     priceFormGroup.append(priceInput);
     form.append(priceFormGroup);
 
-    // Campo Categoria (Select)
-    const categoryFormGroup = createEl('div', { class: 'mb-3' });
-    categoryFormGroup.append(createEl('label', { class: 'form-label', for: 'edit-category-select' }, 'Categoria'));
-    const categorySelect = createEl('select', { class: 'form-select', id: 'edit-category-select', name: 'category' });
-    categoryFormGroup.append(categorySelect);
-    form.append(categoryFormGroup);
-    renderCategorySelect('#edit-category-select', productDetails.idcategoria); // Popola e seleziona
+    // --- Campo CATEGORIA nascosto ------------------------------------
+    // Manteniamo la categoria originale in un <input type="hidden">
+    // in modo che il resto del codice (validazioni, FormData, ecc.)
+    // possa continuare a leggere updatedCategoryId senza errori.
+    const categoryHidden = createEl('input', {
+      type : 'hidden',
+      id   : 'edit-category-id',
+      name : 'category',
+      value: productDetails.idcategoria
+    });
+    form.append(categoryHidden);
 
     // Campo Ingredienti (Checkboxes)
     const ingredientsOuterContainer = createEl('div', { class: 'mb-3', id: 'edit-ingredients-container' });
@@ -412,7 +416,8 @@
         });
     }
 
-
+    /*
+    // QUAAAAAAAAAAAA
     categorySelect.addEventListener('change', () => {
       const selectedCatId = parseInt(categorySelect.value, 10);
       const isPanini = paniniCategoryId && selectedCatId === paniniCategoryId;
@@ -426,7 +431,7 @@
             }
         });
       }
-    });
+    }); */
     
     // TODO: Aggiungere input per file immagine se si vuole permettere la modifica dell'immagine.
     // Se si aggiunge, il submit dovrà usare FormData.
@@ -442,7 +447,7 @@
     saveBtn.addEventListener('click', async () => {
       const updatedName = nameInput.value.trim();
       const updatedPrice = parseFloat(priceInput.value);
-      const updatedCategoryId = parseInt(categorySelect.value, 10);
+      const updatedCategoryId = parseInt(categoryHidden.value, 10);  // ← usa l’input hidden
       let updatedIngredientsArray = [];
 
       if (paniniCategoryId && updatedCategoryId === paniniCategoryId) {
@@ -461,7 +466,7 @@
       updateFormData.append('idprodotto', productId);
       updateFormData.append('name', updatedName);
       updateFormData.append('price', updatedPrice);
-      updateFormData.append('category', updatedCategoryId);
+      updateFormData.append('category',   updatedCategoryId);
       updateFormData.append('ingredients', JSON.stringify(updatedIngredientsArray));
       // Se ci fosse un input file per l'immagine:
       // const imageFile = $('#edit-image-input').files[0];
