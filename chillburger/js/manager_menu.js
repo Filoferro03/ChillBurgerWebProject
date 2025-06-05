@@ -682,7 +682,7 @@
   }
 
   // === FLASH MESSAGE HELPER ============================================
-  function showFlash(html, variant = "success", ms = 2500){
+  function showFlash(html, variant = "success", ms = 1500){
     const overlay = document.createElement("div");
     overlay.className = "flash-overlay";
     overlay.innerHTML = `
