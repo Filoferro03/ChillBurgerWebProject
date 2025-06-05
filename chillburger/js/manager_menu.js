@@ -131,7 +131,17 @@
     const actions = createEl("div", { class: "mt-auto card-body pt-0 d-flex justify-content-end gap-2" });
     const btnEdit = createEl("button", { class: "btn btn-sm btn-primary" }, "Modifica");
     const btnDel  = createEl("button", { class: "btn btn-sm btn-danger"  }, "Elimina");
-    btnEdit.addEventListener("click", () => openEditModal(product.idprodotto));
+    
+    // Consenti la modifica solo ai prodotti con categoria id == 1
+    const canEdit = Number(product.idcategoria || product.categoria) === 1;
+    if (canEdit) {
+      btnEdit.addEventListener("click", () => openEditModal(product.idprodotto));
+    } else {
+      btnEdit.disabled = true;
+      btnEdit.classList.add("disabled");
+      btnEdit.title = "Modifica non consentita per questa categoria";
+    }
+
     btnDel .addEventListener("click", () => openDeleteModal(product.idprodotto));
     actions.append(btnEdit, btnDel);
     body.appendChild(actions);
@@ -355,6 +365,12 @@
     } catch (err) {
         alert(`Errore nel caricamento dei dati del prodotto: ${err.message}`);
         return;
+    }
+
+    // Se la categoria non è 1, blocca l’editing (ulteriore safety net)
+   if (Number(productDetails.idcategoria) !== 1) {
+      alert("La modifica è consentita solo ai prodotti della categoria 1.");
+      return;
     }
 
     const modalOverlay = $('#modal-overlay');
