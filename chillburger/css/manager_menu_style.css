@@ -104,4 +104,12 @@
   display: flex !important;
 }
 
+.flash-overlay{
+  position:fixed; inset:0; z-index:1080;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.45);
+}
+/* card più grande  & testo più visibile */
+.flash-card{ min-width:400px; max-width:620px; }   /* ← prima 280–420 */
+.flash-card .flash-body{ font-size:1.35rem; }       /* ~fs-4 Bootstrap */
 /* Fine del file CSS personalizzato */

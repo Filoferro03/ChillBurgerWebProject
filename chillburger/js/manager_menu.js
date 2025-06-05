@@ -413,10 +413,10 @@
           imagePreview.src = "";
         }
         updateIngredientSelectUI(false, false, "#ingredient-select");
-        alert("Prodotto aggiunto con successo!");
+        showFlash("Prodotto aggiunto con successo!","success");
       } catch (err) {
         console.error("Errore invio form aggiunta:", err);
-        alert(`Creazione fallita: ${err.message}`);
+        showFlash("Creazione fallita: ${err.message}","danger");
       }
     });
   }
@@ -465,7 +465,7 @@
       }
       productDetails = response.data;
     } catch (err) {
-      alert(`Errore nel caricamento dei dati del prodotto: ${err.message}`);
+      showFlash("Errore caricamento: ${err.message}","danger");
       return;
     }
 
@@ -589,7 +589,7 @@
       }
 
       if (!updatedName || updatedPrice < 0 || isNaN(updatedPrice) || !updatedCategoryId) {
-        alert("Nome, prezzo valido e categoria sono obbligatori.");
+        showFlash("Nome, prezzo valido e categoria sono obbligatori.","warning");
         return;
       }
 
@@ -615,12 +615,12 @@
         if (!jsonResponse.success) {
           throw new Error(jsonResponse.error || `Errore aggiornamento prodotto`);
         }
-        alert("Prodotto aggiornato con successo!");
+        showFlash("Prodotto aggiornato con successo!","success");
         closeModal();
         await loadInitialData();
       } catch (err) {
         console.error("Errore salvataggio modifiche:", err);
-        alert(`Salvataggio fallito: ${err.message}`);
+        showFlash("Salvataggio fallito: ${err.message}","danger");
       }
     });
 
@@ -631,7 +631,7 @@
   async function openDeleteModal(productId) {
     const product = productsToList.find((p) => p.idprodotto == productId);
     if (!product) {
-      alert("Errore: prodotto non trovato per eliminazione.");
+      showFlash("Prodotto non trovato","warning");
       return;
     }
 
@@ -668,18 +668,41 @@
         if (!jsonResponse.success) {
           throw new Error(jsonResponse.error || `Errore eliminazione`);
         }
-        alert("Prodotto eliminato con successo!");
+        showFlash("Prodotto eliminato con successo!","success");
         closeModal();
         await loadInitialData();
       } catch (err) {
         console.error("Errore eliminazione:", err);
-        alert(`Eliminazione fallita: ${err.message}`);
+        showFlash("Eliminazione fallita: ${err.message}","danger");
       }
     });
 
     cancelBtn.addEventListener("click", closeModal);
     modalOverlay.classList.remove("d-none");
   }
+
+  // === FLASH MESSAGE HELPER ============================================
+  function showFlash(html, variant = "success", ms = 1500){
+    const overlay = document.createElement("div");
+    overlay.className = "flash-overlay";
+    overlay.innerHTML = `
+      <div class="card shadow flash-card text-center">
+        <div class="flash-body py-4 px-5 fw-bold ${
+            variant === "success" ? "text-success"
+          : variant === "danger"  ? "text-danger"
+          : variant === "warning" ? "text-warning"
+          : "text-info"}">
+          ${html}
+        </div>
+        <button class="btn-close position-absolute top-0 end-0 m-3"></button>
+      </div>`;
+    document.body.append(overlay);
+
+    const close = ()=>overlay.remove();
+    overlay.querySelector(".btn-close").addEventListener("click", close);
+    setTimeout(close, ms);
+  }
+
 
   // Esegui al caricamento del DOM
   window.addEventListener("DOMContentLoaded", () => {
