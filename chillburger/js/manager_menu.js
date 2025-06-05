@@ -116,37 +116,83 @@
   function createProductCard(product) {
     const card = createEl("div", { class: "card h-100 shadow-sm" });
 
-    const img = createEl("img", { class: "card-img-top", src: product.image || "./resources/placeholder.png", alt: product.nome });
+    // Immagine
+    const img = createEl("img", {
+      class: "card-img-top",
+      src: product.image || "./resources/placeholder.png",
+      alt: product.nome
+    });
     img.style.height = "180px";
     img.style.objectFit = "cover";
     card.appendChild(img);
 
+    // Corpo della card
     const body = createEl("div", { class: "card-body d-flex flex-column" });
-    body.appendChild(createEl("h5", { class: "card-title mb-1" }, product.nome));
-    body.appendChild(createEl("p", { class: "card-text text-muted mb-2" }, `€ ${Number(product.prezzo).toFixed(2)}`));
+    body.appendChild(
+      createEl("h5", { class: "card-title mb-1" }, product.nome)
+    );
+    body.appendChild(
+      createEl(
+        "p",
+        { class: "card-text text-muted mb-2" },
+        `€ ${Number(product.prezzo).toFixed(2)}`
+      )
+    );
 
-    const catObj = allAvailableCategories.find(c => c.idcategoria == (product.idcategoria || product.categoria));
-    if (catObj) body.appendChild(createEl("p", { class: "card-text small text-info" }, `Categoria: ${catObj.descrizione}`));
+    // Testo della categoria, se esiste
+    const catObj = allAvailableCategories.find(
+      (c) => c.idcategoria == (product.idcategoria || product.categoria)
+    );
+    if (catObj) {
+      body.appendChild(
+        createEl(
+          "p",
+          { class: "card-text small text-info" },
+          `Categoria: ${catObj.descrizione}`
+        )
+      );
+    }
 
-    const actions = createEl("div", { class: "mt-auto card-body pt-0 d-flex justify-content-end gap-2" });
-   
-    // Pulsante ELIMINA (presente sempre)
-   const btnDel = createEl("button", { class: "btn btn-sm btn-danger" }, "Elimina");
-    btnDel.addEventListener("click", () => openDeleteModal(product.idprodotto));
+    // Container per i pulsanti di azione
+    const actions = createEl("div", {
+      class: "mt-auto card-body pt-0 d-flex justify-content-end gap-2"
+    });
 
-    // Pulsante MODIFICA: crealo e aggiungilo solo se la categoria è id == 1
-    if (Number(product.idcategoria || product.categoria) === 1) {
-      const btnEdit = createEl("button", { class: "btn btn-sm btn-primary" }, "Modifica");
-      btnEdit.addEventListener("click", () => openEditModal(product.idprodotto));
+    // Determina l'id della categoria corrente
+    const categoryId = Number(product.idcategoria || product.categoria);
+
+    // Pulsante MODIFICA: viene aggiunto solo se categoria == 1
+    if (categoryId === 1) {
+      const btnEdit = createEl(
+        "button",
+        { class: "btn btn-sm btn-primary" },
+        "Modifica"
+      );
+      btnEdit.addEventListener("click", () =>
+        openEditModal(product.idprodotto)
+      );
       actions.append(btnEdit);
     }
-    
-    actions.append(btnDel);
-    body.appendChild(actions);
 
+    // Pulsante ELIMINA: dimensione diversa se categoria != 1
+    let btnDel;
+    if (categoryId !== 1) {
+      // Bottone più grande (senza "btn-sm")
+      btnDel = createEl("button", { class: "btn btn-danger" }, "Elimina");
+    } else {
+      // Bottone piccolo (con "btn-sm")
+      btnDel = createEl("button", { class: "btn btn-sm btn-danger" }, "Elimina");
+    }
+    btnDel.addEventListener("click", () =>
+      openDeleteModal(product.idprodotto)
+    );
+    actions.append(btnDel);
+
+    body.appendChild(actions);
     card.appendChild(body);
     return card;
   }
+
 
   // === FILTER HANDLER ===
   function setupFiltering() {
