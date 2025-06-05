@@ -196,7 +196,8 @@ INSERT INTO chillburgerdb.stati_ordine (descrizione) VALUES
 ('In preparazione'),
 ('In consegna'),
 ('Consegnato'),
-('Confermato');
+('Confermato'), 
+('Annullato');
 
 -- Insert Utenti
 INSERT INTO chillburgerdb.utenti (nome, cognome, username, password, tipo) VALUES

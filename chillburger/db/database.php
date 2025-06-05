@@ -1,4 +1,8 @@
 <?php
+if (!class_exists('StockUnavailableException')) {
+    class StockUnavailableException extends Exception {}
+}
+
 class DatabaseHelper
 {
     private $db;
@@ -1244,7 +1248,7 @@ class DatabaseHelper
                                GROUP BY idordine
                            ) ms_max ON ms.idordine = ms_max.idordine AND ms.timestamp_modifica = ms_max.max_timestamp
                        ) ON o.idordine = ms.idordine
-                       WHERE ms.idstato != 5 AND o.completato = 1";
+                       WHERE ms.idstato < 5 AND o.completato = 1";
         $countStmt = $this->db->prepare($countQuery);
         $countStmt->execute();
         $countResult = $countStmt->get_result();
@@ -1271,7 +1275,7 @@ class DatabaseHelper
                       ) ms_max ON ms.idordine = ms_max.idordine AND ms.timestamp_modifica = ms_max.max_timestamp
                   ) ON o.idordine = ms.idordine
                   LEFT JOIN stati_ordine so ON ms.idstato = so.idstato
-                  WHERE ms.idstato != 5 AND o.completato = 1
+                  WHERE ms.idstato < 5 AND o.completato = 1
                   ORDER BY o.data_ordine DESC, o.orario DESC
                   LIMIT ? OFFSET ?";
 
@@ -1315,7 +1319,7 @@ class DatabaseHelper
                                GROUP BY idordine
                            ) ms_max ON ms.idordine = ms_max.idordine AND ms.timestamp_modifica = ms_max.max_timestamp
                        ) ON o.idordine = ms.idordine
-                       WHERE ms.idstato = 5";
+                       WHERE ms.idstato >= 5";
         $countStmt = $this->db->prepare($countQuery);
         $countStmt->execute();
         $countResult = $countStmt->get_result();
@@ -1342,7 +1346,7 @@ class DatabaseHelper
                       ) ms_max ON ms.idordine = ms_max.idordine AND ms.timestamp_modifica = ms_max.max_timestamp
                   ) ON o.idordine = ms.idordine
                   LEFT JOIN stati_ordine so ON ms.idstato = so.idstato
-                  WHERE ms.idstato = 5
+                  WHERE ms.idstato >= 5
                   ORDER BY o.data_ordine DESC, o.orario DESC
                   LIMIT ? OFFSET ?";
 
@@ -1710,5 +1714,134 @@ class DatabaseHelper
             error_log("Errore preparazione statement in getProductImageFilename: " . $this->db->error);
         }
         return null;
+    }
+
+    public function advanceOrderStatus($orderId) {
+        $currentStatusQuery = "SELECT MAX(idstato) AS current_max_idstato FROM modifiche_stato WHERE idordine = ? AND idstato != " . ID_STATO_ANNULLATO_PER_STOCK; // Assicurati che ID_STATO_ANNULLATO_PER_STOCK sia definito
+        $stmtStatus = $this->db->prepare($currentStatusQuery);
+        if (!$stmtStatus) {
+            error_log("Errore preparazione currentStatusQuery in advanceOrderStatus: " . $this->db->error);
+            return false;
+        }
+        $stmtStatus->bind_param('i', $orderId);
+        $stmtStatus->execute();
+        $resultStatus = $stmtStatus->get_result();
+        $rowStatus = $resultStatus->fetch_assoc();
+        $stmtStatus->close();
+        
+        $current_max_idstato = ($rowStatus && $rowStatus['current_max_idstato'] !== null) ? (int)$rowStatus['current_max_idstato'] : 0;
+        
+        // Se lo stato corrente è 0 (nessuno stato precedente valido escluso annullato), il prossimo è 1 (In Attesa).
+        // Altrimenti, è lo stato massimo corrente + 1.
+        $nextStatusId = ($current_max_idstato == 0 && !$this->hasAnyStatusOtherThanCancelled($orderId, ID_STATO_ANNULLATO_PER_STOCK)) ? 1 : $current_max_idstato + 1;
+
+
+        $checkStateExistsQuery = "SELECT 1 FROM stati_ordine WHERE idstato = ?";
+        $stmtCheck = $this->db->prepare($checkStateExistsQuery);
+         if (!$stmtCheck) {
+            error_log("Errore preparazione checkStateExistsQuery in advanceOrderStatus: " . $this->db->error);
+            return false;
+        }
+        $stmtCheck->bind_param('i', $nextStatusId);
+        $stmtCheck->execute();
+        $stmtCheck->store_result();
+        $stateExists = $stmtCheck->num_rows > 0;
+        $stmtCheck->close();
+
+        if (!$stateExists) {
+             // Non c'è un prossimo stato valido definito nella tabella stati_ordine
+             // (es. si è provato ad andare oltre "Confermato")
+            return false; // Indica che non c'è stato un avanzamento o che lo stato non è valido.
+        }
+
+        $insertQuery = "INSERT INTO modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (?, ?, NOW())";
+        $stmt = $this->db->prepare($insertQuery);
+
+        if (!$stmt) {
+            error_log("Errore preparazione statement (insertQuery) in advanceOrderStatus per ordine ID $orderId: " . $this->db->error);
+            return false;
+        }
+
+        $stmt->bind_param('ii', $orderId, $nextStatusId);
+
+        try {
+            $success = $stmt->execute();
+            $affectedRows = $stmt->affected_rows;
+            $stmt->close();
+            return $success && $affectedRows > 0;
+        } catch (mysqli_sql_exception $e) {
+            $stmt->close();
+            // Controlla specificamente l'SQLSTATE che il trigger dovrebbe usare per SIGNAL
+            if ($e->getSqlState() === MYSQL_SIGNAL_USER_EXCEPTION_SQLSTATE) { // MYSQL_SIGNAL_USER_EXCEPTION_SQLSTATE deve essere '45000'
+                throw new StockUnavailableException("Stock insufficiente rilevato dal database: " . $e->getMessage(), $e->getCode(), $e);
+            }
+            error_log("SQL Exception in advanceOrderStatus for order ID $orderId: " . $e->getMessage() . " (Code: " . $e->getCode() . ", SQLSTATE: " . $e->getSqlState() . ")");
+            throw $e; // Rilancia altre eccezioni SQL
+        }
+    }
+
+    // Funzione helper per advanceOrderStatus per determinare se l'ordine ha solo stati "annullato" o nessuno stato
+    private function hasAnyStatusOtherThanCancelled($orderId, $idStatoAnnullato) {
+        $query = "SELECT 1 FROM modifiche_stato WHERE idordine = ? AND idstato != ? LIMIT 1";
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) return true; // Assume there might be other states if query fails, to be safe
+        $stmt->bind_param('ii', $orderId, $idStatoAnnullato);
+        $stmt->execute();
+        $stmt->store_result();
+        $hasOtherStatus = $stmt->num_rows > 0;
+        $stmt->close();
+        return $hasOtherStatus;
+    }
+
+
+    public function setOrderStatus($orderId, $statusId) {
+        $query = "INSERT INTO modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (?, ?, NOW())";
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            error_log("Errore preparazione statement setOrderStatus: " . $this->db->error);
+            return false;
+        }
+        $stmt->bind_param('ii', $orderId, $statusId);
+        $success = $stmt->execute();
+        if (!$success) {
+            error_log("Errore esecuzione statement setOrderStatus: " . $stmt->error);
+        }
+        $stmt->close();
+        return $success;
+    }
+
+    public function getOrderCurrentStatusInfo($idordine) {
+        $query = "SELECT ms.idstato, so.descrizione
+                  FROM modifiche_stato ms
+                  JOIN stati_ordine so ON ms.idstato = so.idstato
+                  WHERE ms.idordine = ?
+                  ORDER BY ms.timestamp_modifica DESC
+                  LIMIT 1";
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
+            error_log("Errore preparazione statement getOrderCurrentStatusInfo: " . $this->db->error);
+            return null;
+        }
+        $stmt->bind_param('i', $idordine);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $statusInfo = $result->fetch_assoc();
+        $stmt->close();
+        return $statusInfo;
+    }
+    
+    public function getStatusInfoById($statusId) {
+         $query = "SELECT idstato, descrizione FROM stati_ordine WHERE idstato = ?";
+         $stmt = $this->db->prepare($query);
+         if (!$stmt) {
+            error_log("Errore preparazione statement getStatusInfoById: " . $this->db->error);
+            return null;
+         }
+         $stmt->bind_param('i', $statusId);
+         $stmt->execute();
+         $result = $stmt->get_result();
+         $statusData = $result->fetch_assoc();
+         $stmt->close();
+         return $statusData;
     }
 }

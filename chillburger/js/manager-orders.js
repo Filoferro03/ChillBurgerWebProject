@@ -3,7 +3,10 @@
  * Gestisce le chiamate API per recuperare e visualizzare gli ordini
  */
 
-// Standardized fetchData function
+// Definisci l'ID dello stato "Annullato per Stock" come costante JS
+// DEVE corrispondere all'ID nel database e in PHP (es. 6)
+const ID_STATO_ANNULLATO_PER_STOCK_JS = 6; // Assicurati che sia l'ID corretto
+
 async function fetchData(url, formData) {
     try {
         const response = await fetch(url, {
@@ -11,162 +14,154 @@ async function fetchData(url, formData) {
             body: formData
         });
         if (!response.ok) {
-            // Throw an error with the status for better debugging
+            const errorText = await response.text(); // Leggi il corpo dell'errore se presente
+            console.error("Fetch error response text:", errorText);
             throw new Error(`Errore HTTP: ${response.status} - ${response.statusText}`);
         }
         const data = await response.json();
-        if (data.success === false) { // Check for a 'success: false' in the JSON response
-            throw new Error(data.error || "Errore sconosciuto dal server.");
-        }
-        return data.data; // Return the 'data' payload from the API response
+        return data; 
     } catch (error) {
         console.error("Errore durante la fetch:", error.message);
-        // Re-throw or handle as needed, typically a UI update indicating failure
-        throw error; // Re-throw to allow calling functions to catch and handle
+        // Rilancia l'errore così può essere gestito dal chiamante
+        throw error; 
     }
 }
 
-let currentOrderIdToUpdate = null; // Variabile globale per tenere traccia dell'ID dell'ordine da aggiornare
-let currentOrderStatusId = null; // Variabile globale per tenere traccia del nuovo stato ID
+
+let currentOrderIdToUpdate = null; 
+// currentOrderStatusId non è più necessario che sia globale in JS,
+// perché la logica di avanzamento è gestita principalmente dal backend.
+
+async function updateOrderStatusAPI(orderId) {
+    const url = 'api/api-orders.php';
+    const formData = new FormData();
+    formData.append('action', 'update');
+    formData.append('idordine', orderId);
+    // La chiamata a fetchData ora restituisce la promise con la risposta JSON completa
+    return fetchData(url, formData); 
+}
+
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Carica gli ordini attivi e lo storico all'avvio della pagina
     loadActiveOrders(1);
     loadOrderHistory(1);
 
-    // Listener per il bottone di conferma nel modale
     const confirmUpdateBtn = document.getElementById('confirmUpdateStatusBtn');
     if (confirmUpdateBtn) {
         confirmUpdateBtn.addEventListener('click', async () => {
-            if (currentOrderIdToUpdate && currentOrderStatusId) {
-                // Chiudi il modale
-                const modal = bootstrap.Modal.getInstance(document.getElementById('confirmStatusModal'));
-                if (modal) modal.hide();
+            if (currentOrderIdToUpdate) {
+                const modalElement = document.getElementById('confirmStatusModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
 
-                // Chiamata all'API per aggiornare lo stato
-                await updateOrderStatus(currentOrderIdToUpdate, currentOrderStatusId);
+                try {
+                    const apiResponse = await updateOrderStatusAPI(currentOrderIdToUpdate);
 
-                // Reset delle variabili globali
+                    if (apiResponse && apiResponse.success) {
+                        // Se l'aggiornamento ha avuto successo, o se l'ordine è stato annullato con successo
+                        if (apiResponse.new_status_id === ID_STATO_ANNULLATO_PER_STOCK_JS) {
+                            alert(`L'ordine #${currentOrderIdToUpdate} è stato annullato automaticamente a causa di stock insufficiente.`);
+                        } else if (apiResponse.message) {
+                            // Potresti voler mostrare un toast/notifica più discreta invece di un alert per i successi standard
+                            // alert(apiResponse.message); 
+                        }
+                        // Ricarica entrambe le liste per riflettere i cambiamenti
+                        loadActiveOrders(1);
+                        loadOrderHistory(1); 
+                    } else {
+                        // L'API ha restituito success: false
+                        alert('Errore durante l\'aggiornamento: ' + (apiResponse ? apiResponse.error : 'Risposta non valida dall\'API.'));
+                    }
+                } catch (error) {
+                    // Errore a livello di fetch (rete, HTTP error non 2xx, JSON malformato, ecc.)
+                    alert('Errore di comunicazione durante l\'aggiornamento dello stato: ' + error.message);
+                }
                 currentOrderIdToUpdate = null;
-                currentOrderStatusId = null;
             }
         });
     }
 });
 
-/**
- * Funzione per aggiornare lo stato dell'ordine tramite API.
- * @param {number} orderId L'ID dell'ordine.
- */
-async function updateOrderStatus(orderId) {
-    const url = 'api/api-orders.php';
-    const formData = new FormData();
-    formData.append('action', 'update'); 
-    formData.append('idordine', orderId);
-
-    try {
-        await fetchData(url, formData);
-        loadActiveOrders(1); // Ricarica la prima pagina degli ordini attivi
-    } catch (error) {
-        console.error('Errore nell\'aggiornamento dello stato:', error);
-    }
-}
-
-
-/**
- * Carica gli ordini attivi dal database
- */
-async function loadActiveOrders(page = 1, perPage = 4) { // Added pagination parameters
+async function loadActiveOrders(page = 1, perPage = 4) {
     const ordersGrid = document.getElementById('ordersGrid');
     const paginationContainer = document.getElementById('activeOrdersPagination');
-    if (!ordersGrid || !paginationContainer) {
-        console.error("Elemento 'ordersGrid' o 'activeOrdersPagination' non trovato.");
-        return;
-    }
+    if (!ordersGrid || !paginationContainer) return;
 
-    // Mostra un indicatore di caricamento
-    ordersGrid.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Caricamento ordini attuali...</span></div></div>';
-    paginationContainer.innerHTML = ''; // Clear existing pagination
+    ordersGrid.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Caricamento...</span></div></div>';
+    paginationContainer.innerHTML = '';
 
-    // Prepara i dati per la richiesta
     const url = 'api/api-orders.php';
     const formData = new FormData();
     formData.append('action', 'getActiveOrders');
-    formData.append('page', page); // Pass current page
-    formData.append('perPage', perPage); // Pass items per page
+    formData.append('page', page);
+    formData.append('perPage', perPage);
 
     try {
-        const responseData = await fetchData(url, formData); // responseData now contains { orders, currentPage, totalPages }
-        const activeOrders = responseData.orders;
-        const currentPage = responseData.currentPage;
-        const totalPages = responseData.totalPages;
+        const apiResponse = await fetchData(url, formData);
+        if (!apiResponse.success || !apiResponse.data) {
+            throw new Error(apiResponse.error || "Dati ordini attivi non validi.");
+        }
+        const responseData = apiResponse.data;
+        displayActiveOrders(responseData.orders);
 
-        displayActiveOrders(activeOrders);
-
-        // Create and append pagination component
         const paginationElement = createPaginationComponent(
-            currentPage,
-            totalPages,
-            (newPage) => loadActiveOrders(newPage, perPage) // Callback function for page click
+            responseData.currentPage,
+            responseData.totalPages,
+            (newPage) => loadActiveOrders(newPage, perPage)
         );
         if (paginationElement) {
             paginationContainer.appendChild(paginationElement);
         }
-
     } catch (error) {
         console.error('Errore nel caricamento degli ordini attivi:', error);
-        ordersGrid.innerHTML = '<div class="col-12 text-center text-danger">Errore nel caricamento degli ordini attivi: ' + error.message + '</div>';
-        paginationContainer.innerHTML = ''; // Clear pagination on error
+        ordersGrid.innerHTML = `<div class="col-12 text-center text-danger">Errore nel caricamento degli ordini attivi: ${error.message}</div>`;
+        paginationContainer.innerHTML = '';
     }
 }
-/**
- * Carica lo storico degli ordini dal database
- */
-async function loadOrderHistory(page = 1, perPage = 4) { // Added pagination parameters
+
+async function loadOrderHistory(page = 1, perPage = 4) {
     const historyGrid = document.getElementById('historyGrid');
     const paginationContainer = document.getElementById('historyOrdersPagination');
-    if (!historyGrid || !paginationContainer) {
-        console.error("Elemento 'historyGrid' o 'historyOrdersPagination' non trovato.");
-        return;
-    }
+     if (!historyGrid || !paginationContainer) return;
 
-    // Mostra un indicatore di caricamento
-    historyGrid.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Caricamento storico ordini...</span></div></div>';
-    paginationContainer.innerHTML = ''; // Clear existing pagination
-
-    // Prepara i dati per la richiesta
+    historyGrid.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Caricamento...</span></div></div>';
+    paginationContainer.innerHTML = '';
+    
     const url = 'api/api-orders.php';
     const formData = new FormData();
     formData.append('action', 'getOrderHistory');
-    formData.append('page', page); // Pass current page
-    formData.append('perPage', perPage); // Pass items per page
+    formData.append('page', page);
+    formData.append('perPage', perPage);
 
     try {
-        const responseData = await fetchData(url, formData); // responseData now contains { orders, currentPage, totalPages }
-        const orderHistory = responseData.orders;
-        const currentPage = responseData.currentPage;
-        const totalPages = responseData.totalPages;
+        const apiResponse = await fetchData(url, formData);
+        if (!apiResponse.success || !apiResponse.data) {
+            throw new Error(apiResponse.error || "Dati storico ordini non validi.");
+        }
+        const responseData = apiResponse.data;
+        // Assicurati che responseData.orders esista
+        displayOrderHistory(responseData.orders || []); 
 
-        displayOrderHistory(orderHistory);
-
-        // Create and append pagination component
         const paginationElement = createPaginationComponent(
-            currentPage,
-            totalPages,
-            (newPage) => loadOrderHistory(newPage, perPage) // Callback function for page click
+            responseData.currentPage,
+            responseData.totalPages,
+            (newPage) => loadOrderHistory(newPage, perPage)
         );
         if (paginationElement) {
             paginationContainer.appendChild(paginationElement);
         }
-
     } catch (error) {
         console.error('Errore nel caricamento dello storico ordini:', error);
-        historyGrid.innerHTML = '<div class="col-12 text-center text-danger">Errore nel caricamento dello storico ordini: ' + error.message + '</div>';
-        paginationContainer.innerHTML = ''; // Clear pagination on error
+        historyGrid.innerHTML = `<div class="col-12 text-center text-danger">Errore nel caricamento dello storico: ${error.message}</div>`;
+        paginationContainer.innerHTML = '';
     }
 }
+
 function displayActiveOrders(orders) {
     const ordersGrid = document.getElementById('ordersGrid');
+    if (!ordersGrid) return;
 
     if (!orders || orders.length === 0) {
         ordersGrid.innerHTML = '<div class="col-12 text-center">Nessun ordine attivo al momento</div>';
@@ -174,88 +169,83 @@ function displayActiveOrders(orders) {
     }
 
     let html = '';
-
     orders.forEach(order => {
+        // Se getActiveOrders è stato modificato per escludere ID_STATO_ANNULLATO_PER_STOCK_JS,
+        // questo controllo diventa una sicurezza aggiuntiva.
+        const isCancelledByStock = order.idstato_attuale === ID_STATO_ANNULLATO_PER_STOCK_JS;
+        
         const orderDate = new Date(order.data_ordine + ' ' + order.orario);
         const formattedDate = orderDate.toLocaleDateString('it-IT');
         const formattedTime = orderDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         const formattedPrice = parseFloat(order.prezzo_totale).toFixed(2).replace('.', ',') + ' €';
 
-        let nextStatusId, nextStatusText, nextStatus;
-        let buttonClass = "order-button";
+        let buttonHtmlContent = '';
+        let cardSpecificClass = "";
 
-        switch (order.stato) {
-            case 'In attesa':
-                nextStatusId = 2;
-                nextStatusText = 'Metti In Preparazione';
-                nextStatus = 'In preparazione';
-                break;
-            case 'In preparazione':
-                nextStatusId = 3;
-                nextStatusText = 'Metti In Consegna';
-                nextStatus = 'In consegna';
-                break;
-            case 'In consegna':
-                nextStatusId = 4;
-                nextStatusText = 'Segna Come Consegnato';
-                nextStatus = 'Consegnato';
-                break;
-            default:
-                nextStatusId = null;
-                nextStatusText = '';
-                nextStatus = '';
-                buttonClass = "";
-                break;
+        if (isCancelledByStock) {
+            // Questo non dovrebbe accadere se l'API li esclude da "active orders"
+            buttonHtmlContent = `<button type="button" class="btn btn-sm btn-outline-danger w-100" disabled>Annullato (Stock)</button>`;
+            cardSpecificClass = "border-danger order-cancelled-visual";
+        } else {
+            let nextStatusTextBtn = '';
+            let buttonClassBtn = "order-button";
+            let buttonDisabledBtn = "";
+            let modalTarget = 'data-bs-target="#confirmStatusModal" data-bs-toggle="modal"';
+
+            // Determina il testo e l'azione del bottone per gli stati avanzabili
+            switch (order.stato) { // order.stato è la descrizione testuale
+                case 'In attesa':
+                    nextStatusTextBtn = 'Metti In Preparazione';
+                    break;
+                case 'In preparazione':
+                    nextStatusTextBtn = 'Metti In Consegna';
+                    break;
+                case 'In consegna':
+                    nextStatusTextBtn = 'Segna Come Consegnato';
+                    break;
+                default: // Stati come 'Consegnato', 'Confermato' o altri non avanzabili qui
+                    nextStatusTextBtn = order.stato; // Mostra lo stato attuale
+                    buttonClassBtn = "btn-secondary";
+                    buttonDisabledBtn = "disabled";
+                    modalTarget = ""; // Non aprire modale per stati non azionabili
+                    break;
+            }
+            buttonHtmlContent = `
+                <button type="button"
+                        class="btn btn-sm ${buttonClassBtn} w-100 update-status-btn"
+                        data-order-id="${order.idordine}"
+                        data-next-status-text="${nextStatusTextBtn}" 
+                        ${modalTarget}
+                        ${buttonDisabledBtn}>
+                    ${nextStatusTextBtn}
+                </button>`;
         }
-
-        // --- INIZIO MODIFICA CLASSI COLONNA CARD ---
+        
         html += `
         <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4"> 
-            <div class="card text-center shadow-sm h-100 hover-up">
+            <div class="card text-center shadow-sm h-100 hover-up ${cardSpecificClass}">
                 <a href="order-details.php?id=${order.idordine}" class="text-decoration-none d-flex flex-column h-100" style="color:inherit;">
                     <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;">
                     <div class="card-body d-flex flex-column">
                         <p class="card-title fs-3">Ordine #${order.idordine}</p>
                         <p class="card-text small text-muted">${formattedDate} - ${formattedTime}</p>
-                        <p class="card-text small text-muted">Stato: ${order.stato}</p>
-                        <div class="mt-auto"> {/* Per spingere il footer in basso */}
+                        <p class="card-text small ${isCancelledByStock ? 'text-danger fw-bold' : 'text-muted'}">Stato: ${order.stato}</p>
+                        <div class="mt-auto"> 
                             <span class="fw-bold d-block mt-2">${formattedPrice}</span> 
                         </div>
                     </div>
-                </a>`;
-        // --- FINE MODIFICA CLASSI COLONNA CARD ---
-
-        if (nextStatusId !== null) {
-            // --- INIZIO MODIFICA BOTTONE ---
-            html += `<div class="px-2 pb-3 pt-1">
-                        <button type="button"
-                                class="btn btn-sm ${buttonClass} w-100 update-status-btn"
-                                data-order-id="${order.idordine}"
-                                data-next-status-id="${nextStatusId}"
-                                data-next-status-text="${nextStatusText}"
-                                data-next-status="${nextStatus}"
-                                data-bs-toggle="modal"
-                                data-bs-target="#confirmStatusModal">
-                            ${nextStatusText}
-                        </button>
-                     </div>`;
-        } else {
-             html += `<div class="pb-1"></div>`;
-        }
-
-        html += `</div></div>`;
+                </a>
+                ${buttonHtmlContent ? `<div class="px-2 pb-3 pt-1">${buttonHtmlContent}</div>` : '<div class="pb-1" style="height: 40px;"></div>'}
+            </div>
+        </div>`;
     });
-
     ordersGrid.innerHTML = html;
     addUpdateStatusButtonListeners();
 }
 
-/**
- * Visualizza lo storico degli ordini nella griglia
- * @param {Array} orders - Array di ordini completati
- */
 function displayOrderHistory(orders) {
     const historyGrid = document.getElementById('historyGrid');
+    if (!historyGrid) return;
 
     if (!orders || orders.length === 0) {
         historyGrid.innerHTML = '<div class="col-12 text-center">Nessun ordine nello storico</div>';
@@ -263,48 +253,53 @@ function displayOrderHistory(orders) {
     }
 
     let html = '';
-
     orders.forEach(order => {
         const orderDate = new Date(order.data_ordine + ' ' + order.orario);
         const formattedDate = orderDate.toLocaleDateString('it-IT');
         const formattedTime = orderDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         const formattedPrice = parseFloat(order.prezzo_totale).toFixed(2).replace('.', ',') + ' €';
+        
+        // Assumendo che getOrderHistoryPaginated ora ritorni order.idstato_attuale
+        const isCancelledByStock = order.idstato_attuale === ID_STATO_ANNULLATO_PER_STOCK_JS;
+        const cardSpecificClass = isCancelledByStock ? 'border-danger order-cancelled-visual' : '';
+        const statusTextClass = isCancelledByStock ? 'text-danger fw-bold' : 'text-muted';
 
         html += `
         <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4"> 
             <a href="order-details.php?id=${order.idordine}" class="text-decoration-none" style="color:inherit;">
-                <div class="card h-100 text-center shadow-sm hover-up"> 
+                <div class="card h-100 text-center shadow-sm hover-up ${cardSpecificClass}"> 
                     <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;"> 
                     <div class="card-body d-flex flex-column">
                         <p class="card-title fs-3">Ordine #${order.idordine}</p>
                         <p class="card-text small text-muted">${formattedDate} - ${formattedTime}</p>
+                        <p class="card-text small ${statusTextClass}">Stato: ${order.stato}</p>
                         <div class="mt-auto">
                            <span class="fw-bold d-block mt-2">${formattedPrice}</span>
                         </div>
                     </div>
+                    ${isCancelledByStock ? '<div class="card-footer bg-transparent border-0 p-1 pt-0"><small class="text-danger fst-italic">Annullato per stock</small></div>' : ''}
                 </div>
             </a>
-        </div>
-        `;
+        </div>`;
     });
-
     historyGrid.innerHTML = html;
 }
 
-/**
- * Aggiunge event listener ai bottoni di aggiornamento stato.
- * Chiamato dopo che le card degli ordini attivi sono state renderizzate.
- */
 function addUpdateStatusButtonListeners() {
     document.querySelectorAll('.update-status-btn').forEach(button => {
+        // Assicurati che l'evento venga aggiunto solo a bottoni non disabilitati,
+        // o che il listener stesso verifichi se è disabilitato.
+        if (button.hasAttribute('disabled')) return;
+
         button.addEventListener('click', function() {
             currentOrderIdToUpdate = this.dataset.orderId;
-            currentOrderStatusId = this.dataset.nextStatusId;
-            const nextStatus = this.dataset.nextStatus;
+            const nextStatusForModal = this.dataset.nextStatusText; // Usa il testo del bottone per il modale
 
-            // Popola il modale con i dati dell'ordine
-            document.getElementById('modalOrderId').textContent = currentOrderIdToUpdate;
-            document.getElementById('modalNewStatus').textContent = nextStatus;
+            const modalOrderIdElem = document.getElementById('modalOrderId');
+            const modalNewStatusElem = document.getElementById('modalNewStatus');
+            
+            if(modalOrderIdElem) modalOrderIdElem.textContent = currentOrderIdToUpdate;
+            if(modalNewStatusElem) modalNewStatusElem.textContent = nextStatusForModal || 'Prossimo Stato';
         });
     });
 }
