@@ -6,17 +6,10 @@
     </h2>
 
     <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
-        <button class="btn btn-filter active" data-category="all">Tutto</button>
-        <button class="btn btn-filter" data-category="Panini">Panini</button>
-        <button class="btn btn-filter" data-category="Fritti">Fritti</button>
-        <button class="btn btn-filter" data-category="Bevande">Bevande</button>
-        <button class="btn btn-filter" data-category="Dolci">Dolci</button>
+         <!-- Qui il JS inserirà i button dei filtri -->
     </div>
 
     <div class="row g-4" id="menuGrid">
         <!-- Qui il JS inserirà le card dei prodotti -->
     </div>
 </section>
-
-<link rel="stylesheet" href="css/order_now_style.css" />
-<script src="js/order_now.js"></script>

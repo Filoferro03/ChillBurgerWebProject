@@ -39,6 +39,28 @@ function generateProducts(products) {
   return result;
 }
 
+// Funzione per generare dinamicamente i bottoni dei filtri
+function generateFilterButtons(products) {
+    const filterButtonsContainer = document.querySelector(".d-flex.flex-wrap.justify-content-center.gap-2.mb-4");
+    if (!filterButtonsContainer) return;
+
+    // Aggiungi il bottone "Tutto" fisso
+    let buttonsHtml = '<button class="btn btn-filter active" data-category="all">Tutto</button>';
+
+    // Estrai le categorie uniche dai prodotti
+    const categories = [...new Set(products.map(product => product.categoryDescrizione))];
+    
+    // Ordina le categorie alfabeticamente (opzionale)
+    categories.sort();
+
+    // Genera i bottoni per ogni categoria
+    categories.forEach(category => {
+        buttonsHtml += `<button class="btn btn-filter" data-category="${category}">${category}</button>`;
+    });
+
+    filterButtonsContainer.innerHTML = buttonsHtml;
+}
+
 async function getAllProducts() {
   const url = "api/api-order-now.php";
   const formData = new FormData();
@@ -46,6 +68,9 @@ async function getAllProducts() {
 
   const jsonResponse = await fetchData(url, formData);
   products = jsonResponse.products;  // store globally
+
+  // Genera i bottoni dei filtri prima di generare i prodotti e impostare i filtri
+  generateFilterButtons(products); 
 
   const productsHtml = generateProducts(products);
   const main = document.querySelector("#menuGrid");
