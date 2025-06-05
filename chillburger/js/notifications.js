@@ -44,6 +44,7 @@ function generateNotifications(notes) {
     const bgClass = "bg-white";
     const roundedClass = "rounded-3";
     const idNotifica = notes[i]["idnotifica"];
+    const idOrdine = notes[i]["idordine"];
     const tipo = notes[i]["tipo"];
     const titolo = notes[i]["titolo"] ?? "Titolo mancante";
     const testo = notes[i]["testo"] ?? "Testo mancante";
@@ -53,7 +54,7 @@ function generateNotifications(notes) {
     if (tipo === "ordine") {
       actionsHTML = `
         <div class="d-flex flex-row justify-content-between">
-            <a href="manager_orders.php?id=${idNotifica}" class="text-decoration-none">
+            <a href="order-view.php?id=${idOrdine}" class="text-decoration-none">
               <button type="button" class="btn btn-primary m-1 go-to-order" data-id="${idNotifica}">
                 Vai all'ordine
               </button>
