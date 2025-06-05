@@ -40,26 +40,45 @@ function generateNotifications(notes) {
   }
 
   for (let i = 0; i < notes.length; i++) {
-    const isFirst = i === 0;
     const borderClass = "border border-dark";
     const bgClass = "bg-white";
     const roundedClass = "rounded-3";
     const idNotifica = notes[i]["idnotifica"];
+    const tipo = notes[i]["tipo"];
+    const titolo = notes[i]["titolo"] ?? "Titolo mancante";
+    const testo = notes[i]["testo"] ?? "Testo mancante";
+
+    let actionsHTML = "";
+
+    if (tipo === "ordine") {
+      actionsHTML = `
+        <div class="d-flex flex-row justify-content-between">
+            <a href="manager_orders.php?id=${idNotifica}" class="text-decoration-none">
+              <button type="button" class="btn btn-primary m-1 go-to-order" data-id="${idNotifica}">
+                Vai all'ordine
+              </button>
+            </a>
+            <button type="button" class="btn m-1 read-notification" data-id="${idNotifica}" aria-label="Segna come letta">
+                <span class="fa-solid fa-check fa-2x"></span>
+            </button>
+        </div>`;
+    } else {
+      actionsHTML = `
+        <div class="d-flex flex-row justify-content-end">
+            <button type="button" class="btn m-1 read-notification" data-id="${idNotifica}" aria-label="Segna come letta">
+                <span class="fa-solid fa-check fa-2x"></span>
+            </button>
+        </div>`;
+    }
 
     result += `
-        <div class="${borderClass} ${bgClass} ${roundedClass} my-3 shadow-sm">
-            <div class="p-3">
-                <h1 class="text-black">${
-                  notes[i]["titolo"] ?? "Titolo mancante"
-                }</h1>
-                <p>${notes[i]["testo"] ?? "Testo mancante"}</p>
-                <div class="d-flex flex-row justify-content-end">
-                    <button type="button" class="btn m-1 read-notification" data-id="${idNotifica}" aria-label="Segna come letta">
-                        <span class="fa-solid fa-check fa-2x"></span>
-                    </button>
-                </div>
-            </div>
-        </div>`;
+      <div class="${borderClass} ${bgClass} ${roundedClass} my-3 shadow-sm">
+          <div class="p-3">
+              <h1 class="text-black">${titolo}</h1>
+              <p>${testo}</p>
+              ${actionsHTML}
+          </div>
+      </div>`;
   }
 
   return result;

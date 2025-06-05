@@ -1,4 +1,5 @@
 <?php
+
 /**
  *  /api/api-notifications.php
  *  GET         → restituisce le notifiche del manager in JSON
@@ -47,7 +48,7 @@ if ($method === 'POST') {
     $id      = $_POST['notification_id'] ?? 0;
     $action  = $_POST['action']          ?? '';
 
-    if (!$id || !in_array($action, ['toggle','delete'], true)) {
+    if (!$id || !in_array($action, ['toggle', 'delete'], true)) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Parametri mancanti']);
         exit;
