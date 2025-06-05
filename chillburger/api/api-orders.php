@@ -23,12 +23,6 @@ if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
     if (isset($_GET['idordine'])) {
         $idOrdine = $_GET['idordine'];
     } else {
-        // Se idordine non è in GET, potresti voler verificare se è in POST o sessione
-        // Per ora, se non è in GET, potrebbe dare errore o usare un default come $_SESSION['idordine']
-        // $idOrdine = $_SESSION['idordine'] ?? null; // Esempio se si volesse usare la sessione come fallback
-        // Se $idOrdine rimane null qui, $dbh->getOrderDetails($idOrdine) fallirà o restituirà dati imprevisti.
-        // È importante che $idOrdine sia valorizzato correttamente.
-        // L'originale usava $_SESSION['idordine'] come fallback.
         if (isset($_SESSION['idordine'])) {
              $idOrdine = $_SESSION['idordine'];
         }
@@ -37,10 +31,14 @@ if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
     if ($idOrdine === null) {
         $response = ['success' => false, 'error' => 'ID ordine non specificato o non trovato.'];
     } else {
-        $allOrders = $dbh->getOrderDetails($idOrdine);
-        if ($allOrders !== null) { // Controlla se getOrderDetails ha restituito qualcosa
+        $orderDetails = $dbh->getOrderDetails($idOrdine); // Renamed to avoid conflict
+        $statusInfo = $dbh->getOrderCurrentStatusInfo($idOrdine); // Get current status
+
+        if ($orderDetails !== null) { 
             $response['success'] = true;
-            $response['data'] = $allOrders;
+            // Combine order details and status info into the data payload
+            $response['data'] = $orderDetails; // $orderDetails already contains orderCustom, orderStock, totalPrice
+            $response['data']['statusInfo'] = $statusInfo; // Add statusInfo to the data
         } else {
             $response = ['success' => false, 'error' => 'Dettagli ordine non trovati per ID: ' . $idOrdine];
         }

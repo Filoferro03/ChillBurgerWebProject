@@ -1,5 +1,6 @@
 let currentOrderIdToReview = null;
 let currentReviewData = null;
+let currentOrderStatusInfo = null; // Store status info globally for the page context
 
 async function fetchData(url, formData) {
     try {
@@ -60,10 +61,12 @@ function displayOrderDetails(data) {
                     modifiche: []
                 });
             }
-            customProductsMap.get(item.idpersonalizzazione).modifiche.push({
-                ingredientName: item.nomeingrediente || '',
-                action: item.azione || ''
-            });
+            if (item.nomeingrediente && item.azione) { // Ensure ingredient name and action exist
+                customProductsMap.get(item.idpersonalizzazione).modifiche.push({
+                    ingredientName: item.nomeingrediente,
+                    action: item.azione
+                });
+            }
         });
 
         customProductsMap.forEach(customProduct => {
@@ -73,13 +76,15 @@ function displayOrderDetails(data) {
                         <div class="w-100 w-md-50 mb-2 mb-md-0"> 
                         <p class="fs-5 fw-bold mb-1">${customProduct.productName}</p>`;
 
-            if (customProduct.modifiche.length > 0 && customProduct.modifiche[0].ingredientName != '') {
+            if (customProduct.modifiche.length > 0 && customProduct.modifiche.some(mod => mod.ingredientName)) {
                 result += `<ul class="list-unstyled ms-md-3 small">`; 
                 customProduct.modifiche.forEach(mod => {
-                    let prefix = '';
-                    if (mod.action === 'aggiunto') prefix = '+ ';
-                    else if (mod.action === 'rimosso') prefix = '- ';
-                    result += `<li>${prefix}${mod.ingredientName}</li>`;
+                    if (mod.ingredientName) { // Only display if ingredientName is present
+                        let prefix = '';
+                        if (mod.action === 'aggiunto') prefix = '+ ';
+                        else if (mod.action === 'rimosso') prefix = '- ';
+                        result += `<li>${prefix}${mod.ingredientName}</li>`;
+                    }
                 });
                 result += `</ul>`;
             }
@@ -107,7 +112,7 @@ function displayOrderDetails(data) {
  result += `
                 <div class="card shadow-sm mb-3"> 
                     <div class="card-body d-flex flex-column flex-md-row justify-content-md-between align-items-md-center text-center text-md-start">
-                        <p class="fs-5 fw-bold mb-2 mb-md-0 w-100 w-md-50">${productName}</h3>
+                        <p class="fs-5 fw-bold mb-2 mb-md-0 w-100 w-md-50">${productName}</p>
                         <div class="d-flex flex-column align-items-center align-items-md-end w-100 w-md-auto mt-2 mt-md-0">
                             <p class="card-text m-0 mb-1"> 
                                 <strong>Q.tà:</strong> ${quantity}
@@ -161,36 +166,38 @@ async function loadOrderDetails() {
 
     orderDetailsContainer.innerHTML = "<p class='text-center'>Caricamento dettagli ordine...</p>";
 
-    // L'action viene mandata via POST con formData, idordine via GET nell'URL
-    const apiUrl = `api/api-orders.php?idordine=${orderId}`; // idordine via GET
+    const apiUrl = `api/api-orders.php?idordine=${orderId}`; 
     const formData = new FormData();
-    formData.append('action', 'getDetails'); // action via POST
+    formData.append('action', 'getDetails'); 
 
     const json = await fetchData(apiUrl, formData);
 
     if (json && json.success && json.data) {
         orderDetailsContainer.innerHTML = displayOrderDetails(json.data);
+        currentOrderStatusInfo = json.data.statusInfo; // Store status info
+        await getReview(orderId, currentOrderStatusInfo); // Pass statusInfo to getReview
     } else {
-        // Usa il messaggio di errore dall'API se disponibile, altrimenti un messaggio generico
         const errorMessage = json && json.error ? json.error : 'Dati non disponibili o si è verificato un errore.';
         orderDetailsContainer.innerHTML = `<p class='text-center text-danger'>Errore nel caricamento dei dettagli dell'ordine: ${errorMessage}</p>`;
+        await getReview(orderId, null); // Call getReview even on error to handle UI
     }
-
-    await getReview(orderId);
 }
 
-async function getReview(orderid) {
-    const url = "api/api-reviews.php"; //
+async function getReview(orderid, statusInfo) { // Accept statusInfo
+    const url = "api/api-reviews.php"; 
     const formData = new FormData();
-    formData.append('action', 'getbyorder'); //
-    formData.append('idordine', orderid); //
+    formData.append('action', 'getbyorder'); 
+    formData.append('idordine', orderid); 
 
     const json = await fetchData(url, formData);
 
     const reviewContainer = document.getElementById('reviewContainer');
+    if (!reviewContainer) return; // Guard clause
 
-    if (json.success) {
-        const reviewData = json.data[0]; //
+    reviewContainer.innerHTML = `<h2 class="card-header align-items-center">La tua Recensione</h2>`; // Reset and add header
+
+    if (json && json.success && json.data && json.data.length > 0) { // Check if json.data exists and is not empty
+        const reviewData = json.data[0]; 
         currentReviewData = reviewData;
         reviewContainer.innerHTML += `
             <div class="d-flex flex-column align-items-center text-center flex-md-row justify-content-md-between align-items-md-center mt-2 px-3">
@@ -203,11 +210,21 @@ async function getReview(orderid) {
                 <button class="btn btn-sm btn-danger" id="cancelReviewButton" data-bs-toggle="modal" data-bs-target="#deleteModal">Elimina</button>
             </div>`;
     } else {
-        reviewContainer.innerHTML += `
-            <p class="text-center mt-2 px-3">Non hai ancora lasciato nessuna recensione per questo ordine...</p>
-            <div class="text-center mt-2 mb-2 px-3">
-                <button class="btn btn-sm order-button" id="addReviewButton" data-bs-toggle="modal" data-bs-target="#reviewModal">Lascia una Recensione</button>
-            </div>`;
+        // No review exists, check order status
+        if (statusInfo && statusInfo.idstato === 5) { // 5 is "Confermato"
+            reviewContainer.innerHTML += `
+                <p class="text-center mt-2 px-3">Non hai ancora lasciato nessuna recensione per questo ordine...</p>
+                <div class="text-center mt-2 mb-2 px-3">
+                    <button class="btn btn-sm order-button" id="addReviewButton" data-bs-toggle="modal" data-bs-target="#reviewModal">Lascia una Recensione</button>
+                </div>`;
+        } else {
+            let statusMessage = "Puoi lasciare una recensione solo dopo che l'ordine è stato confermato.";
+            if (statusInfo && statusInfo.descrizione) {
+                statusMessage = `Puoi lasciare una recensione solo dopo che l'ordine è stato confermato. Stato attuale: ${statusInfo.descrizione}.`;
+            }
+             reviewContainer.innerHTML += `
+                <p class="text-center mt-2 px-3">${statusMessage}</p>`;
+        }
     }
 }
 
@@ -230,9 +247,9 @@ async function submitReview(orderId, title, rating, comment, action) {
                 reviewModal.hide();
             }
             document.getElementById('reviewForm').reset(); // Reset form fields
-            window.location.reload(); // Ricarica la pagina dopo aver inviato la recensione
+            window.location.reload(); 
         } else {
-            alert("Errore nell'invio della recensione: " + (result.error || "Dettagli non disponibili."));
+            alert("Errore nell'invio della recensione: " + (json.error || "Dettagli non disponibili."));
         }
     } catch (error) {
         console.error("Errore invio recensione:", error);
@@ -248,20 +265,17 @@ function validateReviewForm() {
     const titleError = document.getElementById('review-title-error');
     const ratingError = document.getElementById('review-rating-error');
 
-    // Reset stati di errore
     titleInput.classList.remove('is-invalid');
     ratingInput.classList.remove('is-invalid');
     titleError.textContent = '';
     ratingError.textContent = '';
 
-    // Validazione Titolo
     if (!titleInput.value.trim()) {
         titleInput.classList.add('is-invalid');
         titleError.textContent = 'Il titolo è obbligatorio.';
         isValid = false;
     }
 
-    // Validazione Voto
     const ratingValue = parseInt(ratingInput.value, 10);
     if (!ratingInput.value || isNaN(ratingValue) || ratingValue < 1 || ratingValue > 5) {
         ratingInput.classList.add('is-invalid');
@@ -281,9 +295,9 @@ async function deleteReview (orderId) {
     try {
         const json = await fetchData(api, formData);
         if (json && json.success) {
-            window.location.reload(); // Ricarica la pagina dopo aver cancellato la recensione
+            window.location.reload(); 
         } else {
-            alert("Errore nella cancellazione della recensione: " + (result.error || "Dettagli non disponibili."));
+            alert("Errore nella cancellazione della recensione: " + (json.error || "Dettagli non disponibili."));
         }
     } catch (error) {
         console.error("Errore nella cancellazione della recensione:", error);
@@ -291,13 +305,12 @@ async function deleteReview (orderId) {
     }
 }
 
-// Chiamata per caricare i dettagli dell'ordine quando il DOM è pronto
 document.addEventListener('DOMContentLoaded', async function () {
-    await loadOrderDetails(); // Carica i dettagli dell'ordine quando il DOM è pronto
+    await loadOrderDetails(); 
 
-    let action = 'submit'; // Default action, will be updated based on button clicked
+    let action = 'submit'; 
 
-    const reviewModalP = document.querySelector('#reviewModal .modal-body p'); // Target the <p> tag in modal body
+    const reviewModalP = document.querySelector('#reviewModal .modal-body p'); 
     const confirmButtonText = document.getElementById('confirm-review-button');
     const reviewForm = document.getElementById('reviewForm');
     const titleInput = document.getElementById('review-title');
@@ -307,7 +320,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     const ratingError = document.getElementById('review-rating-error');
 
 
-    // Function to clear validation and reset form for "Add"
     function setupModalForAdd() {
         action = 'submit';
         if (reviewForm) reviewForm.reset();
@@ -315,11 +327,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (ratingInput) ratingInput.classList.remove('is-invalid');
         if (titleError) titleError.textContent = '';
         if (ratingError) ratingError.textContent = '';
-        if (reviewModalP) reviewModalP.textContent = 'Lascia una recensione per questo ordine:'; //
+        if (reviewModalP) reviewModalP.textContent = 'Lascia una recensione per questo ordine:'; 
         if (confirmButtonText) confirmButtonText.textContent = 'Inserisci';
     }
 
-    // Function to clear validation and populate form for "Edit"
     function setupModalForEdit() {
         action = 'update';
         if (currentReviewData) {
@@ -336,7 +347,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (confirmButtonText) confirmButtonText.textContent = 'Aggiorna';
         } else {
             console.error("Dati della recensione non disponibili per la modifica. Reimpostazione per l'aggiunta.");
-            setupModalForAdd(); // Fallback to add mode
+            setupModalForAdd(); 
         }
     }
 
@@ -356,12 +367,11 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (confirmReviewButton) {
         confirmReviewButton.addEventListener('click', () => {
             if (!currentOrderIdToReview) {
-                alert("Errore: ID ordine non specificato per la recensione."); // Questo è un errore di sistema
+                alert("Errore: ID ordine non specificato per la recensione."); 
                 return;
             }
 
-            if (validateReviewForm()) { // Chiama la funzione di validazione
-                // Se la validazione passa, prendi i valori e invia
+            if (validateReviewForm()) { 
                 const title = document.getElementById('review-title').value.trim();
                 const rating = document.getElementById('review-rating').value;
                 const comment = document.getElementById('review-textarea').value.trim();
@@ -370,7 +380,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         });
     }
 
-    const cancelReviewModalButton = document.getElementById('cancel-review-button'); // "No, grazie" button in review modal
+    const cancelReviewModalButton = document.getElementById('cancel-review-button'); 
     if (cancelReviewModalButton) {
         cancelReviewModalButton.addEventListener('click', () => {
             if (reviewForm) reviewForm.reset();
@@ -378,7 +388,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (ratingInput) ratingInput.classList.remove('is-invalid');
             if (titleError) titleError.textContent = '';
             if (ratingError) ratingError.textContent = '';
-            // Reset modal text to default (add) if needed, or leave as is until next open trigger
              if (reviewModalP) reviewModalP.textContent = 'Lascia una recensione per questo ordine:';
              if (confirmButtonText) confirmButtonText.textContent = 'Inserisci';
         });
@@ -387,9 +396,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     const deleteButton = document.getElementById('delete-button');
     if (deleteButton) {
         deleteButton.addEventListener('click', async () => {
-            deleteReview(currentOrderIdToReview);
+            if(currentOrderIdToReview) {
+                deleteReview(currentOrderIdToReview);
+            }
         }
     )};
 });
-
- 
