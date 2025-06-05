@@ -415,6 +415,10 @@ html, body {
   min-height: 10px;
   background-color: red;
   border-radius: 50%;
-  display: block;
   z-index: 1;
+  display: none; /* ← mantieni qui */
+}
+
+.notification-badge.active {
+  display: block;
 }

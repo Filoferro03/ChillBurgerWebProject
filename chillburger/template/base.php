@@ -206,6 +206,31 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
         crossorigin="anonymous"></script>
+
+    <?php if (isUserLoggedIn()): ?>
+        <?php if (isUserClient()): ?>
+            <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                    if (typeof checkNewNotifications === "function") {
+                        checkNewNotifications();
+                    } else {
+                        console.error("checkNewNotifications non è definita!");
+                    }
+                });
+            </script>
+        <?php elseif (isUserAdmin()): ?>
+            <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                    if (typeof checkManagerNewNotifications === "function") {
+                        checkManagerNewNotifications();
+                    } else {
+                        console.error("checkManagerNewNotifications non è definita!");
+                    }
+                });
+            </script>
+        <?php endif; ?>
+    <?php endif; ?>
+
 </body>
 
 </html>
