@@ -185,8 +185,18 @@
 
     // Pulsante MODIFICA (sempre presente)
     const btnEdit = createEl("button", { class: "btn btn-sm btn-primary" }, "Modifica");
-    btnEdit.addEventListener("click", () => openEditModal(product.idprodotto));
+    btnEdit.addEventListener("click", () => {
+      const catId = product.idcategoria || product.categoria;      // compatibilità vecchi nomi
+      if (paniniCategoryId !== null && Number(catId) === paniniCategoryId) {
+        // ➜ redirect a pagina dedicata
+        window.location.href = `edit-burger.php?id=${product.idprodotto}`;
+      } else {
+        // ➜ continua con la modale
+        openEditModal(product.idprodotto);
+      }
+    });
     actions.append(btnEdit);
+
 
     // Pulsante ELIMINA (dimensione costante per tutte le categorie)
     const btnDel = createEl("button", { class: "btn btn-sm btn-danger" }, "Elimina");
@@ -436,6 +446,13 @@
   }
 
   async function openEditModal(productId) {
+    // Se è un panino, rimanda alla pagina e interrompi
+    const paninoCheck = productsToList.find(p => p.idprodotto == productId);
+    if (paninoCheck && Number(paninoCheck.idcategoria || paninoCheck.categoria) === paniniCategoryId) {
+      window.location.href = `edit-burger.php?id=${productId}`;
+      return;
+    }
+
     let productDetails;
     try {
       // Chiamata API per ottenere i dettagli completi del prodotto, inclusi gli ingredienti associati
