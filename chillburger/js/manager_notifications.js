@@ -110,6 +110,7 @@ async function getManagerNotifications() {
 
   const notifications = await fetchData(url, formData);
   console.log(notifications);
+
   const container = document.querySelector("#manager-notifications");
 
   if (notifications !== null) {

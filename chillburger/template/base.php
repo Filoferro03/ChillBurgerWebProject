@@ -36,8 +36,11 @@
                             <strong class="fa-solid fa-user text-black fs-2" aria-hidden="true"></strong>
                             <span class="visually-hidden">Profilo</span>
                         </a>
-                        <a href="notifications.php" class="text-decoration-none mx-1" aria-label="Notifiche">
-                            <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
+                        <a href="notifications.php" class="text-decoration-none mx-2" aria-label="Notifiche">
+                            <span class="notification-icon-wrapper">
+                                <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
+                                <span class="notification-badge"></span> <!-- pallino rosso -->
+                            </span>
                             <span class="visually-hidden">Notifiche</span>
                         </a>
                         <a href="cart.php" class="text-decoration-none" aria-label="Carrello">
@@ -46,8 +49,11 @@
                         </a>
 
                     <?php elseif (isUserLoggedIn() && isUserAdmin()): ?>
-                        <a href="notifications.php" class="text-decoration-none mx-1" aria-label="Notifiche">
-                            <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
+                        <a href="manager_notifications.php" class="text-decoration-none mx-2" aria-label="Notifiche">
+                            <span class="notification-icon-wrapper">
+                                <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
+                                <span class="notification-badge"></span> <!-- pallino rosso -->
+                            </span>
                             <span class="visually-hidden">Notifiche</span>
                         </a>
                         <a href="manager.php" class="text-decoration-none" aria-label="Manager">
@@ -112,17 +118,24 @@
                             <span class="visually-hidden">Profilo</span>
                         </a>
                         <a href="notifications.php" class="text-decoration-none mx-2" aria-label="Notifiche">
-                            <strong class="fa-solid fa-bell text-black fs-3" aria-hidden="true"></strong>
+                            <span class="notification-icon-wrapper">
+                                <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
+                                <span class="notification-badge"></span> <!-- pallino rosso -->
+                            </span>
                             <span class="visually-hidden">Notifiche</span>
                         </a>
+
                         <a href="cart.php" class="text-decoration-none" aria-label="Carrello">
                             <strong class="fa-solid fa-cart-shopping text-black fs-3" aria-hidden="true"></strong>
                             <span class="visually-hidden">Carrello</span>
                         </a>
 
                     <?php elseif (isUserLoggedIn() && isUserAdmin()): ?>
-                        <a href="notifications.php" class="text-decoration-none mx-4" aria-label="Notifiche">
-                            <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
+                        <a href="manager_notifications.php" class="text-decoration-none mx-2" aria-label="Notifiche">
+                            <span class="notification-icon-wrapper">
+                                <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
+                                <span class="notification-badge"></span> <!-- pallino rosso -->
+                            </span>
                             <span class="visually-hidden">Notifiche</span>
                         </a>
                         <a href="manager.php" class="text-decoration-none" aria-label="Manager">
@@ -194,4 +207,5 @@
         integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
         crossorigin="anonymous"></script>
 </body>
+
 </html>
