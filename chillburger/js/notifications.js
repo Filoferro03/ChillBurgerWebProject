@@ -54,7 +54,7 @@ function generateNotifications(notes) {
     if (tipo === "ordine") {
       actionsHTML = `
         <div class="d-flex flex-row justify-content-between">
-            <a href="order-view.php?id=${idOrdine}" class="text-decoration-none">
+            <a href="order-view.php?idordine=${idOrdine}" class="text-decoration-none">
               <button type="button" class="btn btn-primary m-1 go-to-order" data-id="${idNotifica}">
                 Vai all'ordine
               </button>
