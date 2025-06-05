@@ -144,7 +144,7 @@
   function setupFiltering() {
     const buttons = $$(".btn-filter");
     const items   = $$(".menu-item");
-    if (!buttons.length) return; // niente pulsanti → skip
+    if (!buttons.length) return;
 
     buttons.forEach(btn => {
       btn.addEventListener("click", () => {
