@@ -67,13 +67,6 @@
       renderFilterButtons();
       renderProducts();
       setupFiltering();
-      renderCategorySelect("#category");
-      renderIngredientSelect("#ingredient-select");
-
-      // 4. init select/ingredient toggle
-      const catSel = $("#category");
-      if (catSel) catSel.addEventListener("change", handleCategoryChangeForAddForm);
-      updateIngredientSelectUI(false, false, "#ingredient-select");
     } catch (err) {
       console.error("loadInitialData:", err);
       const listEl = $("#product-list");
@@ -92,7 +85,7 @@
       createEl(
         "button",
         {
-          class: "btn btn-outline-primary btn-filter active",
+          class: "btn btn-filter active",
           "data-category": "all",
           type: "button",
         },
@@ -106,7 +99,7 @@
         createEl(
           "button",
           {
-            class: "btn btn-outline-primary btn-filter",
+            class: "btn btn-filter",
             "data-category": slug,
             type: "button",
           },
@@ -368,75 +361,9 @@
     }
   }
 
-  function handleCategoryChangeForAddForm(event) {
-    const selectedCategoryId = parseInt(event.target.value, 10);
-    const isPanini =
-      paniniCategoryId !== null && selectedCategoryId === paniniCategoryId;
-    updateIngredientSelectUI(isPanini, false, "#ingredient-select");
-    if (!isPanini) {
-      // Se non è panini, pulisci le checkbox degli ingredienti
-      $$("#ingredient-select input[type=\"checkbox\"]:checked").forEach((cb) => (cb.checked = false));
-    }
-  }
 
-  const addForm = $("#add-product-form");
-  if (addForm) {
-    addForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const selectedCategoryIdFromForm = parseInt(formData.get("category"), 10);
-      let selectedIngsArray = [];
-      if (
-        paniniCategoryId !== null &&
-        selectedCategoryIdFromForm === paniniCategoryId
-      ) {
-        selectedIngsArray = $$("#ingredient-select input[type=\"checkbox\"]:checked").map(
-          (i) => parseInt(i.value, 10)
-        );
-      }
-      formData.set("ingredients", JSON.stringify(selectedIngsArray));
-      // Aggiungiamo un'azione per distinguerla dall'update se usiamo lo stesso endpoint POST
-      formData.append("action", "add");
 
-      try {
-        const jsonResponse = await fetchData(API_MANAGER_PRODUCT_HANDLER, {
-          method: "POST",
-          body: formData,
-        });
-        if (!jsonResponse.success)
-          throw new Error(jsonResponse.error || "Errore sconosciuto dal server");
-        await loadInitialData();
-        e.target.reset();
-        const imagePreview = $("#image-preview");
-        if (imagePreview) {
-          imagePreview.classList.add("d-none");
-          imagePreview.src = "";
-        }
-        updateIngredientSelectUI(false, false, "#ingredient-select");
-        showFlash("Prodotto aggiunto con successo!","success");
-      } catch (err) {
-        console.error("Errore invio form aggiunta:", err);
-        showFlash("Creazione fallita: ${err.message}","danger");
-      }
-    });
-  }
 
-  const mainImageInput = $("#image");
-  if (mainImageInput) {
-    mainImageInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      const preview = $("#image-preview");
-      if (!preview) return;
-      if (!file) {
-        preview.classList.add("d-none");
-        preview.src = "";
-        return;
-      }
-      preview.src = URL.createObjectURL(file);
-      preview.classList.remove("d-none");
-      preview.onload = () => URL.revokeObjectURL(preview.src);
-    });
-  }
 
   function closeModal() {
     const modalOverlay = $("#modal-overlay");
@@ -448,15 +375,15 @@
   async function openEditModal(productId) {
     // Se è un panino, rimanda alla pagina e interrompi
     const paninoCheck = productsToList.find(p => p.idprodotto == productId);
-    if (paninoCheck && Number(paninoCheck.idcategoria || paninoCheck.categoria) === paniniCategoryId) {
+    const isPaniniCategory = paninoCheck && Number(paninoCheck.idcategoria || paninoCheck.categoria) === paniniCategoryId;
+
+    if (isPaniniCategory) {
       window.location.href = `manager_edit_burger.php?id=${productId}`;
       return;
     }
 
     let productDetails;
     try {
-      // Chiamata API per ottenere i dettagli completi del prodotto, inclusi gli ingredienti associati
-      // Assumiamo che API_MANAGER_PRODUCT_HANDLER gestisca GET con action=getProduct&idprodotto=ID
       const response = await fetchData(
         `${API_MANAGER_PRODUCT_HANDLER}?action=getProduct&idprodotto=${productId}`
       );
@@ -465,19 +392,17 @@
       }
       productDetails = response.data;
     } catch (err) {
-      showFlash("Errore caricamento: ${err.message}","danger");
+      showFlash(`Errore caricamento: ${err.message}`, "danger");
       return;
     }
 
-    // Determina se è categoria panini (1) o meno
-    const isPaniniCategory = Number(productDetails.idcategoria) === 1;
     const modalOverlay = $("#modal-overlay");
     const modalBox = $("#modal-box");
     if (!modalOverlay || !modalBox) return;
     modalBox.innerHTML = "";
     modalBox.append(createEl("h4", { class: "mb-4 fw-bold" }, "Modifica Prodotto"));
 
-    const form = createEl("form", { id: "edit-product-form" });
+    const form = createEl("form", { id: "edit-product-form", enctype: "multipart/form-data" });
 
     // Campo Nome
     const nameFormGroup = createEl("div", { class: "mb-3" });
@@ -487,8 +412,8 @@
       type: "text",
       id: "edit-name",
       name: "name",
+      value: productDetails.nome,
     });
-    nameInput.value = productDetails.nome;
     nameFormGroup.append(nameInput);
     form.append(nameFormGroup);
 
@@ -502,15 +427,12 @@
       min: "0",
       id: "edit-price",
       name: "price",
+      value: productDetails.prezzo,
     });
-    priceInput.value = productDetails.prezzo;
     priceFormGroup.append(priceInput);
     form.append(priceFormGroup);
 
-    // --- Campo CATEGORIA nascosto ------------------------------------
-    // Manteniamo la categoria originale in un <input type="hidden">
-    // in modo che il resto del codice (validazioni, FormData, ecc.)
-    // possa continuare a leggere updatedCategoryId senza errori.
+    // Campo Categoria (nascosto)
     const categoryHidden = createEl("input", {
       type: "hidden",
       id: "edit-category-id",
@@ -519,50 +441,64 @@
     });
     form.append(categoryHidden);
 
-    // Campo Ingredienti (Checkboxes) - SOLO per categoria panini (1)
-    if (isPaniniCategory) {
-      const ingredientsOuterContainer = createEl("div", {
-        class: "mb-3",
-        id: "edit-ingredients-container",
-      });
-      ingredientsOuterContainer.append(createEl("label", { class: "form-label" }, "Ingredienti"));
-      const ingredientsCheckboxesDiv = createEl("div", {
-        class: "d-flex flex-wrap gap-2 border p-2 rounded",
-        id: "edit-ingredient-select",
-      });
-      ingredientsCheckboxesDiv.style.maxHeight = "150px";
-      ingredientsCheckboxesDiv.style.overflowY = "auto";
-      ingredientsOuterContainer.append(ingredientsCheckboxesDiv);
-      form.append(ingredientsOuterContainer);
+    // Campo Disponibilità (solo per non-panini)
+    const availabilityFormGroup = createEl("div", { class: "mb-3", id: "edit-availability-container" });
+    availabilityFormGroup.style.display = isPaniniCategory ? "none" : "block";
+    availabilityFormGroup.append(createEl("label", { class: "form-label", for: "edit-availability" }, "Disponibilità"));
+    const availabilityInput = createEl("input", {
+      class: "form-control",
+      type: "number",
+      min: "0",
+      id: "edit-availability",
+      name: "availability",
+      value: productDetails.disponibilita ?? '0',
+    });
+    availabilityFormGroup.append(availabilityInput);
+    form.append(availabilityFormGroup);
 
-      // Popola ingredienti e gestisci UI iniziale
-      const currentProductIngredientIds = new Set(
-        (productDetails.ingredients || []).map((id) => parseInt(id, 10))
-      );
-      renderIngredientSelect("#edit-ingredient-select", currentProductIngredientIds);
-      updateIngredientSelectUI(true, false, "#edit-ingredient-select"); // Abilita per i panini
+    // Campo Immagine
+    const imageFormGroup = createEl("div", { class: "mb-3" });
+    imageFormGroup.append(createEl("label", { class: "form-label", for: "edit-image" }, "Cambia Immagine (opzionale)"));
+    const imageInput = createEl("input", {
+      class: "form-control",
+      type: "file",
+      id: "edit-image",
+      name: "image",
+      accept: "image/*",
+    });
+    imageFormGroup.append(imageInput);
 
-      // Assicura che i checkbox siano checkati correttamente
-      $$("#edit-ingredient-select input[type=\"checkbox\"]").forEach((cb) => {
-        if (currentProductIngredientIds.has(parseInt(cb.value))) {
-          cb.checked = true;
-        }
-      });
-    } else {
-      // Per categorie diverse da panini, mostra un messaggio informativo
-      const infoDiv = createEl("div", { class: "mb-3 p-3 bg-light rounded" });
-      infoDiv.append(
-        createEl(
-          "p",
-          { class: "text-muted mb-0" },
-          "Gli ingredienti non sono modificabili per questa categoria di prodotto."
-        )
-      );
-      form.append(infoDiv);
-    }
+    // Anteprima Immagine
+    const currentImagePreview = createEl("img", {
+      src: productDetails.image,
+      alt: "Immagine attuale",
+      class: "img-thumbnail mt-2",
+      style: "max-height: 100px;",
+    });
+    const newImagePreviewContainer = createEl("div", { id: "edit-new-image-preview-container", class: "mt-2" });
+    imageFormGroup.append(currentImagePreview, newImagePreviewContainer);
+    form.append(imageFormGroup);
 
-    // TODO: Aggiungere input per file immagine se si vuole permettere la modifica dell'immagine.
-    // Se si aggiunge, il submit dovrà usare FormData.
+    imageInput.addEventListener("change", (e) => {
+      newImagePreviewContainer.innerHTML = "";
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const newImg = createEl("img", {
+            src: event.target.result,
+            alt: "Anteprima nuova immagine",
+            class: "img-thumbnail",
+            style: "max-height: 100px;",
+          });
+          newImagePreviewContainer.appendChild(newImg);
+          currentImagePreview.style.display = 'none';
+        };
+        reader.readAsDataURL(e.target.files[0]);
+      } else {
+        currentImagePreview.style.display = 'block';
+      }
+    });
+
     modalBox.append(form);
 
     const footerActions = createEl("div", { class: "mt-4 d-flex justify-content-end" });
@@ -574,53 +510,45 @@
     saveBtn.addEventListener("click", async () => {
       const updatedName = nameInput.value.trim();
       const updatedPrice = parseFloat(priceInput.value);
-      const updatedCategoryId = parseInt(categoryHidden.value, 10); // ← usa l'input hidden
-      let updatedIngredientsArray = [];
+      const updatedCategoryId = parseInt(categoryHidden.value, 10);
+      const updatedAvailability = isPaniniCategory ? null : parseInt(availabilityInput.value, 10);
+      const imageFile = imageInput.files[0];
+      const updatedIngredientsArray = []; // Vuoto per non-panini
 
-      // Solo per categoria panini raccogliamo gli ingredienti
-      if (
-        isPaniniCategory &&
-        paniniCategoryId &&
-        updatedCategoryId === paniniCategoryId
-      ) {
-        updatedIngredientsArray = $$("#edit-ingredient-select input[type=\"checkbox\"]:checked").map(
-          (cb) => parseInt(cb.value)
-        );
-      }
-
-      if (!updatedName || updatedPrice < 0 || isNaN(updatedPrice) || !updatedCategoryId) {
-        showFlash("Nome, prezzo valido e categoria sono obbligatori.","warning");
+      if (!updatedName || updatedPrice < 0 || isNaN(updatedPrice) || !updatedCategoryId || (updatedAvailability !== null && (isNaN(updatedAvailability) || updatedAvailability < 0))) {
+        showFlash("Nome, prezzo, categoria e disponibilità validi sono obbligatori.", "warning");
         return;
       }
 
-      // Per l'aggiornamento, invieremo i dati come FormData via POST con un campo action=update
-      // Questo è più semplice se in futuro si volesse aggiungere la modifica dell'immagine.
       const updateFormData = new FormData();
       updateFormData.append("action", "update");
       updateFormData.append("idprodotto", productId);
       updateFormData.append("name", updatedName);
       updateFormData.append("price", updatedPrice);
       updateFormData.append("category", updatedCategoryId);
-      updateFormData.append("ingredients", JSON.stringify(updatedIngredientsArray));
+      updateFormData.append("ingredients", JSON.stringify(updatedIngredientsArray)); // Invia array vuoto
 
-      // Se ci fosse un input file per l'immagine:
-      // const imageFile = $('#edit-image-input').files[0];
-      // if (imageFile) updateFormData.append('image', imageFile);
+      if (updatedAvailability !== null) {
+        updateFormData.append("availability", updatedAvailability);
+      }
+      if (imageFile) {
+        updateFormData.append("image", imageFile);
+      }
 
       try {
         const jsonResponse = await fetchData(API_MANAGER_PRODUCT_HANDLER, {
-          method: "POST", // Usiamo POST per semplicità con FormData
+          method: "POST",
           body: updateFormData,
         });
         if (!jsonResponse.success) {
           throw new Error(jsonResponse.error || `Errore aggiornamento prodotto`);
         }
-        showFlash("Prodotto aggiornato con successo!","success");
+        showFlash("Prodotto aggiornato con successo!", "success");
         closeModal();
         await loadInitialData();
       } catch (err) {
         console.error("Errore salvataggio modifiche:", err);
-        showFlash("Salvataggio fallito: ${err.message}","danger");
+        showFlash(`Salvataggio fallito: ${err.message}`, "danger");
       }
     });
 
@@ -631,7 +559,7 @@
   async function openDeleteModal(productId) {
     const product = productsToList.find((p) => p.idprodotto == productId);
     if (!product) {
-      showFlash("Prodotto non trovato","warning");
+      showFlash("Prodotto non trovato", "warning");
       return;
     }
 
@@ -668,12 +596,12 @@
         if (!jsonResponse.success) {
           throw new Error(jsonResponse.error || `Errore eliminazione`);
         }
-        showFlash("Prodotto eliminato con successo!","success");
+        showFlash("Prodotto eliminato con successo!", "success");
         closeModal();
         await loadInitialData();
       } catch (err) {
         console.error("Errore eliminazione:", err);
-        showFlash("Eliminazione fallita: ${err.message}","danger");
+        showFlash(`Eliminazione fallita: ${err.message}`, "danger");
       }
     });
 
@@ -682,7 +610,7 @@
   }
 
   // === FLASH MESSAGE HELPER ============================================
-  function showFlash(html, variant = "success", ms = 1500){
+  function showFlash(html, variant = "success", ms = 1500) {
     const overlay = document.createElement("div");
     overlay.className = "flash-overlay";
     overlay.innerHTML = `
@@ -698,14 +626,27 @@
       </div>`;
     document.body.append(overlay);
 
-    const close = ()=>overlay.remove();
+    const close = () => overlay.remove();
     overlay.querySelector(".btn-close").addEventListener("click", close);
     setTimeout(close, ms);
   }
 
 
+  // === NUOVO PRODOTTO BUTTON ===
+  function setupNewProductButton() {
+    const btnNewProduct = $("#btn-new-product");
+    if (btnNewProduct) {
+      btnNewProduct.addEventListener("click", () => {
+        window.location.href = "manager_edit_burger.php";
+      });
+    }
+  }
+
   // Esegui al caricamento del DOM
   window.addEventListener("DOMContentLoaded", () => {
-    setTimeout(loadInitialData, 0); // Assicura che il DOM sia completamente pronto
+    setTimeout(() => {
+      loadInitialData();
+      setupNewProductButton();
+    }, 0); // Assicura che il DOM sia completamente pronto
   });
 })();

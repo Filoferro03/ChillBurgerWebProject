@@ -9,9 +9,14 @@
 
     <!-- Elenco prodotti + filtri -->
     <section class="mb-5">
-      <h2 class="h4 mb-4 position-relative animate-underline">
-        <span>Prodotti attuali</span>
-      </h2>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h4 mb-0 position-relative animate-underline">
+          <span>Prodotti attuali</span>
+        </h2>
+        <button id="btn-new-product" class="btn btn-success">
+          <i class="fas fa-plus me-2"></i>Nuovo Prodotto
+        </button>
+      </div>
 
       <!-- Gruppo pulsanti filtro (generato via JS) -->
       <div id="filter-group" class="d-flex flex-wrap justify-content-center gap-2 mb-4">
@@ -26,41 +31,7 @@
       <div id="product-list" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4"></div>
     </section>
 
-    <!-- Aggiunta nuovo prodotto -->
-    <section>
-      <h2 class="h4 mb-4 position-relative animate-underline">
-        <span>Aggiungi nuovo prodotto</span>
-      </h2>
 
-      <form id="add-product-form" class="bg-white shadow rounded p-4">
-        <div class="mb-3">
-          <label for="name" class="form-label">Nome prodotto</label>
-          <input id="name" name="name" type="text" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label for="price" class="form-label">Prezzo (€/unità)</label>
-          <input id="price" name="price" type="number" step="0.01" min="0" class="form-control" required>
-        </div>
-        <div class="mb-3">
-          <label for="category" class="form-label">Categoria <span class="text-danger">*</span></label>
-          <select id="category" name="category" class="form-select" required>
-            <option value="" disabled selected>Seleziona una categoria...</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label for="image" class="form-label">Immagine prodotto</label>
-          <input id="image" name="image" type="file" accept="image/*" class="form-control" required>
-          <img id="image-preview" class="img-fluid mt-2 rounded d-none" alt="Anteprima immagine">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Ingredienti</label>
-          <div id="ingredient-select" class="d-flex flex-wrap gap-2"></div>
-        </div>
-        <div class="d-grid">
-          <button type="submit" class="btn btn-primary">Aggiungi Prodotto</button>
-        </div>
-      </form>
-    </section>
   </main>
 
   <!-- Modal overlay -->

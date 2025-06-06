@@ -68,6 +68,7 @@ CREATE TABLE prodotti (
      disponibilita INT NOT NULL DEFAULT 0,
      idcategoria INT NOT NULL,
      image VARCHAR(255),
+     eliminato TINYINT(1) NOT NULL DEFAULT 0,
      PRIMARY KEY (idprodotto)
 );
 
