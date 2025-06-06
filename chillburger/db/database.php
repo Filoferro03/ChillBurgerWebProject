@@ -535,27 +535,13 @@ class DatabaseHelper
         return $ingredients;
     }
 
-    // TODO Guardate se ho fatto del casino modificando la query
-    /**
-     * Vecchia funzione:
-     * public function getAllProducts()
-     * {
-     *       $query = "SELECT * FROM prodotti";
-     *       $stmt = $this->db->prepare($query);
-     *       $stmt->execute();
-     *       $result = $stmt->get_result();
-     *       $products = $result->fetch_all(MYSQLI_ASSOC);
-     *       $result->free();
-     *       $stmt->close();
-     *       return $products;
-     * }
-     */
     public function getAllProducts()
     {
         $query = "
             SELECT p.*, c.descrizione AS categoryDescrizione
             FROM prodotti p
             JOIN categorie c ON p.idcategoria = c.idcategoria
+            WHERE p.eliminato = 0
         ";
         $stmt = $this->db->prepare($query);
         $stmt->execute();
@@ -1372,7 +1358,7 @@ class DatabaseHelper
 
     public function getAllDrinks()
     {
-        $query = "SELECT * FROM prodotti WHERE idcategoria = 3";
+        $query = "SELECT * FROM prodotti WHERE idcategoria = (SELECT idcategoria FROM categorie WHERE descrizione LIKE '%bevande%') AND eliminato = 0";
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -1384,7 +1370,7 @@ class DatabaseHelper
 
     public function getAllFrieds()
     {
-        $query = "SELECT * FROM prodotti WHERE idcategoria = 2";
+        $query = "SELECT * FROM prodotti WHERE idcategoria = (SELECT idcategoria FROM categorie WHERE descrizione LIKE '%fritti%') AND eliminato = 0";
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -1396,7 +1382,7 @@ class DatabaseHelper
 
     public function getAllDessertes()
     {
-        $query = "SELECT * FROM prodotti WHERE idcategoria = 4";
+        $query = "SELECT * FROM prodotti WHERE idcategoria = (SELECT idcategoria FROM categorie WHERE descrizione LIKE '%desserti%') AND eliminato = 0";
         $stmt = $this->db->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -1588,16 +1574,7 @@ class DatabaseHelper
         return $product;
     }
 
-    /**
-     * Aggiorna i dati di un prodotto esistente.
-     * @param int $idprodotto L'ID del prodotto da aggiornare.
-     * @param string $nome Il nuovo nome del prodotto.
-     * @param float $prezzo Il nuovo prezzo del prodotto.
-     * @param int $idcategoria Il nuovo ID della categoria.
-     * @param string|null $imageFilenameForDb Il nuovo nome del file immagine (o null per non cambiarlo).
-     * @return bool True se l'aggiornamento ha avuto successo, false altrimenti.
-     */
-    public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageFilenameForDb = null, $disponibilita = null) {
+public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageFilenameForDb = null, $disponibilita = null) {
         if ($imageFilenameForDb && $disponibilita !== null) {
             $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ?, image = ?, disponibilita = ? WHERE idprodotto = ?";
             $stmt = $this->db->prepare($sql);
@@ -1605,7 +1582,8 @@ class DatabaseHelper
                 error_log("Errore preparazione statement (con immagine e disponibilità) in updateProduct: " . $this->db->error);
                 return false;
             }
-            $stmt->bind_param('sdsiii', $nome, $prezzo, $idcategoria, $imageFilenameForDb, $disponibilita, $idprodotto);
+            // CORRETTO: nome(s), prezzo(d), idcategoria(i), image(s), disponibilita(i), idprodotto(i)
+            $stmt->bind_param('sdisii', $nome, $prezzo, $idcategoria, $imageFilenameForDb, $disponibilita, $idprodotto);
         } else if ($imageFilenameForDb) {
             $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ?, image = ? WHERE idprodotto = ?";
             $stmt = $this->db->prepare($sql);
@@ -1613,6 +1591,7 @@ class DatabaseHelper
                 error_log("Errore preparazione statement (con immagine) in updateProduct: " . $this->db->error);
                 return false;
             }
+            // CORRETTO: nome(s), prezzo(d), idcategoria(i), image(s), idprodotto(i)
             $stmt->bind_param('sdisi', $nome, $prezzo, $idcategoria, $imageFilenameForDb, $idprodotto);
         } else if ($disponibilita !== null) {
             $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ?, disponibilita = ? WHERE idprodotto = ?";
@@ -1621,7 +1600,8 @@ class DatabaseHelper
                 error_log("Errore preparazione statement (con disponibilità) in updateProduct: " . $this->db->error);
                 return false;
             }
-            $stmt->bind_param('sdsii', $nome, $prezzo, $idcategoria, $disponibilita, $idprodotto);
+            // CORRETTO: nome(s), prezzo(d), idcategoria(i), disponibilita(i), idprodotto(i)
+            $stmt->bind_param('sdiii', $nome, $prezzo, $idcategoria, $disponibilita, $idprodotto);
         } else {
             $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ? WHERE idprodotto = ?";
             $stmt = $this->db->prepare($sql);
@@ -1629,7 +1609,8 @@ class DatabaseHelper
                 error_log("Errore preparazione statement (senza immagine) in updateProduct: " . $this->db->error);
                 return false;
             }
-            $stmt->bind_param('sdsi', $nome, $prezzo, $idcategoria, $idprodotto);
+            // CORRETTO: nome(s), prezzo(d), idcategoria(i), idprodotto(i)
+            $stmt->bind_param('sdii', $nome, $prezzo, $idcategoria, $idprodotto);
         }
         $success = $stmt->execute();
         if (!$success) {
@@ -1638,7 +1619,7 @@ class DatabaseHelper
         $stmt->close();
         return $success;
     }
-
+    
     /**
      * Rimuove tutte le associazioni di ingredienti per un dato prodotto.
      * @param int $idprodotto L'ID del prodotto.
@@ -1668,24 +1649,16 @@ class DatabaseHelper
      * @return bool True se l'eliminazione ha avuto successo, false altrimenti.
      */
     public function deleteProduct($idprodotto) {
-        // Se non si usa ON DELETE CASCADE, le cancellazioni delle dipendenze
-        // dovrebbero avvenire nell'API (api-manager-menu.php) prima di chiamare questo.
-        // Esempio di come potrebbe essere fatto qui se si volesse centralizzare:
-        // $this->deleteProductCompositions($idprodotto);
-        // $this->deleteProductPersonalizations($idprodotto); // Richiede implementazione
-        // $this->deleteProductFromCarts($idprodotto);       // Richiede implementazione
-        // $this->deleteProductNotifications($idprodotto);   // Richiede implementazione
-
-        $sql = "DELETE FROM prodotti WHERE idprodotto = ?";
+        $sql = "UPDATE prodotti SET eliminato = 1 WHERE idprodotto = ?";
         $stmt = $this->db->prepare($sql);
         if (!$stmt) {
-            error_log("Errore preparazione statement in deleteProduct: " . $this->db->error);
+            error_log("Errore preparazione statement in softDeleteProduct: " . $this->db->error);
             return false;
         }
         $stmt->bind_param('i', $idprodotto);
         $success = $stmt->execute();
         if (!$success) {
-            error_log("Errore esecuzione statement in deleteProduct: " . $stmt->error);
+            error_log("Errore esecuzione statement in softDeleteProduct: " . $stmt->error);
         }
         $stmt->close();
         return $success;
