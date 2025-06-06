@@ -16,16 +16,12 @@
         <button id="btn-new-product" class="btn btn-success">
           <i class="fas fa-plus me-2"></i>Nuovo Prodotto
         </button>
+        
       </div>
 
       <!-- Gruppo pulsanti filtro (generato via JS) -->
       <div id="filter-group" class="d-flex flex-wrap justify-content-center gap-2 mb-4">
-        <button class="btn btn-filter active" data-category="all">Tutto</button>
-        <button class="btn btn-filter" data-category="Panini">Panini</button>
-        <button class="btn btn-filter" data-category="Fritti">Fritti</button>
-        <button class="btn btn-filter" data-category="Bevande">Bevande</button>
-        <button class="btn btn-filter" data-category="Dolci">Dolci</button>
-    </div>
+      </div>
 
       <!-- Griglia prodotti -->
       <div id="product-list" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4"></div>
