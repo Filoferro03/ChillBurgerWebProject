@@ -185,31 +185,6 @@
 
     <script src="js/shared/components.js"></script>
     <script src="js/shared/utils.js"></script>
-    <?php if (isUserLoggedIn()): ?>
-        <?php if (isUserClient()): ?>
-            <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                    if (typeof checkNewNotifications === "function") {
-                        checkNewNotifications();
-                        window.location.reload();
-                    } else {
-                        console.error("checkNewNotifications non è definita!");
-                    }
-                });
-            </script>
-        <?php elseif (isUserAdmin()): ?>
-            <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                    if (typeof checkManagerNewNotifications === "function") {
-                        checkManagerNewNotifications();
-                        window.location.reload();
-                    } else {
-                        console.error("checkManagerNewNotifications non è definita!");
-                    }
-                });
-            </script>
-        <?php endif; ?>
-    <?php endif; ?>
 
 
     <?php
