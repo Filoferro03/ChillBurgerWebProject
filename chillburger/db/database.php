@@ -1510,10 +1510,16 @@ class DatabaseHelper
     }
     
     /* DatabaseHelper.php */
-    public function insertProduct($nome, $prezzo, $imageFilenameForDb, $idcategoria) {
+    public function insertProduct($nome, $prezzo, $imageFilenameForDb, $idcategoria, $disponibilita = null) {
+        // Per i panini, la disponibilità è sempre 999 (gestita tramite ingredienti)
+        // Per altri prodotti, usa il valore fornito o 1 (disponibile) come default
+        if ($disponibilita === null) {
+            $disponibilita = 999; // Default per compatibilità
+        }
+        
         $sql = "INSERT INTO prodotti
                 (nome, prezzo, image, idcategoria, disponibilita)
-                VALUES (?, ?, ?, ?, 999)"; // 4 placeholders
+                VALUES (?, ?, ?, ?, ?)"; // 5 placeholders
         $stmt = $this->db->prepare($sql);
         
         if ($stmt === false) {
@@ -1521,8 +1527,8 @@ class DatabaseHelper
             return false; 
         }
         
-        // Tipi di parametri: nome (s), prezzo (d), image (s), idcategoria (i)
-        $stmt->bind_param('sdsi', $nome, $prezzo, $imageFilenameForDb, $idcategoria);
+        // Tipi di parametri: nome (s), prezzo (d), image (s), idcategoria (i), disponibilita (i)
+        $stmt->bind_param('sdsii', $nome, $prezzo, $imageFilenameForDb, $idcategoria, $disponibilita);
         
         if (!$stmt->execute()) {
             error_log("DatabaseHelper::insertProduct - Errore esecuzione query: " . $stmt->error);
@@ -1591,16 +1597,31 @@ class DatabaseHelper
      * @param string|null $imageFilenameForDb Il nuovo nome del file immagine (o null per non cambiarlo).
      * @return bool True se l'aggiornamento ha avuto successo, false altrimenti.
      */
-    public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageFilenameForDb = null) {
-        if ($imageFilenameForDb) {
+    public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageFilenameForDb = null, $disponibilita = null) {
+        if ($imageFilenameForDb && $disponibilita !== null) {
+            $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ?, image = ?, disponibilita = ? WHERE idprodotto = ?";
+            $stmt = $this->db->prepare($sql);
+            if (!$stmt) {
+                error_log("Errore preparazione statement (con immagine e disponibilità) in updateProduct: " . $this->db->error);
+                return false;
+            }
+            $stmt->bind_param('sdsiii', $nome, $prezzo, $idcategoria, $imageFilenameForDb, $disponibilita, $idprodotto);
+        } else if ($imageFilenameForDb) {
             $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ?, image = ? WHERE idprodotto = ?";
             $stmt = $this->db->prepare($sql);
             if (!$stmt) {
                 error_log("Errore preparazione statement (con immagine) in updateProduct: " . $this->db->error);
                 return false;
             }
-            // Tipi: string (nome), double (prezzo), int (idcategoria), string (image), int (idprodotto)
             $stmt->bind_param('sdisi', $nome, $prezzo, $idcategoria, $imageFilenameForDb, $idprodotto);
+        } else if ($disponibilita !== null) {
+            $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ?, disponibilita = ? WHERE idprodotto = ?";
+            $stmt = $this->db->prepare($sql);
+            if (!$stmt) {
+                error_log("Errore preparazione statement (con disponibilità) in updateProduct: " . $this->db->error);
+                return false;
+            }
+            $stmt->bind_param('sdsii', $nome, $prezzo, $idcategoria, $disponibilita, $idprodotto);
         } else {
             $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ? WHERE idprodotto = ?";
             $stmt = $this->db->prepare($sql);
@@ -1608,7 +1629,6 @@ class DatabaseHelper
                 error_log("Errore preparazione statement (senza immagine) in updateProduct: " . $this->db->error);
                 return false;
             }
-            // Tipi: string (nome), double (prezzo), int (idcategoria), int (idprodotto)
             $stmt->bind_param('sdsi', $nome, $prezzo, $idcategoria, $idprodotto);
         }
         $success = $stmt->execute();

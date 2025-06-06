@@ -53,6 +53,14 @@ try {
                 $idcategoria = isset($_POST['category']) ? intval($_POST['category']) : null;
                 $ingredientsJson = isset($_POST['ingredients']) ? $_POST['ingredients'] : '[]';
                 $ingredients = json_decode($ingredientsJson, true);
+                $availability = isset($_POST['availability']) ? intval($_POST['availability']) : null;
+                
+                // Validate availability if provided
+                if ($availability !== null && $availability < 0) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => 'La disponibilità deve essere un numero intero positivo o zero.']);
+                    exit;
+                }
 
                 // Validazioni (simili a quelle dell'aggiunta)
                 if (!$idprodotto) {
@@ -98,7 +106,7 @@ try {
                 }
 
                 // Aggiornamento prodotto nel DB
-                $updateSuccess = $dbh->updateProduct($idprodotto, $name, $price, $idcategoria, $imageFilenameForDb); // METODO DA CREARE in DatabaseHelper
+                $updateSuccess = $dbh->updateProduct($idprodotto, $name, $price, $idcategoria, $imageFilenameForDb, $availability);
 
                 if (!$updateSuccess) {
                     http_response_code(500);
@@ -170,6 +178,14 @@ try {
                 $price = floatval($_POST['price']); //
                 $ingredients = json_decode($_POST['ingredients'], true); //
                 $idcategoria = intval($_POST['category']); //
+                $availability = isset($_POST['availability']) ? intval($_POST['availability']) : null;
+                
+                // Validate availability if provided
+                if ($availability !== null && $availability < 0) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => 'La disponibilità deve essere un numero intero positivo o zero.']);
+                    exit;
+                }
 
                 if ($idcategoria <= 0) { //
                     http_response_code(400); //
@@ -205,7 +221,16 @@ try {
                 $imageWebPath = RESOURCES_DIR . 'products/' . $filename; //
 
 
-                $productId = $dbh->insertProduct($name, $price, $imageFilenameForDb, $idcategoria); //
+                // Per i panini, la disponibilità è sempre 999 (gestita tramite ingredienti)
+                // Per altri prodotti, usa il valore fornito o 1 come default
+                $finalAvailability = null;
+                if ($idcategoria == $dbh->getPaniniCategoryId()) {
+                    $finalAvailability = 999; // Panini sempre 999
+                } else {
+                    $finalAvailability = $availability !== null ? $availability : 1; // Default disponibile
+                }
+                
+                $productId = $dbh->insertProduct($name, $price, $imageFilenameForDb, $idcategoria, $finalAvailability); //
 
                 if (!$productId) { //
                     error_log('API-manager-menu ERROR: dbh->insertProduct ha restituito un ID non valido.'); //

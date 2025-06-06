@@ -67,13 +67,6 @@
       renderFilterButtons();
       renderProducts();
       setupFiltering();
-      renderCategorySelect("#category");
-      renderIngredientSelect("#ingredient-select");
-
-      // 4. init select/ingredient toggle
-      const catSel = $("#category");
-      if (catSel) catSel.addEventListener("change", handleCategoryChangeForAddForm);
-      updateIngredientSelectUI(false, false, "#ingredient-select");
     } catch (err) {
       console.error("loadInitialData:", err);
       const listEl = $("#product-list");
@@ -92,7 +85,7 @@
       createEl(
         "button",
         {
-          class: "btn btn-outline-primary btn-filter active",
+          class: "btn btn-filter active",
           "data-category": "all",
           type: "button",
         },
@@ -106,7 +99,7 @@
         createEl(
           "button",
           {
-            class: "btn btn-outline-primary btn-filter",
+            class: "btn btn-filter",
             "data-category": slug,
             type: "button",
           },
@@ -368,75 +361,9 @@
     }
   }
 
-  function handleCategoryChangeForAddForm(event) {
-    const selectedCategoryId = parseInt(event.target.value, 10);
-    const isPanini =
-      paniniCategoryId !== null && selectedCategoryId === paniniCategoryId;
-    updateIngredientSelectUI(isPanini, false, "#ingredient-select");
-    if (!isPanini) {
-      // Se non è panini, pulisci le checkbox degli ingredienti
-      $$("#ingredient-select input[type=\"checkbox\"]:checked").forEach((cb) => (cb.checked = false));
-    }
-  }
 
-  const addForm = $("#add-product-form");
-  if (addForm) {
-    addForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const selectedCategoryIdFromForm = parseInt(formData.get("category"), 10);
-      let selectedIngsArray = [];
-      if (
-        paniniCategoryId !== null &&
-        selectedCategoryIdFromForm === paniniCategoryId
-      ) {
-        selectedIngsArray = $$("#ingredient-select input[type=\"checkbox\"]:checked").map(
-          (i) => parseInt(i.value, 10)
-        );
-      }
-      formData.set("ingredients", JSON.stringify(selectedIngsArray));
-      // Aggiungiamo un'azione per distinguerla dall'update se usiamo lo stesso endpoint POST
-      formData.append("action", "add");
 
-      try {
-        const jsonResponse = await fetchData(API_MANAGER_PRODUCT_HANDLER, {
-          method: "POST",
-          body: formData,
-        });
-        if (!jsonResponse.success)
-          throw new Error(jsonResponse.error || "Errore sconosciuto dal server");
-        await loadInitialData();
-        e.target.reset();
-        const imagePreview = $("#image-preview");
-        if (imagePreview) {
-          imagePreview.classList.add("d-none");
-          imagePreview.src = "";
-        }
-        updateIngredientSelectUI(false, false, "#ingredient-select");
-        showFlash("Prodotto aggiunto con successo!","success");
-      } catch (err) {
-        console.error("Errore invio form aggiunta:", err);
-        showFlash("Creazione fallita: ${err.message}","danger");
-      }
-    });
-  }
 
-  const mainImageInput = $("#image");
-  if (mainImageInput) {
-    mainImageInput.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      const preview = $("#image-preview");
-      if (!preview) return;
-      if (!file) {
-        preview.classList.add("d-none");
-        preview.src = "";
-        return;
-      }
-      preview.src = URL.createObjectURL(file);
-      preview.classList.remove("d-none");
-      preview.onload = () => URL.revokeObjectURL(preview.src);
-    });
-  }
 
   function closeModal() {
     const modalOverlay = $("#modal-overlay");
@@ -704,8 +631,21 @@
   }
 
 
+  // === NUOVO PRODOTTO BUTTON ===
+  function setupNewProductButton() {
+    const btnNewProduct = $("#btn-new-product");
+    if (btnNewProduct) {
+      btnNewProduct.addEventListener("click", () => {
+        window.location.href = "manager_edit_burger.php";
+      });
+    }
+  }
+
   // Esegui al caricamento del DOM
   window.addEventListener("DOMContentLoaded", () => {
-    setTimeout(loadInitialData, 0); // Assicura che il DOM sia completamente pronto
+    setTimeout(() => {
+      loadInitialData();
+      setupNewProductButton();
+    }, 0); // Assicura che il DOM sia completamente pronto
   });
 })();
