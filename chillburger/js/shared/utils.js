@@ -71,17 +71,15 @@ async function checkNewNotifications() {
   formData.append("action", "getallnotifications");
 
   const json = await fetchData(url, formData);
-  const badge = document.querySelector(".notification-badge");
-  console.log("badge:", badge, "json:", json);
-
-  if (badge) {
+  const badges = document.querySelectorAll(".notification-badge");
+  console.log("badge:", badges, "json:", json);
+  badges.forEach((badge) => {
     if (json.length > 0) {
       badge.classList.add("active");
-      console.log("badge:", badge);
     } else {
       badge.classList.remove("active");
     }
-  }
+  });
 }
 
 async function checkNewManagerNotifications() {
@@ -90,14 +88,13 @@ async function checkNewManagerNotifications() {
   formData.append("action", "getallnotifications");
 
   const json = await fetchData(url, formData);
-  const badge = document.querySelector(".notification-badge");
-  console.log("ci arriva 0");
-
-  if (json.length > 0) {
-    badge.style.display = "block";
-    console.log("ci arriva 1");
-  } else {
-    badge.style.display = "none";
-    console.log("ci arriva 2");
-  }
+  const badges = document.querySelectorAll(".notification-badge");
+  console.log("badge:", badges, "json:", json);
+  badges.forEach((badge) => {
+    if (json.length > 0) {
+      badge.classList.add("active");
+    } else {
+      badge.classList.remove("active");
+    }
+  });
 }
