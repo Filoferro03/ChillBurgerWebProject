@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const LOW_STOCK_THRESHOLD = 10;
+  const LOW_STOCK_THRESHOLD = 3;
   let allProducts = [];
   let currentFiltered = [];
   let currentPage     = 1;
