@@ -37,6 +37,7 @@ function displayOrderDetails(data) {
             if (!customProductsMap.has(item.idpersonalizzazione)) {
                 customProductsMap.set(item.idpersonalizzazione, {
                     idpersonalizzazione: item.idpersonalizzazione,
+                    idprodotto: item.idprodotto || '', // Add the standard product ID
                     productName: item.nomeprodotto || 'Nome Prodotto N/D',
                     productQuantity: item.quantita !== undefined ? item.quantita : 'N/D', // Quantità del prodotto personalizzato
                     productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D', // Prezzo totale della personalizzazione
@@ -55,6 +56,7 @@ function displayOrderDetails(data) {
             if (!customProductsMap.has(item.idpersonalizzazione)) {
                 customProductsMap.set(item.idpersonalizzazione, {
                     idpersonalizzazione: item.idpersonalizzazione,
+                    idprodotto: item.idprodotto || '', // Add the standard product ID
                     productName: item.nomeprodotto || 'Nome Prodotto N/D',
                     productQuantity: item.quantita !== undefined ? item.quantita : 'N/D',
                     productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D',
@@ -74,7 +76,7 @@ function displayOrderDetails(data) {
                 <div class="card shadow-sm mb-3"> 
                     <div class="card-body d-flex flex-column flex-md-row justify-content-md-between align-items-md-center text-center text-md-start">
                         <div class="w-100 w-md-50 mb-2 mb-md-0"> 
-                        <p class="fs-5 fw-bold mb-1">${customProduct.productName}</p>`;
+                        <p class="fs-5 fw-bold mb-1"><a href="burger-details.php?id=${customProduct.idprodotto}" style="color: inherit; text-decoration: none;">${customProduct.productName}</a></p>`;
 
             if (customProduct.modifiche.length > 0 && customProduct.modifiche.some(mod => mod.ingredientName)) {
                 result += `<ul class="list-unstyled ms-md-3 small">`; 
@@ -112,7 +114,7 @@ function displayOrderDetails(data) {
  result += `
                 <div class="card shadow-sm mb-3"> 
                     <div class="card-body d-flex flex-column flex-md-row justify-content-md-between align-items-md-center text-center text-md-start">
-                        <p class="fs-5 fw-bold mb-2 mb-md-0 w-100 w-md-50">${productName}</p>
+                        <p class="fs-5 fw-bold mb-2 mb-md-0 w-100 w-md-50"><a href="menu.php#${stockElement.idprodotto || ''}" style="color: inherit; text-decoration: none;">${productName}</a></p>
                         <div class="d-flex flex-column align-items-center align-items-md-end w-100 w-md-auto mt-2 mt-md-0">
                             <p class="card-text m-0 mb-1"> 
                                 <strong>Q.tà:</strong> ${quantity}
