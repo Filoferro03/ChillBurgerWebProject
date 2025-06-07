@@ -1837,4 +1837,25 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
          $stmt->close();
          return $statusData;
     }
+
+    /** Inserisce un ingrediente e restituisce l’ID appena creato */
+    public function insertIngredient($nome, $sovrapprezzo, $giacenza = 999, $imageFilename = null) {
+        $sql = "INSERT INTO ingredienti (nome, sovrapprezzo, giacenza, image)
+                VALUES (?,?,?,?)";
+        $stmt = $this->db->prepare($sql);
+        if (!$stmt) {
+            error_log("insertIngredient – prepare failed: " . $this->db->error);
+            return false;
+        }
+        $stmt->bind_param('sdis', $nome, $sovrapprezzo, $giacenza, $imageFilename);
+        if ($stmt->execute()) {
+            $id = $this->db->insert_id;
+            $stmt->close();
+            return $id;
+        }
+        error_log("insertIngredient – execute failed: " . $stmt->error);
+        $stmt->close();
+        return false;
+    }
+
 }

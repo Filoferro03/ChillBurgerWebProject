@@ -7,7 +7,7 @@ $templateParams = [
     "css"    => [
         "css/style.css",
     ],
-    "js" => ["js/manger-new-ingredient.js"]
+    "js" => ["js/manager_new_ingredient.js"]
 ];
 
 require "template/base.php";

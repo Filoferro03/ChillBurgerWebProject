@@ -29,13 +29,6 @@
               <input id="product-price" name="price" type="number" step="0.01" min="0" class="form-control" required>
             </div>
 
-            <div class="mb-3">
-              <label for="product-category" class="form-label">Categoria <span class="text-danger">*</span></label>
-              <select id="product-category" name="category" class="form-select" required>
-                <option value="" disabled selected>Seleziona una categoria...</option>
-              </select>
-            </div>
-
             <div class="mb-3" id="availability-section" style="display: none;">
               <label for="product-availability" class="form-label">Disponibilità <span class="text-danger">*</span></label>
               <input id="product-availability" name="availability" type="number" min="0" step="1" class="form-control" placeholder="Inserisci quantità disponibile">
