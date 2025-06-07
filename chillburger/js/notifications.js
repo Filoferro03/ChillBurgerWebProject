@@ -92,9 +92,8 @@ async function tryRead(idnotification) {
   formData.append("idnotification", idnotification);
 
   const response = await fetchData(url, formData);
-  if (response !== null) {
-    window.location.reload();
-  }
+  window.location.reload();
+  console.log("ha superato refresh");
 }
 
 function addNotificationListeners() {
@@ -117,7 +116,6 @@ async function getNotificationsData() {
   const notifications = await fetchData(url, formData);
   const container = document.querySelector("#notes-container");
   console.log("array normale", notifications);
-  console.log("array invertito", notifications.reverse());
 
   if (notifications !== null) {
     container.innerHTML = generateNotifications(notifications);
