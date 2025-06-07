@@ -45,13 +45,13 @@
               <div class="mt-3" id="current-image-container" style="display: none;">
                 <label class="form-label">Immagine attuale:</label>
                 <div>
-                  <img id="current-image" class="img-fluid rounded" style="max-height: 200px;" alt="Immagine attuale">
+                  <img id="current-image" class="img-fluid rounded" src="/" style="max-height: 200px;" alt="Immagine attuale">
                 </div>
               </div>
               <div class="mt-3" id="image-preview-container" style="display: none;">
                 <label class="form-label">Anteprima nuova immagine:</label>
                 <div>
-                  <img id="image-preview" class="img-fluid rounded" style="max-height: 200px;" alt="Anteprima immagine">
+                  <img id="image-preview" class="img-fluid rounded" src="/" style="max-height: 200px;" alt="Anteprima immagine">
                 </div>
               </div>
             </div>

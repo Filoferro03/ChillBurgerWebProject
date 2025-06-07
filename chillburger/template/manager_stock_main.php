@@ -39,6 +39,7 @@
   
     <!-- ===== Filters ======================================================= -->
     <section class="mb-4">
+      <h3 class="visually-hidden">Filtri di ricerca</h3>
       <div class="row g-3">
         <div class="col-12 col-md-6 col-lg-3 mt-4">
           <label for="category-filter" class="form-label small text-secondary mb-1">Categoria</label>
