@@ -1,38 +1,62 @@
 <?php
-// ChillBurger – API: inserimento di un nuovo ingrediente
+require_once __DIR__ . '/../bootstrap.php';
 header('Content-Type: application/json');
-session_start();
 
-require_once __DIR__ . '/../bootstrap.php';      // apre la sessione DB + autoload
-require_once __DIR__ . '/../utils/functions.php';// se usi funzioni comuni
-$dbh = new DatabaseHelper($servername,$username,$password,$dbname,$port);
+if ($method === 'GET' &&
+    isset($_GET['action'], $_GET['idingrediente']) &&
+    $_GET['action'] === 'getIngredient') {
 
-// Solo POST
+    $id   = intval($_GET['idingrediente']);
+    $data = $dbh->getIngredient($id);     // nuovo metodo nel DatabaseHelper
+
+    if ($data) {
+        // aggiunge il path della risorsa se manca
+        if (!empty($data['image']) &&
+            !str_starts_with($data['image'], RESOURCES_DIR)) {
+            $data['image'] = RESOURCES_DIR . $uploadDirRel . $data['image'];
+        }
+        echo json_encode(['success'=>true,'data'=>$data]);
+    } else {
+        http_response_code(404);
+        echo json_encode(['success'=>false,'error'=>'Ingrediente non trovato']);
+    }
+    exit;
+}
+
+/*----------------------------------------------------------------
+ * 1.  Solo POST
+ *---------------------------------------------------------------*/
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['success'=>false, 'message'=>'Metodo non consentito']);
-    exit;
+    exit(json_encode(['success'=>false,'message'=>'Metodo non consentito']));
 }
 
-// === Validazione campi ===
-$name   = trim($_POST['name']   ?? '');
-$price  = floatval($_POST['price'] ?? -1);
-$stock  = isset($_POST['availability']) ? intval($_POST['availability']) : 999; // default “illimitato”
+/*----------------------------------------------------------------
+ * 2.  Validazione campi
+ *---------------------------------------------------------------*/
+$name  = trim($_POST['name']  ?? '');
+$price = $_POST['price'] ?? '';
+$stock = $_POST['availability'] ?? '999';
 
-if ($name === '' || $price < 0) {
+if ($name === '' || !is_numeric($price) || $price < 0) {
     http_response_code(400);
-    echo json_encode(['success'=>false,'message'=>'Nome e prezzo sono obbligatori']);
-    exit;
+    exit(json_encode(['success'=>false,'message'=>'Nome e prezzo obbligatori']));
 }
 
-// === Upload immagine ===
-$imageFilenameForDb = null;
-$uploadDir = __DIR__ . '/../resources/ingredients/';
-if (!is_dir($uploadDir)) { mkdir($uploadDir, 0755, true); }
+/*----------------------------------------------------------------
+ * 3.  Upload immagine (opzionale)
+ *---------------------------------------------------------------*/
+$imageFilenameForDb = null;           // nel DB salvi solo il nome file
+
+if (!is_dir(INGR_RES_ABS)) {
+    mkdir(INGR_RES_ABS, 0755, true);  // crea cartella se manca
+}
 
 if (!empty($_FILES['image']['tmp_name'])) {
+
     $allowed = ['jpg','jpeg','png','webp'];
-    $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+    $ext     = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+
     if (!in_array($ext, $allowed)) {
         http_response_code(415);
         echo json_encode(['success'=>false,'message'=>'Formato immagine non supportato']);
@@ -40,25 +64,28 @@ if (!empty($_FILES['image']['tmp_name'])) {
     }
 
     $imageFilenameForDb = 'ing_' . uniqid() . '.' . $ext;
-    $destPath = $uploadDir . $imageFilenameForDb;
+    $destPath           = INGR_RES_ABS . $imageFilenameForDb;
+
+    // log utile in debug
+    error_log('Tmp: '.$_FILES['image']['tmp_name'].' → '.$destPath);
+
     if (!move_uploaded_file($_FILES['image']['tmp_name'], $destPath)) {
+        error_log('move_uploaded_file fallita – permessi? path?');
         http_response_code(500);
         echo json_encode(['success'=>false,'message'=>'Upload immagine fallito']);
         exit;
     }
-}
 
-// === Inserimento DB ===
+/*----------------------------------------------------------------
+ * 4.  Inserimento su tabella `ingredienti`
+ *---------------------------------------------------------------*/
 try {
-    // nuovo metodo nel DatabaseHelper (vedi sotto)  
-    $id = $dbh->insertIngredient($name, $price, $stock, $imageFilenameForDb);
+    $newId = $dbh->insertIngredient($name, $price, $stock, $imageFilename);
+    if (!$newId) throw new Exception('Inserimento non riuscito');
 
-    if ($id) {
-        echo json_encode(['success'=>true, 'id'=>$id]);
-    } else {
-        throw new Exception('Inserimento non riuscito');
-    }
+    echo json_encode(['success'=>true, 'idingrediente'=>$newId]);
+
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success'=>false, 'message'=>$e->getMessage()]);
+    echo json_encode(['success'=>false,'message'=>$e->getMessage()]);
 }

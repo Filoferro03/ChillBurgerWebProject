@@ -1838,24 +1838,31 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
          return $statusData;
     }
 
-    /** Inserisce un ingrediente e restituisce l’ID appena creato */
-    public function insertIngredient($nome, $sovrapprezzo, $giacenza = 999, $imageFilename = null) {
-        $sql = "INSERT INTO ingredienti (nome, sovrapprezzo, giacenza, image)
-                VALUES (?,?,?,?)";
-        $stmt = $this->db->prepare($sql);
-        if (!$stmt) {
-            error_log("insertIngredient – prepare failed: " . $this->db->error);
-            return false;
-        }
-        $stmt->bind_param('sdis', $nome, $sovrapprezzo, $giacenza, $imageFilename);
-        if ($stmt->execute()) {
-            $id = $this->db->insert_id;
-            $stmt->close();
-            return $id;
-        }
-        error_log("insertIngredient – execute failed: " . $stmt->error);
-        $stmt->close();
-        return false;
+    /** Ritorna l’ID appena creato */
+    public function insertIngredient(string $name,
+    float  $price,
+    int    $stock,
+    ?string $image = null): int
+    {
+        $stmt = $this->db->prepare(
+        "INSERT INTO ingredienti (nome, sovrapprezzo, giacenza, image)
+        VALUES (?, ?, ?, ?)"
+        );
+        $stmt->bind_param("sdis", $name, $price, $stock, $image);
+        if (!$stmt->execute()) return 0;
+        return $this->db->insert_id;   // <-- nuovo idingrediente
+    }
+
+    /** Recupera un singolo ingrediente */
+    public function getIngredient(int $id): ?array
+    {
+        $stmt = $this->db->prepare(
+        "SELECT * FROM ingredienti WHERE idingrediente = ?"
+        );
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        return $res->fetch_assoc() ?: null;
     }
 
 }
