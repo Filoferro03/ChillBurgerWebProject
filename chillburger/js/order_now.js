@@ -16,10 +16,19 @@ async function fetchData(url, formData) {
 function generateProducts(products) {
   let result = "";
   products.forEach((product) => {
+    const isBurger = product.categoryDescrizione.toLowerCase() === 'panini';
+
+    // Se è un panino, avvolge l'immagine in un link alla pagina di dettaglio
+    const imgTag = isBurger
+      ? `<a href="./burger-details.php?id=${product.idprodotto}">
+           <img src="${product.image}" class="card-img-top" alt="${product.nome}">
+         </a>`
+      : `<img src="${product.image}" class="card-img-top" alt="${product.nome}">`;
+
     result += `
     <div class="col-6 col-md-4 col-lg-3 menu-item" data-category="${product.categoryDescrizione}">
       <div class="card h-100 text-center shadow-sm hover-up">
-        <img src="${product.image}" class="card-img-top" alt="${product.nome}">
+        ${imgTag}
         <div class="card-body">
           <h5 class="card-title">${product.nome}</h5>
           <p class="card-text small text-muted">${product.descrizione || ''}</p>
