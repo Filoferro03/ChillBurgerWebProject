@@ -185,6 +185,19 @@
 
     <script src="js/shared/components.js"></script>
     <script src="js/shared/utils.js"></script>
+    <script src="js/shared/animation-dot.js"></script>
+    <?php if (isUserLoggedIn()): ?>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                if (typeof checkNewNotifications === "function") {
+                    checkNewNotifications();
+                } else {
+                    console.error("checkNewNotifications non è definita!");
+                }
+            });
+        </script>
+    <?php endif; ?>
+
 
 
     <?php
