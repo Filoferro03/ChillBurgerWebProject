@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $templateParams["titolo"]; ?></title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
         rel="stylesheet"
         integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7"
@@ -77,16 +81,16 @@
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-start flex-grow-1 pe-3">
                             <li class="nav-item">
-                                <a class="nav-link fs-3" aria-current="page" href="menu.php">Menu</a>
+                                <a class="nav-link fs-2" aria-current="page" href="menu.php">Menu</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fs-3" href="order_now.php">Ordina ora</a>
+                                <a class="nav-link fs-2" href="order_now.php">Ordina</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fs-3" href="about_us.php">About us</a>
+                                <a class="nav-link fs-2" href="about_us.php">About us</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link fs-3" href="reviews.php">Recensioni</a>
+                                <a class="nav-link fs-2" href="reviews.php">Recensioni</a>
                             </li>
                         </ul>
                     </div>
