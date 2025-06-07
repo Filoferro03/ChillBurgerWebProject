@@ -7,6 +7,7 @@ $templateParams = [
     "css"    => [
         "css/style.css",
         "css/manager_stock_style.css",
+        "css/manager_menu_style.css",
     ],
     "js"     => ["js/manager_stock.js"]
 ];
