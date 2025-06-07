@@ -7,7 +7,9 @@
           <span class="emoji">🍔</span>
         </h2>
         <a href="manager_menu.php" class="btn btn-outline-secondary">
-          <i class="fas fa-arrow-left me-2"></i>Torna al Menu
+          <span class="fas fa-arrow-left me-2" aria-hidden="true"></span>
+          <span class="visually-hidden">Indietro</span>
+          Torna al Menu
         </a>
       </div>
 

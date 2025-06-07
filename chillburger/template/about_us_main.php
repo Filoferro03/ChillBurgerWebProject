@@ -11,7 +11,7 @@
     <!-- Sottotitolo -->
     <p class="lead text-center mb-5">
         Dal <strong>2024</strong> trasformiamo ingredienti locali di primissima qualità in burger dal gusto
-        indimenticabile. Siamo <em>Chill Burger</em>: passione per la cucina, attenzione all’ambiente
+        indimenticabile. Siamo <em>Chill Burger:</em> passione per la cucina, attenzione all’ambiente
         e un sorriso per ogni cliente. 😊
     </p>
 

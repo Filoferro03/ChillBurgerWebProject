@@ -86,13 +86,14 @@
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title fw-bold" id="qtyModalLabel">Modifica Quantità</h5>
+              <h4 class="modal-title fw-bold" id="qtyModalLabel">Modifica Quantità</h4>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
             </div>
             <div class="modal-body">
               <p id="modalProductName" class="fw-medium mb-3"></p>
               <div class="input-group">
                 <button class="btn btn-outline-secondary" id="decrementBtn">−</button>
+                <label for="qtyInput" class="visually-hidden">Quantità</label>
                 <input type="number" class="form-control text-center" id="qtyInput" value="0" min="0">
                 <button class="btn btn-outline-secondary" id="incrementBtn">+</button>
               </div>

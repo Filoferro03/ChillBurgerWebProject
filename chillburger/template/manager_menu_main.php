@@ -14,9 +14,11 @@
           <h2 class="h4 mb-0 position-relative animate-underline">
             <span>Prodotti attuali</span>
           </h2>
-          <button id="btn-new-product" class="btn btn-success">
-            <i class="fas fa-plus me-2"></i>Nuovo Prodotto
-          </button>
+        <button id="btn-new-product" class="btn btn-success">
+          <span class="fas fa-plus me-2" aria-hidden="true"></span>
+          <span class="visually-hidden">Aggiungi Nuovo Prodotto</span>
+          Nuovo Prodotto
+        </button>
           
         </div>
 

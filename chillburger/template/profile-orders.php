@@ -27,7 +27,7 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content w-75 mx-auto">
           <div class="modal-header">
-            <h5 class="modal-title" id="logoutModalLabel">Conferma Logout</h5>
+          <h4 class="modal-title" id="logoutModalLabel">Conferma Logout</h4>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -45,7 +45,7 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content w-75 mx-auto">
           <div class="modal-header">
-            <h5 class="modal-title" id="stateModalLabel">Conferma Ricezione Ordine</h5>
+          <h5 class="modal-title" id="stateModalLabel">Conferma Ricezione Ordine</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
