@@ -597,7 +597,7 @@ class DatabaseHelper
 
         // Recupera i prodotti personalizzati con le loro modifiche di ingredienti
         $queryCustom = "SELECT pe.idpersonalizzazione, p.nome AS nomeprodotto, 
-                               pe.prezzo, pe.quantita, 
+                               pe.prezzo, pe.quantita, pe.idprodotto,
                                i.nome AS nomeingrediente, m.azione
                         FROM ordini o
                         JOIN personalizzazioni pe ON o.idordine = pe.idordine
@@ -621,7 +621,7 @@ class DatabaseHelper
         }
 
         // Recupera i prodotti standard (non personalizzati)
-        $queryStock = "SELECT p.nome, p.prezzo, cp.quantita, p.idcategoria
+        $queryStock = "SELECT p.nome, p.prezzo, cp.quantita, p.idcategoria, p.idprodotto
                        FROM ordini o
                        JOIN carrelli_prodotti cp ON o.idordine = cp.idordine
                        JOIN prodotti p ON cp.idprodotto = p.idprodotto

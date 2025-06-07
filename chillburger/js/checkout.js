@@ -25,6 +25,7 @@ data.orderCustom.forEach(item => {
             if (!customProductsMap.has(item.idpersonalizzazione)) {
                 customProductsMap.set(item.idpersonalizzazione, {
                     idpersonalizzazione: item.idpersonalizzazione,
+                    idprodotto: item.idprodotto || '', // Add the standard product ID
                     productName: item.nomeprodotto || 'Nome Prodotto N/D',
                     productQuantity: item.quantita !== undefined ? item.quantita : 'N/D', // Quantità del prodotto personalizzato
                     productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D', // Prezzo totale della personalizzazione
@@ -44,7 +45,7 @@ customProductsMap.forEach(customProduct => {
                 <div class="card shadow-sm mb-3">
                     <div class="card-body d-flex flex-column flex-md-row justify-content-md-between align-items-md-center text-center text-md-start">
                         <div class="w-100 w-md-50 mb-2 mb-md-0">
-                            <p class="card-title">${customProduct.productName}</p>`;
+                            <p class="card-title"><a href="burger-details.php?id=${customProduct.idprodotto}" style="color: inherit; text-decoration: none;">${customProduct.productName}</a></p>`;
 
             if (customProduct.modifiche.length > 0 && customProduct.modifiche[0].ingredientName != '') {
                 result += `<ul class="list-unstyled ms-md-3 small">`;
@@ -80,7 +81,7 @@ customProductsMap.forEach(customProduct => {
             result += `
                 <div class="card shadow-sm mb-3">
                     <div class="card-body d-flex flex-column flex-md-row justify-content-md-between align-items-md-center text-center text-md-start">
-                        <p class="card-title w-100 w-md-50 mb-2 mb-md-0">${productName}</p>
+                        <p class="card-title w-100 w-md-50 mb-2 mb-md-0"><a href="menu.php#${stockElement.idprodotto || ''}" style="color: inherit; text-decoration: none;">${productName}</a></p>
                         <div class="d-flex flex-column align-items-center align-items-md-end w-100 w-md-auto mt-2 mt-md-0">
                             <p class="card-text m-0 mb-1">
                                 <strong>Q.tà:</strong> ${quantity}

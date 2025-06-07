@@ -10,15 +10,19 @@ header {
 }
 
 body {
-    font-family: cute, Arial, Helvetica, sans-serif;
+    font-family: 'Nunito', sans-serif;
 }
 
 footer {
-    font-family: Arial, sans-serif;
+    font-family: 'Nunito', sans-serif;
 }
 
 h1 {
     color: white;
+}
+
+.custom-title, .chill-burger-title, .welcome-to-title, .animate-underline {
+    font-family: 'cute', Arial, Helvetica, sans-serif;
 }
 
 .dark-brown-text {

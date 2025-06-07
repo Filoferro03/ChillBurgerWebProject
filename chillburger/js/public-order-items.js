@@ -18,6 +18,8 @@ function displayOrderItemsOnly(data) {
         data.orderCustom.forEach(item => {
             if (!customProductsMap.has(item.idpersonalizzazione)) {
                 customProductsMap.set(item.idpersonalizzazione, {
+                    idpersonalizzazione: item.idpersonalizzazione,
+                    idprodotto: item.idprodotto || '', // Add the standard product ID
                     productName: item.nomeprodotto || 'Prodotto Personalizzato N/D',
                     productQuantity: item.quantita !== undefined ? item.quantita : 'N/D',
                     modifiche: []
@@ -33,7 +35,7 @@ function displayOrderItemsOnly(data) {
 
         customProductsMap.forEach(customProduct => {
             result += `<div class="mb-2">
-                           <p class="fs-5 fw-bold mb-0">${customProduct.productName} (Q.tà: ${customProduct.productQuantity})</p>`;
+                           <p class="fs-5 fw-bold mb-0"><a href="burger-details.php?id=${customProduct.idprodotto}" style="color: inherit; text-decoration: none;">${customProduct.productName}</a> (Q.tà: ${customProduct.productQuantity})</p>`;
             if (customProduct.modifiche.length > 0 && customProduct.modifiche[0].ingredientName) {
                 result += `<ul class="list-unstyled ms-3 small">`;
                 customProduct.modifiche.forEach(mod => {
@@ -51,7 +53,7 @@ function displayOrderItemsOnly(data) {
             const productName = stockElement.nome || 'Prodotto N/D';
             const quantity = stockElement.quantita !== undefined ? stockElement.quantita : 'N/D';
             result += `<div class="mb-2">
-                           <p class="fs-5 fw-bold mb-0">${productName} (Q.tà: ${quantity})</p>
+                           <p class="fs-5 fw-bold mb-0"><a href="menu.php#${stockElement.idprodotto || ''}" style="color: inherit; text-decoration: none;">${productName}</a> (Q.tà: ${quantity})</p>
                        </div><hr class="my-2">`;
         });
     }
