@@ -159,9 +159,20 @@ if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
         $availableTimes = $dbh->getAvailableTimeSlots($date);
         $response['success'] = true;
         $response['data'] = $availableTimes; 
+    } else if (isset($_POST['action']) && $_POST['action'] == 'check_availability') {
+    if (!isset($_SESSION['idordine'])) {
+        $response = ['success' => false, 'error' => 'Nessun ordine attivo trovato nella sessione.'];
+    } else {
+        $idordine = $_SESSION['idordine'];
+        $unavailable_items = $dbh->checkOrderAvailability($idordine);
+
+        if (empty($unavailable_items)) {
+            $response = ['success' => true];
+        } else {
+            $response = ['success' => false, 'unavailable_items' => $unavailable_items];
+        }
     }
-    
-    else {
+    } else {
         http_response_code(400); // Bad Request
         $response = ['success' => false, 'error' => 'Azione non specificata o non valida'];
     }

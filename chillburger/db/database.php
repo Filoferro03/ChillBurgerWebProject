@@ -1865,4 +1865,159 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
         return $res->fetch_assoc() ?: null;
     }
 
+    // Add this new method to the DatabaseHelper class in db/database.php
+
+    public function checkOrderAvailability($idordine) {
+        $required_ingredients = [];
+        $required_products = [];
+        $unavailable_items = [];
+
+        // 1. Get standard products from carrelli_prodotti
+        $query_std_prods = "SELECT idprodotto, quantita FROM carrelli_prodotti WHERE idordine = ?";
+        $stmt_std_prods = $this->db->prepare($query_std_prods);
+        $stmt_std_prods->bind_param('i', $idordine);
+        $stmt_std_prods->execute();
+        $result_std_prods = $stmt_std_prods->get_result();
+        $standard_products = $result_std_prods->fetch_all(MYSQLI_ASSOC);
+        $stmt_std_prods->close();
+
+        foreach ($standard_products as $prod) {
+            // Check if product is composite
+            $query_is_composite = "SELECT 1 FROM composizioni WHERE idprodotto = ? LIMIT 1";
+            $stmt_is_composite = $this->db->prepare($query_is_composite);
+            $stmt_is_composite->bind_param('i', $prod['idprodotto']);
+            $stmt_is_composite->execute();
+            $stmt_is_composite->store_result();
+            $is_composite = $stmt_is_composite->num_rows > 0;
+            $stmt_is_composite->close();
+
+            if ($is_composite) {
+                // It's a composite product (e.g., a burger), aggregate its ingredients
+                $query_comp = "SELECT idingrediente, quantita FROM composizioni WHERE idprodotto = ?";
+                $stmt_comp = $this->db->prepare($query_comp);
+                $stmt_comp->bind_param('i', $prod['idprodotto']);
+                $stmt_comp->execute();
+                $result_comp = $stmt_comp->get_result();
+                $ingredients = $result_comp->fetch_all(MYSQLI_ASSOC);
+                $stmt_comp->close();
+
+                foreach ($ingredients as $ing) {
+                    $total_required = $ing['quantita'] * $prod['quantita'];
+                    if (!isset($required_ingredients[$ing['idingrediente']])) {
+                        $required_ingredients[$ing['idingrediente']] = 0;
+                    }
+                    $required_ingredients[$ing['idingrediente']] += $total_required;
+                }
+            } else {
+                // It's a simple product (drink, fries), track by id
+                if (!isset($required_products[$prod['idprodotto']])) {
+                    $required_products[$prod['idprodotto']] = 0;
+                }
+                $required_products[$prod['idprodotto']] += $prod['quantita'];
+            }
+        }
+
+        // 2. Get custom products from personalizzazioni
+        $query_pers = "SELECT idpersonalizzazione, idprodotto, quantita FROM personalizzazioni WHERE idordine = ?";
+        $stmt_pers = $this->db->prepare($query_pers);
+        $stmt_pers->bind_param('i', $idordine);
+        $stmt_pers->execute();
+        $result_pers = $stmt_pers->get_result();
+        $personalizations = $result_pers->fetch_all(MYSQLI_ASSOC);
+        $stmt_pers->close();
+
+        foreach ($personalizations as $pers) {
+        $burger_ingredients = [];
+        
+        // Get base composition
+        $query_base_comp = "SELECT idingrediente, quantita FROM composizioni WHERE idprodotto = ?";
+        $stmt_base_comp = $this->db->prepare($query_base_comp);
+        $stmt_base_comp->bind_param('i', $pers['idprodotto']);
+        $stmt_base_comp->execute();
+        $result_base_comp = $stmt_base_comp->get_result();
+        $base_composition = $result_base_comp->fetch_all(MYSQLI_ASSOC);
+        $stmt_base_comp->close();
+        
+        foreach($base_composition as $ing) {
+            $burger_ingredients[$ing['idingrediente']] = $ing['quantita'];
+        }
+
+        // Apply modifications from modifiche_ingredienti
+        $query_mods = "SELECT idingrediente, azione FROM modifiche_ingredienti WHERE idpersonalizzazione = ?";
+        $stmt_mods = $this->db->prepare($query_mods);
+        $stmt_mods->bind_param('i', $pers['idpersonalizzazione']);
+        $stmt_mods->execute();
+        $result_mods = $stmt_mods->get_result();
+        $modifications = $result_mods->fetch_all(MYSQLI_ASSOC);
+        $stmt_mods->close();
+        
+        foreach($modifications as $mod) {
+            if ($mod['azione'] === 'rimosso') {
+                if(isset($burger_ingredients[$mod['idingrediente']])) {
+                    $burger_ingredients[$mod['idingrediente']] = 0; // Set quantity to 0 if removed
+                }
+            } elseif ($mod['azione'] === 'aggiunto') {
+                 if(isset($burger_ingredients[$mod['idingrediente']])) {
+                    $burger_ingredients[$mod['idingrediente']]++; // Add extra portion
+                 } else {
+                    $burger_ingredients[$mod['idingrediente']] = 1; // Add new ingredient
+                 }
+            }
+        }
+        
+        // Add calculated ingredients to the main required list
+        foreach($burger_ingredients as $id_ing => $qty) {
+            if($qty > 0) {
+                 $total_required = $qty * $pers['quantita'];
+                 if (!isset($required_ingredients[$id_ing])) {
+                    $required_ingredients[$id_ing] = 0;
+                }
+                $required_ingredients[$id_ing] += $total_required;
+            }
+        }
+    }
+
+    // 3. Final Check: Compare required quantities against stock
+    // Check non-composite products stock
+    if (!empty($required_products)) {
+        $product_ids = array_keys($required_products);
+        $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
+        $types = str_repeat('i', count($product_ids));
+
+        $query_prod_stock = "SELECT idprodotto, nome, disponibilita FROM prodotti WHERE idprodotto IN ($placeholders)";
+        $stmt_prod_stock = $this->db->prepare($query_prod_stock);
+        $stmt_prod_stock->bind_param($types, ...$product_ids);
+        $stmt_prod_stock->execute();
+        $result_prod_stock = $stmt_prod_stock->get_result();
+        
+        while($row = $result_prod_stock->fetch_assoc()) {
+            if ($row['disponibilita'] < $required_products[$row['idprodotto']]) {
+                $unavailable_items[] = ['name' => $row['nome']];
+            }
+        }
+        $stmt_prod_stock->close();
+    }
+    
+    // Check ingredients stock
+    if(!empty($required_ingredients)) {
+        $ingredient_ids = array_keys($required_ingredients);
+        $placeholders = implode(',', array_fill(0, count($ingredient_ids), '?'));
+        $types = str_repeat('i', count($ingredient_ids));
+
+        $query_ing_stock = "SELECT idingrediente, nome, giacenza FROM ingredienti WHERE idingrediente IN ($placeholders)";
+        $stmt_ing_stock = $this->db->prepare($query_ing_stock);
+        $stmt_ing_stock->bind_param($types, ...$ingredient_ids);
+        $stmt_ing_stock->execute();
+        $result_ing_stock = $stmt_ing_stock->get_result();
+
+        while($row = $result_ing_stock->fetch_assoc()) {
+            if ($row['giacenza'] < $required_ingredients[$row['idingrediente']]) {
+                $unavailable_items[] = ['name' => $row['nome']];
+            }
+        }
+        $stmt_ing_stock->close();
+    }
+
+    return $unavailable_items;
+    }
 }
