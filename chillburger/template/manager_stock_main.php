@@ -44,7 +44,7 @@
       <div class="row g-3">
         <div class="col-12 col-md-6 col-lg-3 mt-4">
           <label for="category-filter" class="form-label small text-secondary mb-1">Categoria</label>
-          <select id="category-filter" class="form-select rounded-2 shadow-sm">
+          <select id="category-filter" class="form-select w-auto rounded-2 shadow-sm">
             <option value="">Tutte le Categorie</option>
             <option value="ingrediente">Ingredienti</option>
             <option value="bevanda">Bevande</option>
@@ -56,7 +56,7 @@
         <div class="row g-2">
           <!-- Select occupa 2/3 dello spazio -->
           <div class="col-8">
-            <select id="status-filter" class="form-select rounded-2 shadow-sm">
+            <select id="status-filter" class="form-select w-auto rounded-2 shadow-sm">
               <option value="all">Tutti</option>
               <option value="in-stock">In Magazzino</option>
               <option value="low-stock">Bassa Scorta</option>
