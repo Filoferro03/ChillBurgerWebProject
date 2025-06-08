@@ -42,3 +42,10 @@
 .table img {
     border: 1px solid #dee2e6; /* Bordo sottile per le immagini */
 }
+
+/* file custom.css o <style> */
+#status-filter { 
+    max-width: 200px;      /* oppure la misura che preferisci */
+    width: auto;           /* sovrascrive la width:100% di Bootstrap */
+  }
+  
