@@ -67,8 +67,8 @@
             </div>
             <div class="card-footer text-center p-3">
                 <div class="d-flex flex-column flex-sm-row justify-content-sm-end gap-2">
-                    <button type="button" class="btn btn-secondary w-100 w-sm-auto order-sm-1" onclick="window.history.back();">Torna indietro</button>
-                    <button type="submit" class="btn order-button w-100 w-sm-auto order-sm-2" form="paymentForm">Conferma pagamento</button>
+                    <button type="button" class="btn btn-secondary w-sm-auto order-sm-1" onclick="window.history.back();">Torna indietro</button>
+                    <button type="submit" class="btn order-button w-sm-auto order-sm-2" form="paymentForm">Conferma pagamento</button>
                 </div>
             </div>
         </div>
