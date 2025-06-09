@@ -148,7 +148,7 @@
 
     // Corpo della card
     const body = createEl("div", { class: "card-body d-flex flex-column" });
-    body.appendChild(createEl("h5", { class: "card-title mb-1" }, product.nome));
+    body.appendChild(createEl("p", { class: "card-title mb-1" }, product.nome));
     body.appendChild(
       createEl(
         "p",
@@ -400,7 +400,7 @@
     const modalBox = $("#modal-box");
     if (!modalOverlay || !modalBox) return;
     modalBox.innerHTML = "";
-    modalBox.append(createEl("h4", { class: "mb-4 fw-bold" }, "Modifica Prodotto"));
+    modalBox.append(createEl("p", { class: "mb-4 fw-bold" }, "Modifica Prodotto"));
 
     const form = createEl("form", { id: "edit-product-form", enctype: "multipart/form-data" });
 
@@ -569,7 +569,7 @@
 
     modalBox.innerHTML = "";
     modalBox.append(
-      createEl("h4", { class: "mb-3 fw-bold" }, "Conferma Eliminazione")
+      createEl("p", { class: "mb-3 fw-bold" }, "Conferma Eliminazione")
     );
     modalBox.append(
       createEl("p", {}, `Sei sicuro di voler eliminare il prodotto "${product.nome}"?`)

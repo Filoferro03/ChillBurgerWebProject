@@ -1,17 +1,15 @@
-
-<!-- chillburger/manager_menu.php – markup rivisto con gruppo filtri -->
 <section class="container py-5">
-    <h2 class="display-4 custom-title text-center mb-3">
+    <h1 class="display-4 custom-title text-center mb-3">
       <span class="txt">Gestione Menu</span>
       <span class="emoji">📋</span>
-    </h2>
+    </h1>
 
     <div class="container p-4">
 
       <!-- Elenco prodotti + filtri -->
       <section class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-          <h2 class="h4 mb-0 position-relative animate-underline">
+          <h2 class="mb-0 position-relative animate-underline">
             <span>Prodotti attuali</span>
           </h2>
         <button id="btn-new-product" class="btn btn-success">
