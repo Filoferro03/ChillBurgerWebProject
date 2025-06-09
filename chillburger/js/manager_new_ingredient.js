@@ -32,6 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const file = e.target.files?.[0];
       if (file) {
         imgPreview.src = URL.createObjectURL(file);
+
+        const productName = document.getElementById('product-name')?.value.trim() || 'Prodotto';
+        imgPreview.alt = productName;
+    
         imgPreviewCt.style.display = 'block';
       } else {
         imgPreviewCt.style.display = 'none';
