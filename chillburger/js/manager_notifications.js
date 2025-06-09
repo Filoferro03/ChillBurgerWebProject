@@ -110,6 +110,8 @@ async function getManagerNotifications() {
 
   const notifications = await fetchData(url, formData);
   console.log(notifications);
+  const notificationReverse = [...notifications].reverse();
+  console.log(notificationReverse);
 
   const container = document.querySelector("#manager-notifications");
 
