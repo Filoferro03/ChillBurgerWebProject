@@ -243,7 +243,6 @@ INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica
 
 -- Insert Carrelli Prodotti
 INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
-(1, (SELECT idprodotto FROM prodotti WHERE nome = 'Bacon Cheeseburger'), 1),
 (1, (SELECT idprodotto FROM prodotti WHERE nome = 'Patatine Fritte'), 1),
 (1, (SELECT idprodotto FROM prodotti WHERE nome = 'Coca Cola'), 2);
 insert into chillburgerdb.personalizzazioni(idordine, idprodotto, quantita)
@@ -254,12 +253,10 @@ values (@id_personalizzazione_ordine_1, (select idingrediente from ingredienti w
 (@id_personalizzazione_ordine_1, (select idingrediente from ingredienti where nome = 'maionese'), 'Rimosso');
 
 INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
-(2, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 2),
 (2, (SELECT idprodotto FROM prodotti WHERE nome = 'Patatine Fritte'), 2),
 (2, (SELECT idprodotto FROM prodotti WHERE nome = 'Acqua Naturale'), 2);
 
 INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
-(3, (SELECT idprodotto FROM prodotti WHERE nome = 'Smoky Burger'), 2),
 (3, (SELECT idprodotto FROM prodotti WHERE nome = 'Onion Rings'), 1),
 (3, (SELECT idprodotto FROM prodotti WHERE nome = 'Birra Artigianale Bionda'), 2);
 
@@ -268,8 +265,6 @@ INSERT INTO chillburgerdb.personalizzazioni (idordine, idprodotto, quantita) VAL
 (4, (SELECT idprodotto FROM prodotti WHERE nome = 'Chicken Deluxe'), 1);
 
 
-INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
-(5, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 1);
 INSERT INTO chillburgerdb.personalizzazioni (idordine, idprodotto, quantita) VALUES
 (5, (SELECT idprodotto FROM prodotti WHERE nome = 'Bacon Cheeseburger'), 1);
 SET @id_personalizzazione_ordine_5 = LAST_INSERT_ID();
@@ -303,10 +298,16 @@ values (@id_personalizzazione_ordine_7, (select idingrediente from ingredienti w
 
 
 INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
-(8, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 1);
-INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
 (8, (SELECT idprodotto FROM prodotti WHERE nome = 'Patatine Fritte'), 1),
 (8, (SELECT idprodotto FROM prodotti WHERE nome = 'Cheesecake ai Frutti di Bosco'), 1);
+
+INSERT INTO chillburgerdb.personalizzazioni (idordine, idprodotto, quantita) VALUES
+(1, (SELECT idprodotto FROM prodotti WHERE nome = 'Bacon Cheeseburger'), 1),
+(2, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 2),
+(3, (SELECT idprodotto FROM prodotti WHERE nome = 'Smoky Burger'), 2),
+(5, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 1),
+(8, (SELECT idprodotto FROM prodotti WHERE nome = 'Veggie Burger'), 1);
+
 
 
 INSERT INTO chillburgerdb.recensioni (idordine, titolo, voto, commento, timestamp_recensione) VALUES

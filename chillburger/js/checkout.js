@@ -60,7 +60,7 @@ customProductsMap.forEach(customProduct => {
             result += `</div>
                         <div class="d-flex flex-column align-items-center align-items-md-end w-100 w-md-auto mt-2 mt-md-0">
                             <p class="card-text m-0 mb-1">
-                                <strong>Q.tà:</strong> ${customProduct.productQuantity}
+                                Q.tà: ${customProduct.productQuantity}
                             </p>
                             <p class="card-text m-0 fw-bold">
                                 €${customProduct.productPrice}
@@ -84,7 +84,7 @@ customProductsMap.forEach(customProduct => {
                         <p class="card-title w-100 w-md-50 mb-2 mb-md-0"><a href="menu.php#${stockElement.idprodotto || ''}" style="color: inherit; text-decoration: none;">${productName}</a></p>
                         <div class="d-flex flex-column align-items-center align-items-md-end w-100 w-md-auto mt-2 mt-md-0">
                             <p class="card-text m-0 mb-1">
-                                <strong>Q.tà:</strong> ${quantity}
+                                Q.tà: ${quantity}
                             </p>
                             <p class="card-text m-0 fw-bold">
                                 € ${price}
@@ -109,7 +109,7 @@ customProductsMap.forEach(customProduct => {
         const totalPriceFormatted = parseFloat(data.totalPrice).toFixed(2);
         result += `
             <div class="text-end mt-3 pt-3 border-top">
-                <p><strong>Totale: €${totalPriceFormatted}</strong></p>
+                <p>Totale: €${totalPriceFormatted}</p>
             </div>`;
     } else {
         result += '<p class="text-muted mt-4 text-end">Prezzo totale non disponibile.</p>';
