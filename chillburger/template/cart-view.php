@@ -25,7 +25,7 @@
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="confirmDeleteLabel">Conferma Rimozione</h5>
+            <h3 class="modal-title" id="confirmDeleteLabel">Conferma Rimozione</h3>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
           </div>
           <div class="modal-body">
