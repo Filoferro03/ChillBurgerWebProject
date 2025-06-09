@@ -7,9 +7,6 @@ header('Content-Type: application/json'); //
 $uploadDir = realpath(__DIR__ . '/../resources/products'); //
 if (!$uploadDir) {
     $uploadDir = __DIR__ . '/../resources/products';
-    if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true)) {
-        // Error handled within POST logic
-    }
 }
 
 try {
@@ -98,8 +95,8 @@ try {
 
                 $dbh->deleteProductCompositions($idprodotto);
                 if ($idcategoria == $dbh->getPaniniCategoryId()) {
-                    foreach ($ingredients as $idIng) {
-                        $dbh->addProductComposition($idprodotto, intval($idIng));
+                    foreach ($ingredients as $ing) {
+                        $dbh->addProductComposition($idprodotto, $ing['id'], $ing['qty'], $ing['ess']);
                     }
                 }
 
@@ -109,25 +106,24 @@ try {
                 ]);
 
             } elseif ($action === 'add') {
-                 // La logica per 'add' rimane invariata
-                if (strpos($_SERVER['CONTENT_TYPE'] ?? '', 'multipart/form-data') === false) { //
-                    http_response_code(415); //
-                    echo json_encode(['success' => false, 'error' => 'Unsupported Media Type']); //
-                    exit; //
+                if (strpos($_SERVER['CONTENT_TYPE'] ?? '', 'multipart/form-data') === false) {
+                    http_response_code(415);
+                    echo json_encode(['success' => false, 'error' => 'Unsupported Media Type']);
+                    exit;
                 }
 
-                $requiredPost = ['name', 'price', 'category', 'ingredients']; //
-                foreach ($requiredPost as $field) { //
-                    if (empty($_POST[$field])) { //
-                        http_response_code(400); //
-                        echo json_encode(['success' => false, 'error' => "Campo '$field' mancante"]); //
-                        exit; //
+                $requiredPost = ['name', 'price', 'category', 'ingredients'];
+                foreach ($requiredPost as $field) {
+                    if (!isset($_POST[$field])) {
+                        http_response_code(400);
+                        echo json_encode(['success' => false, 'error' => "Campo '$field' mancante"]);
+                        exit;
                     }
                 }
-                if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) { //
-                    http_response_code(400); //
-                    echo json_encode(['success' => false, 'error' => 'Immagine mancante o upload fallito']); //
-                    exit; //
+                if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => 'Immagine mancante o upload fallito']);
+                    exit;
                 }
                 
                 if (!$uploadDir || !is_dir($uploadDir) || !is_writable($uploadDir)) {
@@ -136,86 +132,66 @@ try {
                      exit;
                 }
 
-
-                $name = trim($_POST['name']); //
-                $price = floatval($_POST['price']); //
-                $ingredients = json_decode($_POST['ingredients'], true); //
-                $idcategoria = intval($_POST['category']); //
+                $name = trim($_POST['name']);
+                $price = floatval($_POST['price']);
+                $ingredients = json_decode($_POST['ingredients'], true);
+                $idcategoria = intval($_POST['category']);
                 $availability = isset($_POST['availability']) ? intval($_POST['availability']) : null;
                 
-                // Validate availability if provided
                 if ($availability !== null && $availability < 0) {
                     http_response_code(400);
                     echo json_encode(['success' => false, 'error' => 'La disponibilità deve essere un numero intero positivo o zero.']);
                     exit;
                 }
 
-                if ($idcategoria <= 0) { //
-                    http_response_code(400); //
-                    echo json_encode(['success' => false, 'error' => 'Categoria non valida selezionata.']); //
-                    exit; //
+                if ($idcategoria <= 0) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => 'Categoria non valida selezionata.']);
+                    exit;
                 }
-                if (json_last_error() !== JSON_ERROR_NONE || !is_array($ingredients)) { //
-                    http_response_code(400); //
-                    echo json_encode(['success' => false, 'error' => 'Formato ingredienti non valido.']); //
-                    exit; //
-                }
-
-                $allowedExt = ['jpg', 'jpeg', 'png', 'webp']; //
-                $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION)); //
-                if (!in_array($ext, $allowedExt, true)) { //
-                    http_response_code(400); //
-                    echo json_encode(['success' => false, 'error' => 'Formato immagine non consentito']); //
-                    exit; //
+                if (json_last_error() !== JSON_ERROR_NONE || !is_array($ingredients)) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => 'Formato ingredienti non valido.']);
+                    exit;
                 }
 
-                $filename = uniqid('prod_') . '.' . $ext; //
-                $destPath = $uploadDir . DIRECTORY_SEPARATOR . $filename; //
-
-                if (!move_uploaded_file($_FILES['image']['tmp_name'], $destPath)) { //
-                    http_response_code(500); //
-                    error_log('API-manager-menu UPLOAD-ERR: ' . print_r(error_get_last(), true) . " Dest: " . $destPath); //
-                    echo json_encode(['success' => false, 'error' => 'Errore salvataggio immagine']); //
-                    exit; //
+                $allowedExt = ['jpg', 'jpeg', 'png', 'webp'];
+                $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+                if (!in_array($ext, $allowedExt, true)) {
+                    http_response_code(400);
+                    echo json_encode(['success' => false, 'error' => 'Formato immagine non consentito']);
+                    exit;
                 }
 
-                $imageFilenameForDb = $filename; //
-                // RESOURCES_DIR è definita in bootstrap.php come "./resources/"
-                $imageWebPath = RESOURCES_DIR . 'products/' . $filename; //
+                $filename = uniqid('prod_') . '.' . $ext;
+                $destPath = $uploadDir . DIRECTORY_SEPARATOR . $filename;
 
-
-                // Per i panini, la disponibilità è sempre 999 (gestita tramite ingredienti)
-                // Per altri prodotti, usa il valore fornito o 1 come default
-                $finalAvailability = null;
-                if ($idcategoria == $dbh->getPaniniCategoryId()) {
-                    $finalAvailability = 999; // Panini sempre 999
-                } else {
-                    $finalAvailability = $availability !== null ? $availability : 1; // Default disponibile
+                if (!move_uploaded_file($_FILES['image']['tmp_name'], $destPath)) {
+                    http_response_code(500);
+                    error_log('API-manager-menu UPLOAD-ERR: ' . print_r(error_get_last(), true) . " Dest: " . $destPath);
+                    echo json_encode(['success' => false, 'error' => 'Errore salvataggio immagine']);
+                    exit;
                 }
+
+                $imageFilenameForDb = $filename;
                 
-                $productId = $dbh->insertProduct($name, $price, $imageFilenameForDb, $idcategoria, $finalAvailability); //
+                $productId = $dbh->insertProduct($name, $price, $imageFilenameForDb, $idcategoria, $availability);
 
-                if (!$productId) { //
-                    error_log('API-manager-menu ERROR: dbh->insertProduct ha restituito un ID non valido.'); //
-                    throw new Exception('Errore durante l\'inserimento del prodotto nel database.'); //
+                if (!$productId) {
+                    error_log('API-manager-menu ERROR: dbh->insertProduct ha restituito un ID non valido.');
+                    throw new Exception('Errore durante l\'inserimento del prodotto nel database.');
                 }
                 
                 if ($idcategoria == $dbh->getPaniniCategoryId()) { 
-                    foreach ($ingredients as $idIng) { //
-                        $dbh->addProductComposition($productId, intval($idIng)); //
+                    foreach ($ingredients as $ing) {
+                        $dbh->addProductComposition($productId, $ing['id'], $ing['qty'], $ing['ess']);
                     }
                 }
 
-                echo json_encode([ //
-                    'success' => true, //
-                    'product' => [ //
-                        'idprodotto'  => $productId, //
-                        'nome'        => $name, //
-                        'prezzo'      => $price, //
-                        'image'       => $imageWebPath, //
-                        'idcategoria' => $idcategoria, //
-                        'ingredients' => $ingredients //
-                    ]
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Prodotto aggiunto con successo!',
+                    'idprodotto'  => $productId
                 ]);
             } else {
                 http_response_code(400);

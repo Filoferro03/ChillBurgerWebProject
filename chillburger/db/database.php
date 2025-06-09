@@ -1546,42 +1546,6 @@ class DatabaseHelper
         return $stmt->execute();
     }
 
-    /**
-     * Recupera i dati di un prodotto specifico, inclusi gli ID dei suoi ingredienti.
-     * @param int $productId L'ID del prodotto.
-     * @return array|null Un array associativo con i dati del prodotto e un array 'ingredients' con gli ID, o null se non trovato.
-     */
-    public function getProductWithComposition($productId)
-    {
-        $product = null;
-        $productBaseArray = $this->getProduct($productId); // getProduct esistente restituisce un array
-        if (!empty($productBaseArray)) {
-            $product = $productBaseArray[0]; // Prendiamo il primo (e unico atteso) prodotto
-        }
-
-        if (!$product) {
-            error_log("getProductWithComposition: Prodotto non trovato con ID: " . $productId);
-            return null;
-        }
-
-        $ingredientIds = [];
-        $query_comp = "SELECT idingrediente FROM composizioni WHERE idprodotto = ?";
-        $stmt_comp = $this->db->prepare($query_comp);
-        if ($stmt_comp) {
-            $stmt_comp->bind_param('i', $productId);
-            $stmt_comp->execute();
-            $result_comp = $stmt_comp->get_result();
-            while ($row_comp = $result_comp->fetch_assoc()) {
-                $ingredientIds[] = intval($row_comp['idingrediente']); // Assicura che siano interi
-            }
-            $stmt_comp->close();
-        } else {
-            error_log("Errore preparazione statement per composizione in getProductWithComposition: " . $this->db->error);
-        }
-        $product['ingredients'] = $ingredientIds;
-        return $product;
-    }
-
     public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageFilenameForDb = null, $disponibilita = null)
     {
         if ($imageFilenameForDb && $disponibilita !== null) {
@@ -2039,5 +2003,66 @@ class DatabaseHelper
         }
 
         return $unavailable_items;
+    }
+
+    /**
+     * Recupera i dati di un prodotto specifico, inclusa la sua composizione dettagliata
+     * (ID ingrediente, nome, quantità, essenziale).
+     * @param int $productId L'ID del prodotto.
+     * @return array|null Un array associativo con i dati del prodotto e un array 'ingredients' con oggetti, o null se non trovato.
+     */
+    public function getProductWithComposition($productId)
+    {
+        // 1. Recupera i dati di base del prodotto
+        $product = null;
+        $productBaseArray = $this->getProduct($productId); // getProduct esistente restituisce un array
+        if (!empty($productBaseArray)) {
+            $product = $productBaseArray[0]; // Prendiamo il primo (e unico atteso) prodotto
+        }
+
+        if (!$product) {
+            error_log("getProductWithComposition: Prodotto non trovato con ID: " . $productId);
+            return null;
+        }
+
+        // 2. Recupera la composizione dettagliata se è un panino
+        $ingredients = [];
+        // Controlla se il prodotto appartiene alla categoria panini
+        $paniniCategoryId = $this->getPaniniCategoryId();
+        if ($product['idcategoria'] == $paniniCategoryId) {
+            
+            // Query che unisce composizioni e ingredienti per avere tutti i dati
+            $query_comp = "SELECT 
+                                c.idingrediente, 
+                                i.nome, 
+                                c.quantita, 
+                                c.essenziale 
+                           FROM composizioni c
+                           JOIN ingredienti i ON c.idingrediente = i.idingrediente
+                           WHERE c.idprodotto = ?";
+
+            $stmt_comp = $this->db->prepare($query_comp);
+            if ($stmt_comp) {
+                $stmt_comp->bind_param('i', $productId);
+                $stmt_comp->execute();
+                $result_comp = $stmt_comp->get_result();
+                while ($row_comp = $result_comp->fetch_assoc()) {
+                    // Popola l'array con oggetti strutturati
+                    $ingredients[] = [
+                        'idingrediente' => intval($row_comp['idingrediente']),
+                        'nome'          => $row_comp['nome'],
+                        'quantita'      => intval($row_comp['quantita']),
+                        'essenziale'    => boolval($row_comp['essenziale'])
+                    ];
+                }
+                $stmt_comp->close();
+            } else {
+                error_log("Errore preparazione statement per composizione in getProductWithComposition: " . $this->db->error);
+            }
+        }
+        
+        // 3. Aggiungi l'array di ingredienti (anche se vuoto) al prodotto e restituisci
+        $product['ingredients'] = $ingredients;
+        return $product;
     }
 }

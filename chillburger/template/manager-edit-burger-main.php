@@ -59,13 +59,17 @@
             </div>
 
             <div class="mb-4" id="ingredients-section" style="display: none;">
-              <label class="form-label">Ingredienti</label>
-              <div id="ingredients-container" class="border rounded p-3 bg-light">
-                <div id="ingredients-list" class="d-flex flex-wrap gap-2"></div>
-                <div id="ingredients-loading" class="text-center text-muted">Caricamento ingredienti...</div>
-                <div id="ingredients-error" class="text-danger" style="display: none;">Errore nel caricamento degli ingredienti.</div>
-              </div>
+              <p class="mb-3">Composizione del Panino</p>
+
+              <datalist id="ingredients-datalist"></datalist>
+
+            <div id="ingredients-rows-container" class="mb-3">
             </div>
+
+          <button type="button" id="btn-add-ingredient" class="btn btn-outline-success btn-sm">
+            <span class="fas fa-plus me-2"></span>Aggiungi Ingrediente
+          </button>
+      </div>
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
               <button type="button" id="btn-cancel" class="btn btn-outline-secondary me-md-2">Annulla</button>
