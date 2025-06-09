@@ -91,9 +91,24 @@ async function tryRead(idnotification) {
   formData.append("action", "readnotification");
   formData.append("idnotification", idnotification);
 
+  const container = document.querySelector("#notes-container");
+
+  // Controlla se c'è solo una notifica attualmente mostrata
+  const currentNotifications = container.querySelectorAll(".read-notification");
+  const onlyOneLeft = currentNotifications.length === 1;
+  console.log(
+    "valore di onlyOneLeft: ",
+    onlyOneLeft,
+    " notifiche al momento ",
+    currentNotifications
+  );
+
   const response = await fetchData(url, formData);
-  window.location.reload();
-  console.log("ha superato refresh");
+
+  if (onlyOneLeft) {
+    // Se ce n'era solo una ed è stata letta, ricarica la pagina
+    window.location.reload();
+  }
 }
 
 function addNotificationListeners() {

@@ -27,8 +27,20 @@ async function tryRead(idnotification) {
   formData.append("action", "readnotification");
   formData.append("idnotification", idnotification);
 
+  // Controlla se è l’unica notifica rimasta
+  const container = document.querySelector("#manager-notifications");
+  const currentNotifications = container.querySelectorAll(".read-notification");
+  const onlyOneLeft = currentNotifications.length === 1;
+  console.log(
+    "valore di onlyOneLeft: ",
+    onlyOneLeft,
+    " notifiche al momento ",
+    currentNotifications
+  );
+
   const response = await fetchData(url, formData);
-  if (response !== null) {
+
+  if (onlyOneLeft) {
     window.location.reload();
   }
 }
@@ -109,10 +121,6 @@ async function getManagerNotifications() {
   formData.append("action", "getallnotifications");
 
   const notifications = await fetchData(url, formData);
-  console.log(notifications);
-  const notificationReverse = [...notifications].reverse();
-  console.log(notificationReverse);
-
   const container = document.querySelector("#manager-notifications");
 
   if (notifications !== null) {

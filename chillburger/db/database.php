@@ -342,7 +342,8 @@ class DatabaseHelper
     public function getNotificationsByUserId($idutente)
     {
         try {
-            $query = "SELECT * FROM notifiche WHERE idutente = ? AND vista = 0";
+            $query = "SELECT * FROM notifiche WHERE idutente = ? AND vista = 0 ORDER BY timestamp_notifica DESC";
+
 
             $stmt = $this->db->prepare($query);
 
@@ -1450,7 +1451,8 @@ class DatabaseHelper
     * ============================================================
     */
     // DatabaseHelper.php
-    public function getAllProductsWithIngredients() {
+    public function getAllProductsWithIngredients()
+    {
 
         // TODO bisogna gestire la discrepanza tra idcategoria e descrizione
         $sql = "
@@ -1479,12 +1481,12 @@ class DatabaseHelper
                     'prezzo'     => (float)$r['prezzo'],
                     'image'      => $r['image'],
                     'categoria'  => $r['categoria'],
-                    'ingredients'=> []
+                    'ingredients' => []
                 ];
             }
             if ($r['idingrediente']) {
                 $products[$id]['ingredients'][] = [
-                    'idingrediente'=> $r['idingrediente'],
+                    'idingrediente' => $r['idingrediente'],
                     'nome'         => $r['nome_ingrediente'],
                     'quantita'     => (int)$r['quantita'],
                     'essenziale'   => (bool)$r['essenziale']
@@ -1494,42 +1496,47 @@ class DatabaseHelper
 
         return array_values($products);
     }
-    
+
     /* DatabaseHelper.php */
-    public function insertProduct($nome, $prezzo, $imageFilenameForDb, $idcategoria, $disponibilita = null) {
+    public function insertProduct($nome, $prezzo, $imageFilenameForDb, $idcategoria, $disponibilita = null)
+    {
         // Per i panini, la disponibilità è sempre 999 (gestita tramite ingredienti)
         // Per altri prodotti, usa il valore fornito o 1 (disponibile) come default
         if ($disponibilita === null) {
             $disponibilita = 999; // Default per compatibilità
         }
-        
+
         $sql = "INSERT INTO prodotti
                 (nome, prezzo, image, idcategoria, disponibilita)
                 VALUES (?, ?, ?, ?, ?)"; // 5 placeholders
         $stmt = $this->db->prepare($sql);
-        
+
         if ($stmt === false) {
             error_log("DatabaseHelper::insertProduct - Errore preparazione query: " . $this->db->error);
-            return false; 
+            return false;
         }
-        
+
         // Tipi di parametri: nome (s), prezzo (d), image (s), idcategoria (i), disponibilita (i)
         $stmt->bind_param('sdsii', $nome, $prezzo, $imageFilenameForDb, $idcategoria, $disponibilita);
-        
+
         if (!$stmt->execute()) {
             error_log("DatabaseHelper::insertProduct - Errore esecuzione query: " . $stmt->error);
             $stmt->close();
             return false;
         }
-        
+
         $id = $this->db->insert_id;
         $stmt->close();
         return $id;
     }
-    
 
-    public function addProductComposition($idprodotto, $idingrediente,
-                                        $quantita = 1, $essenziale = true) {
+
+    public function addProductComposition(
+        $idprodotto,
+        $idingrediente,
+        $quantita = 1,
+        $essenziale = true
+    ) {
         $sql = "INSERT INTO composizioni (idprodotto, idingrediente, quantita, essenziale)
                 VALUES (?,?,?,?)";
         $stmt = $this->db->prepare($sql);
@@ -1544,7 +1551,8 @@ class DatabaseHelper
      * @param int $productId L'ID del prodotto.
      * @return array|null Un array associativo con i dati del prodotto e un array 'ingredients' con gli ID, o null se non trovato.
      */
-    public function getProductWithComposition($productId) {
+    public function getProductWithComposition($productId)
+    {
         $product = null;
         $productBaseArray = $this->getProduct($productId); // getProduct esistente restituisce un array
         if (!empty($productBaseArray)) {
@@ -1574,7 +1582,8 @@ class DatabaseHelper
         return $product;
     }
 
-public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageFilenameForDb = null, $disponibilita = null) {
+    public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageFilenameForDb = null, $disponibilita = null)
+    {
         if ($imageFilenameForDb && $disponibilita !== null) {
             $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ?, image = ?, disponibilita = ? WHERE idprodotto = ?";
             $stmt = $this->db->prepare($sql);
@@ -1619,13 +1628,14 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
         $stmt->close();
         return $success;
     }
-    
+
     /**
      * Rimuove tutte le associazioni di ingredienti per un dato prodotto.
      * @param int $idprodotto L'ID del prodotto.
      * @return bool True se l'operazione ha avuto successo, false altrimenti.
      */
-    public function deleteProductCompositions($idprodotto) {
+    public function deleteProductCompositions($idprodotto)
+    {
         $sql = "DELETE FROM composizioni WHERE idprodotto = ?";
         $stmt = $this->db->prepare($sql);
         if (!$stmt) {
@@ -1648,7 +1658,8 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
      * @param int $idprodotto L'ID del prodotto da eliminare.
      * @return bool True se l'eliminazione ha avuto successo, false altrimenti.
      */
-    public function deleteProduct($idprodotto) {
+    public function deleteProduct($idprodotto)
+    {
         $sql = "UPDATE prodotti SET eliminato = 1 WHERE idprodotto = ?";
         $stmt = $this->db->prepare($sql);
         if (!$stmt) {
@@ -1668,7 +1679,8 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
      * Recupera l'ID della categoria "Panini".
      * @return int|null L'ID della categoria o null se non trovata.
      */
-    public function getPaniniCategoryId() {
+    public function getPaniniCategoryId()
+    {
         $query = "SELECT idcategoria FROM categorie WHERE LOWER(descrizione) = 'panini' LIMIT 1";
         $stmt = $this->db->prepare($query);
         if ($stmt) {
@@ -1691,7 +1703,8 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
      * @param int $productId L'ID del prodotto.
      * @return string|null Il nome del file immagine o null se non trovato/non impostato.
      */
-    public function getProductImageFilename($productId) {
+    public function getProductImageFilename($productId)
+    {
         $query = "SELECT image FROM prodotti WHERE idprodotto = ? LIMIT 1";
         $stmt = $this->db->prepare($query);
         if ($stmt) {
@@ -1709,7 +1722,8 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
         return null;
     }
 
-    public function advanceOrderStatus($orderId) {
+    public function advanceOrderStatus($orderId)
+    {
         $currentStatusQuery = "SELECT MAX(idstato) AS current_max_idstato FROM modifiche_stato WHERE idordine = ? AND idstato != " . ID_STATO_ANNULLATO_PER_STOCK; // Assicurati che ID_STATO_ANNULLATO_PER_STOCK sia definito
         $stmtStatus = $this->db->prepare($currentStatusQuery);
         if (!$stmtStatus) {
@@ -1721,9 +1735,9 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
         $resultStatus = $stmtStatus->get_result();
         $rowStatus = $resultStatus->fetch_assoc();
         $stmtStatus->close();
-        
+
         $current_max_idstato = ($rowStatus && $rowStatus['current_max_idstato'] !== null) ? (int)$rowStatus['current_max_idstato'] : 0;
-        
+
         // Se lo stato corrente è 0 (nessuno stato precedente valido escluso annullato), il prossimo è 1 (In Attesa).
         // Altrimenti, è lo stato massimo corrente + 1.
         $nextStatusId = ($current_max_idstato == 0 && !$this->hasAnyStatusOtherThanCancelled($orderId, ID_STATO_ANNULLATO_PER_STOCK)) ? 1 : $current_max_idstato + 1;
@@ -1731,7 +1745,7 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
 
         $checkStateExistsQuery = "SELECT 1 FROM stati_ordine WHERE idstato = ?";
         $stmtCheck = $this->db->prepare($checkStateExistsQuery);
-         if (!$stmtCheck) {
+        if (!$stmtCheck) {
             error_log("Errore preparazione checkStateExistsQuery in advanceOrderStatus: " . $this->db->error);
             return false;
         }
@@ -1742,8 +1756,8 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
         $stmtCheck->close();
 
         if (!$stateExists) {
-             // Non c'è un prossimo stato valido definito nella tabella stati_ordine
-             // (es. si è provato ad andare oltre "Confermato")
+            // Non c'è un prossimo stato valido definito nella tabella stati_ordine
+            // (es. si è provato ad andare oltre "Confermato")
             return false; // Indica che non c'è stato un avanzamento o che lo stato non è valido.
         }
 
@@ -1774,7 +1788,8 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
     }
 
     // Funzione helper per advanceOrderStatus per determinare se l'ordine ha solo stati "annullato" o nessuno stato
-    private function hasAnyStatusOtherThanCancelled($orderId, $idStatoAnnullato) {
+    private function hasAnyStatusOtherThanCancelled($orderId, $idStatoAnnullato)
+    {
         $query = "SELECT 1 FROM modifiche_stato WHERE idordine = ? AND idstato != ? LIMIT 1";
         $stmt = $this->db->prepare($query);
         if (!$stmt) return true; // Assume there might be other states if query fails, to be safe
@@ -1787,7 +1802,8 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
     }
 
 
-    public function setOrderStatus($orderId, $statusId) {
+    public function setOrderStatus($orderId, $statusId)
+    {
         $query = "INSERT INTO modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (?, ?, NOW())";
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
@@ -1803,7 +1819,8 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
         return $success;
     }
 
-    public function getOrderCurrentStatusInfo($idordine) {
+    public function getOrderCurrentStatusInfo($idordine)
+    {
         $query = "SELECT ms.idstato, so.descrizione
                   FROM modifiche_stato ms
                   JOIN stati_ordine so ON ms.idstato = so.idstato
@@ -1822,30 +1839,32 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
         $stmt->close();
         return $statusInfo;
     }
-    
-    public function getStatusInfoById($statusId) {
-         $query = "SELECT idstato, descrizione FROM stati_ordine WHERE idstato = ?";
-         $stmt = $this->db->prepare($query);
-         if (!$stmt) {
+
+    public function getStatusInfoById($statusId)
+    {
+        $query = "SELECT idstato, descrizione FROM stati_ordine WHERE idstato = ?";
+        $stmt = $this->db->prepare($query);
+        if (!$stmt) {
             error_log("Errore preparazione statement getStatusInfoById: " . $this->db->error);
             return null;
-         }
-         $stmt->bind_param('i', $statusId);
-         $stmt->execute();
-         $result = $stmt->get_result();
-         $statusData = $result->fetch_assoc();
-         $stmt->close();
-         return $statusData;
+        }
+        $stmt->bind_param('i', $statusId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $statusData = $result->fetch_assoc();
+        $stmt->close();
+        return $statusData;
     }
 
     /** Ritorna l’ID appena creato */
-    public function insertIngredient(string $name,
-    float  $price,
-    int    $stock,
-    ?string $image = null): int
-    {
+    public function insertIngredient(
+        string $name,
+        float  $price,
+        int    $stock,
+        ?string $image = null
+    ): int {
         $stmt = $this->db->prepare(
-        "INSERT INTO ingredienti (nome, sovrapprezzo, giacenza, image)
+            "INSERT INTO ingredienti (nome, sovrapprezzo, giacenza, image)
         VALUES (?, ?, ?, ?)"
         );
         $stmt->bind_param("sdis", $name, $price, $stock, $image);
@@ -1857,7 +1876,7 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
     public function getIngredient(int $id): ?array
     {
         $stmt = $this->db->prepare(
-        "SELECT * FROM ingredienti WHERE idingrediente = ?"
+            "SELECT * FROM ingredienti WHERE idingrediente = ?"
         );
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -1867,7 +1886,8 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
 
     // Add this new method to the DatabaseHelper class in db/database.php
 
-    public function checkOrderAvailability($idordine) {
+    public function checkOrderAvailability($idordine)
+    {
         $required_ingredients = [];
         $required_products = [];
         $unavailable_items = [];
@@ -1927,97 +1947,97 @@ public function updateProduct($idprodotto, $nome, $prezzo, $idcategoria, $imageF
         $stmt_pers->close();
 
         foreach ($personalizations as $pers) {
-        $burger_ingredients = [];
-        
-        // Get base composition
-        $query_base_comp = "SELECT idingrediente, quantita FROM composizioni WHERE idprodotto = ?";
-        $stmt_base_comp = $this->db->prepare($query_base_comp);
-        $stmt_base_comp->bind_param('i', $pers['idprodotto']);
-        $stmt_base_comp->execute();
-        $result_base_comp = $stmt_base_comp->get_result();
-        $base_composition = $result_base_comp->fetch_all(MYSQLI_ASSOC);
-        $stmt_base_comp->close();
-        
-        foreach($base_composition as $ing) {
-            $burger_ingredients[$ing['idingrediente']] = $ing['quantita'];
-        }
+            $burger_ingredients = [];
 
-        // Apply modifications from modifiche_ingredienti
-        $query_mods = "SELECT idingrediente, azione FROM modifiche_ingredienti WHERE idpersonalizzazione = ?";
-        $stmt_mods = $this->db->prepare($query_mods);
-        $stmt_mods->bind_param('i', $pers['idpersonalizzazione']);
-        $stmt_mods->execute();
-        $result_mods = $stmt_mods->get_result();
-        $modifications = $result_mods->fetch_all(MYSQLI_ASSOC);
-        $stmt_mods->close();
-        
-        foreach($modifications as $mod) {
-            if ($mod['azione'] === 'rimosso') {
-                if(isset($burger_ingredients[$mod['idingrediente']])) {
-                    $burger_ingredients[$mod['idingrediente']] = 0; // Set quantity to 0 if removed
+            // Get base composition
+            $query_base_comp = "SELECT idingrediente, quantita FROM composizioni WHERE idprodotto = ?";
+            $stmt_base_comp = $this->db->prepare($query_base_comp);
+            $stmt_base_comp->bind_param('i', $pers['idprodotto']);
+            $stmt_base_comp->execute();
+            $result_base_comp = $stmt_base_comp->get_result();
+            $base_composition = $result_base_comp->fetch_all(MYSQLI_ASSOC);
+            $stmt_base_comp->close();
+
+            foreach ($base_composition as $ing) {
+                $burger_ingredients[$ing['idingrediente']] = $ing['quantita'];
+            }
+
+            // Apply modifications from modifiche_ingredienti
+            $query_mods = "SELECT idingrediente, azione FROM modifiche_ingredienti WHERE idpersonalizzazione = ?";
+            $stmt_mods = $this->db->prepare($query_mods);
+            $stmt_mods->bind_param('i', $pers['idpersonalizzazione']);
+            $stmt_mods->execute();
+            $result_mods = $stmt_mods->get_result();
+            $modifications = $result_mods->fetch_all(MYSQLI_ASSOC);
+            $stmt_mods->close();
+
+            foreach ($modifications as $mod) {
+                if ($mod['azione'] === 'rimosso') {
+                    if (isset($burger_ingredients[$mod['idingrediente']])) {
+                        $burger_ingredients[$mod['idingrediente']] = 0; // Set quantity to 0 if removed
+                    }
+                } elseif ($mod['azione'] === 'aggiunto') {
+                    if (isset($burger_ingredients[$mod['idingrediente']])) {
+                        $burger_ingredients[$mod['idingrediente']]++; // Add extra portion
+                    } else {
+                        $burger_ingredients[$mod['idingrediente']] = 1; // Add new ingredient
+                    }
                 }
-            } elseif ($mod['azione'] === 'aggiunto') {
-                 if(isset($burger_ingredients[$mod['idingrediente']])) {
-                    $burger_ingredients[$mod['idingrediente']]++; // Add extra portion
-                 } else {
-                    $burger_ingredients[$mod['idingrediente']] = 1; // Add new ingredient
-                 }
             }
-        }
-        
-        // Add calculated ingredients to the main required list
-        foreach($burger_ingredients as $id_ing => $qty) {
-            if($qty > 0) {
-                 $total_required = $qty * $pers['quantita'];
-                 if (!isset($required_ingredients[$id_ing])) {
-                    $required_ingredients[$id_ing] = 0;
+
+            // Add calculated ingredients to the main required list
+            foreach ($burger_ingredients as $id_ing => $qty) {
+                if ($qty > 0) {
+                    $total_required = $qty * $pers['quantita'];
+                    if (!isset($required_ingredients[$id_ing])) {
+                        $required_ingredients[$id_ing] = 0;
+                    }
+                    $required_ingredients[$id_ing] += $total_required;
                 }
-                $required_ingredients[$id_ing] += $total_required;
             }
         }
-    }
 
-    // 3. Final Check: Compare required quantities against stock
-    // Check non-composite products stock
-    if (!empty($required_products)) {
-        $product_ids = array_keys($required_products);
-        $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
-        $types = str_repeat('i', count($product_ids));
+        // 3. Final Check: Compare required quantities against stock
+        // Check non-composite products stock
+        if (!empty($required_products)) {
+            $product_ids = array_keys($required_products);
+            $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
+            $types = str_repeat('i', count($product_ids));
 
-        $query_prod_stock = "SELECT idprodotto, nome, disponibilita FROM prodotti WHERE idprodotto IN ($placeholders)";
-        $stmt_prod_stock = $this->db->prepare($query_prod_stock);
-        $stmt_prod_stock->bind_param($types, ...$product_ids);
-        $stmt_prod_stock->execute();
-        $result_prod_stock = $stmt_prod_stock->get_result();
-        
-        while($row = $result_prod_stock->fetch_assoc()) {
-            if ($row['disponibilita'] < $required_products[$row['idprodotto']]) {
-                $unavailable_items[] = ['name' => $row['nome']];
+            $query_prod_stock = "SELECT idprodotto, nome, disponibilita FROM prodotti WHERE idprodotto IN ($placeholders)";
+            $stmt_prod_stock = $this->db->prepare($query_prod_stock);
+            $stmt_prod_stock->bind_param($types, ...$product_ids);
+            $stmt_prod_stock->execute();
+            $result_prod_stock = $stmt_prod_stock->get_result();
+
+            while ($row = $result_prod_stock->fetch_assoc()) {
+                if ($row['disponibilita'] < $required_products[$row['idprodotto']]) {
+                    $unavailable_items[] = ['name' => $row['nome']];
+                }
             }
+            $stmt_prod_stock->close();
         }
-        $stmt_prod_stock->close();
-    }
-    
-    // Check ingredients stock
-    if(!empty($required_ingredients)) {
-        $ingredient_ids = array_keys($required_ingredients);
-        $placeholders = implode(',', array_fill(0, count($ingredient_ids), '?'));
-        $types = str_repeat('i', count($ingredient_ids));
 
-        $query_ing_stock = "SELECT idingrediente, nome, giacenza FROM ingredienti WHERE idingrediente IN ($placeholders)";
-        $stmt_ing_stock = $this->db->prepare($query_ing_stock);
-        $stmt_ing_stock->bind_param($types, ...$ingredient_ids);
-        $stmt_ing_stock->execute();
-        $result_ing_stock = $stmt_ing_stock->get_result();
+        // Check ingredients stock
+        if (!empty($required_ingredients)) {
+            $ingredient_ids = array_keys($required_ingredients);
+            $placeholders = implode(',', array_fill(0, count($ingredient_ids), '?'));
+            $types = str_repeat('i', count($ingredient_ids));
 
-        while($row = $result_ing_stock->fetch_assoc()) {
-            if ($row['giacenza'] < $required_ingredients[$row['idingrediente']]) {
-                $unavailable_items[] = ['name' => $row['nome']];
+            $query_ing_stock = "SELECT idingrediente, nome, giacenza FROM ingredienti WHERE idingrediente IN ($placeholders)";
+            $stmt_ing_stock = $this->db->prepare($query_ing_stock);
+            $stmt_ing_stock->bind_param($types, ...$ingredient_ids);
+            $stmt_ing_stock->execute();
+            $result_ing_stock = $stmt_ing_stock->get_result();
+
+            while ($row = $result_ing_stock->fetch_assoc()) {
+                if ($row['giacenza'] < $required_ingredients[$row['idingrediente']]) {
+                    $unavailable_items[] = ['name' => $row['nome']];
+                }
             }
+            $stmt_ing_stock->close();
         }
-        $stmt_ing_stock->close();
-    }
 
-    return $unavailable_items;
+        return $unavailable_items;
     }
 }
