@@ -199,13 +199,6 @@ html, body {
     z-index: 2;
 }
 
-/*
-    FIXME
-    bottoni, capire quale sia la configurazione migliore
-    è meglio avere il bottone trasparente prima o dopo
-    passarci con il mouse?
-*/
-
 /* -------------------- Buttons -------------------- */
 .btn-body {
     border: 4px solid transparent;

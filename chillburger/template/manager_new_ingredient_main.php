@@ -10,7 +10,7 @@
         <a href="manager_stock.php" class="btn btn-outline-secondary">
           <span class="fas fa-arrow-left me-2" aria-hidden="true"></span>
           <span class="visually-hidden">Indietro</span>
-          Torna allo Stock
+          Indietro
         </a>
       </div>
 

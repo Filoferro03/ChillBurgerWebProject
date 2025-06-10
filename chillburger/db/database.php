@@ -1445,16 +1445,11 @@ class DatabaseHelper
         return $compositions;
     }
 
-    // TODO       
-    /* ===========================================================
-    * Codice da riguardare inizia qui. 
-    * ============================================================
-    */
     // DatabaseHelper.php
     public function getAllProductsWithIngredients()
     {
 
-        // TODO bisogna gestire la discrepanza tra idcategoria e descrizione
+       
         $sql = "
             SELECT 
                 p.idprodotto, p.nome, p.descrizione, p.prezzo, p.image,
