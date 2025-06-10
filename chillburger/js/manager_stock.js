@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentFiltered = [];
   let currentPage = 1;
 
-  /* ====== modal elementi ====== */
   const qtyModal   = new bootstrap.Modal(document.getElementById('qtyModal'));
   const modalTitle = document.getElementById('modalProductName');
   const qtyInput   = document.getElementById('qtyInput');
@@ -16,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveQtyBtn   = document.getElementById('saveQtyBtn');
   let currentId, currentType;
 
-  /* --- helpers --------------------------------------------------------- */
   const statusClass = q => q === 0 ? 'text-danger'
                        : q <= LOW_STOCK_THRESHOLD ? 'text-warning'
                        : 'text-success';
@@ -32,27 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return json.data;
   }
 
-  /* --- aggiornamenti singoli ------------------------------------------- */
   async function updateIngredientStock(id, delta) {
     const fd = new FormData();
     fd.append('action','updateingredientquantity');
     fd.append('idingrediente', id);
     fd.append('quantita', delta);
     await fetchData('api/api-manager-stock.php', fd);
-    await getProductsStock();                 // ricarica
-    applyFilters({resetPage:false});          // mantieni pagina
-  }
-  async function updateDrinkStock(id, delta) {
-    const fd = new FormData();
-    fd.append('action','updatedrinkquantity');
-    fd.append('idprodotto', id);
-    fd.append('quantita', delta);
-    await fetchData('api/api-manager-stock.php', fd);
-    await getProductsStock();
-    applyFilters({resetPage:false});
+    await getProductsStock();                 
+    applyFilters({resetPage:false});          
   }
 
-  /* --- costruzione righe tabella --------------------------------------- */
   function generateProducts(products) {
     const tbody = document.getElementById('stock-table');
     tbody.innerHTML = '';
@@ -84,16 +71,14 @@ document.addEventListener('DOMContentLoaded', () => {
              data-type="${p.tipo}" data-name="${p.nome}"
              data-qty="${p.giacenza}">Modifica Quantità</a>
         </td>`;
-      /* + / − */
       tr.querySelector('.btn-plus').onclick  = e => {
-        const {id,type}=e.currentTarget.dataset;
-        type==='bevanda'? updateDrinkStock(id,-1): updateIngredientStock(id,-1);
+        const {id}=e.currentTarget.dataset;
+        updateIngredientStock(id,-1);
       };
       tr.querySelector('.btn-minus').onclick  = e => {
-        const {id,type}=e.currentTarget.dataset;
-        type==='bevanda'? updateDrinkStock(id,+1): updateIngredientStock(id,+1);
+        const {id}=e.currentTarget.dataset;
+        updateIngredientStock(id,+1);
       };
-      /* link “modifica quantità” */
       tr.querySelector('.changeQty').onclick = e => {
         const link=e.currentTarget;
         currentId = link.dataset.id;
@@ -106,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* --- summary cards ---------------------------------------------------- */
   function updateSummaryCards(arr) {
     document.getElementById('card-total').textContent    = arr.length;
     document.getElementById('card-outstock').textContent = arr.filter(p=>p.giacenza===0).length;
@@ -114,13 +98,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('card-instock').textContent  = arr.filter(p=>p.giacenza>LOW_STOCK_THRESHOLD).length;
   }
 
-  /* --- filtri + paging -------------------------------------------------- */
-  const categoryFilter = document.getElementById('category-filter');
-  const statusFilter   = document.getElementById('status-filter');
+  const searchFilter = document.getElementById('search-filter');
+  const statusFilter = document.getElementById('status-filter');
 
   function applyFilters({resetPage=true} = {}) {
     let filtered = allProducts
-      .filter(p => !categoryFilter.value || p.tipo === categoryFilter.value)
+      .filter(p => {
+        if (searchFilter.value.trim()) {
+          return p.nome.toLowerCase().includes(searchFilter.value.toLowerCase().trim());
+        }
+        return true;
+      })
       .filter(p => {
         switch (statusFilter.value) {
           case 'out-stock' : return p.giacenza === 0;
@@ -164,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
     pager.append(ul);
   }
 
-  /* --- modal +/- pulsanti ---------------------------------------------- */
   qtyInput.onkeydown = e=>{
     if(e.key==='Enter'){e.preventDefault();saveQtyBtn.click();}
   };
@@ -176,11 +163,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const oldQty = +document.querySelector(`.changeQty[data-id="${currentId}"]`).dataset.qty;
     const delta = newQty - oldQty;
     if(!delta) return;
-    (currentType==='bevanda') ? updateDrinkStock(currentId, -delta)
-                              : updateIngredientStock(currentId, -delta);
+    updateIngredientStock(currentId, -delta);
   };
 
-  /* --- fetch iniziale --------------------------------------------------- */
   async function getProductsStock(){
     const fd = new FormData(); fd.append('action','getallproducts');
     const data = await fetchData('api/api-manager-stock.php', fd);
@@ -188,18 +173,12 @@ document.addEventListener('DOMContentLoaded', () => {
       idprodotto:i.idingrediente, nome:i.nome, categoria:'Ingrediente',
       image:i.image, giacenza:i.giacenza, tipo:'ingrediente'
     }));
-    const drinks = (data.drinks||[]).map(d=>({
-      idprodotto:d.idprodotto, nome:d.nome, categoria:'Bevanda',
-      image:d.image, giacenza:d.disponibilita, tipo:'bevanda'
-    }));
-    allProducts = [...ingredients,...drinks];
+    allProducts = [...ingredients];
     updateSummaryCards(allProducts);
   }
 
-  /* listeners filtro */
-  categoryFilter.onchange = ()=> applyFilters({resetPage:true});
-  statusFilter  .onchange = ()=> applyFilters({resetPage:true});
+  searchFilter.oninput = ()=> applyFilters({resetPage:true});
+  statusFilter.onchange = ()=> applyFilters({resetPage:true});
 
-  /* bootstrap */
   getProductsStock().then(()=> applyFilters({resetPage:false}));
 });

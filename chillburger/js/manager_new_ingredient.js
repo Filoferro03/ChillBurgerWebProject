@@ -1,8 +1,3 @@
-/*  manager_new_ingredient.js  
- *  Gestisce la creazione di un nuovo ingrediente.
- *  Richiede Bootstrap 5 (per Toast & Spinner) + FontAwesome per le icone.
- */
-
 document.addEventListener('DOMContentLoaded', () => {
     const form          = document.getElementById('product-form');
     const btnSubmit     = document.getElementById('btn-submit');
@@ -14,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const imgPreviewCt  = document.getElementById('image-preview-container');
     const imgPreview    = document.getElementById('image-preview');
   
-    /* === helper Toast bootstrap === */
     const toastEl   = document.getElementById('toast-message');
     const toastTit  = document.getElementById('toast-title');
     const toastBody = document.getElementById('toast-body');
@@ -27,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
       toast.show();
     };
   
-    /* Anteprima immagine */
     imgInput?.addEventListener('change', e => {
       const file = e.target.files?.[0];
       if (file) {
@@ -42,22 +35,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   
-    /* Annulla → torna alla pagina stock */
     btnCancel?.addEventListener('click', () => {
       window.location.href = 'manager_stock.php';
     });
   
-    /* Submit */
     form.addEventListener('submit', async e => {
       e.preventDefault();
   
-      // disabilita UI
       btnSubmit.disabled = true;
       submitText.textContent = 'Salvataggio...';
       spinner.style.display  = 'inline-block';
   
       try {
-        const fd = new FormData(form);   // include name, price, availability, image
+        const fd = new FormData(form);  
         const res = await fetch('api/api-manager-add-ingredient.php', {
           method: 'POST',
           body  : fd,
@@ -70,7 +60,6 @@ document.addEventListener('DOMContentLoaded', () => {
           form.reset();
           imgPreviewCt.style.display = 'none';
   
-          // torna allo stock dopo 1.5 s
           setTimeout(() => { window.location.href = 'manager_stock.php'; }, 1500);
         } else {
           throw new Error(data.message || 'Errore sconosciuto');
@@ -79,9 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error(err);
         showToast('Errore', err.message || 'Impossibile salvare l\'ingrediente', 5000);
       } finally {
-        // ripristina UI
         btnSubmit.disabled = false;
-        submitText.textContent = 'Aggiungi Prodotto';
+        submitText.textContent = 'Aggiungi Ingrediente';
         spinner.style.display  = 'none';
       }
     });

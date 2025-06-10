@@ -3,7 +3,7 @@
     <div class="col-lg-8">
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="display-4 custom-title text-center mb-3">
-            <span class="txt">Nuovo Prodotto</span>
+            <span class="txt">Nuovo Ingrediente</span>
             <span class="emoji">🥒</span>
         </h2>
 
@@ -20,7 +20,7 @@
             <input type="hidden" id="product-id" name="product-id" value="">
             
             <div class="mb-3">
-              <label for="product-name" class="form-label">Nome prodotto <span class="text-danger">*</span></label>
+              <label for="product-name" class="form-label">Nome ingrediente <span class="text-danger">*</span></label>
               <input id="product-name" name="name" type="text" class="form-control" required>
             </div>
 
@@ -29,14 +29,14 @@
               <input id="product-price" name="price" type="number" step="0.01" min="0" class="form-control" required>
             </div>
 
-            <div class="mb-3" id="availability-section" style="display: none;">
-              <label for="product-availability" class="form-label">Disponibilità <span class="text-danger">*</span></label>
-              <input id="product-availability" name="availability" type="number" min="0" step="1" class="form-control" placeholder="Inserisci quantità disponibile">
-              <div class="form-text">Inserisci 0 per indicare che il prodotto non è disponibile.</div>
+            <div class="mb-3" id="availability-section">
+              <label for="product-availability" class="form-label">Giacenza <span class="text-danger">*</span></label>
+              <input id="product-availability" name="availability" type="number" min="0" step="1" class="form-control" placeholder="Inserisci quantità disponibile" required>
+              <div class="form-text">Inserisci 0 per indicare che l'ingrediente non è disponibile.</div>
             </div>
 
             <div class="mb-3">
-              <label for="product-image" class="form-label">Immagine prodotto</label>
+              <label for="product-image" class="form-label">Immagine ingrediente</label>
               <input id="product-image" name="image" type="file" accept="image/*" class="form-control">
               <div class="mt-3" id="current-image-container" style="display: none;">
                 <label class="form-label">Immagine attuale:</label>
@@ -64,7 +64,7 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
               <button type="button" id="btn-cancel" class="btn btn-outline-secondary me-md-2">Annulla</button>
               <button type="submit" id="btn-submit" class="btn btn-primary">
-                <span id="submit-text">Aggiungi Prodotto</span>
+                <span id="submit-text">Aggiungi Ingrediente</span>
                 <span id="submit-loading" class="spinner-border spinner-border-sm" style="display: none; vertical-align: middle;"></span>
               </button>
             </div>
