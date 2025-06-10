@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   const LOW_STOCK_THRESHOLD = 3;
   const PRODUCTS_PER_PAGE = 10;
-  const IMG_DIR = "/ChillBurgerWebProject/chillburger/resources/ingredients";
 
   let allProducts = [];
   let currentFiltered = [];
@@ -49,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <td class="py-3 px-4">
           <div class="d-flex align-items-center">
             <img class="rounded-circle object-fit-cover me-3" style="width:40px;height:40px"
-                 src="${IMG_DIR}/${p.image}" alt="${p.nome}">
+                 src="${p.image}" alt="${p.nome}">
             <div>
               <div class="fw-medium text-dark">${p.nome}</div>
               <div class="small text-secondary">${p.categoria}</div>

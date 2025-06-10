@@ -33,45 +33,45 @@ INSERT INTO chillburgerdb.categorie (descrizione) VALUES
 ('Dolci');
 
 INSERT INTO chillburgerdb.prodotti (nome, prezzo, idcategoria, image) VALUES
-('Bacon Cheeseburger', 14.50, 1, 'bacon-cheeseburger.png'),
-('Chicken Deluxe', 13.00, 1, 'chicken-deluxe.png'),
-('Smoky Burger', 15.50, 1, 'smoky-burger.png'),
-('Veggie Burger', 12.00, 1, 'veggie-burger.png'),
-('Double Beef BBQ', 16.00, 1, 'double-beef-bbq.png'),
-('Zucchini Delight', 13.00, 1, 'zucchini-delight.png'),
-('Crispy Cotoletta', 14.00, 1, 'crispy-cotoletta.png'),
-('Hot Pepper Burger', 13.50, 1, 'hot-pepper-burger.png'),
-('Melanzana Veggie', 12.50, 1, 'melanzana-veggie.png'),
-('Truffle Deluxe', 15.00, 1, 'truffle-deluxe.png'),
-('Green Garden', 12.50, 1, 'green-garden.png'),
-('Crispy BBQ Chicken', 13.50, 1, 'crispy-bbq-chicken.png');
+('Bacon Cheeseburger', 14.50, 1, 'bacon-cheeseburger.webp'),
+('Chicken Deluxe', 13.00, 1, 'chicken-deluxe.webp'),
+('Smoky Burger', 15.50, 1, 'smoky-burger.webp'),
+('Veggie Burger', 12.00, 1, 'veggie-burger.webp'),
+('Double Beef BBQ', 16.00, 1, 'double-beef-bbq.webp'),
+('Zucchini Delight', 13.00, 1, 'zucchini-delight.webp'),
+('Crispy Cotoletta', 14.00, 1, 'crispy-cotoletta.webp'),
+('Hot Pepper Burger', 13.50, 1, 'hot-pepper-burger.webp'),
+('Melanzana Veggie', 12.50, 1, 'melanzana-veggie.webp'),
+('Truffle Deluxe', 15.00, 1, 'truffle-deluxe.webp'),
+('Green Garden', 12.50, 1, 'green-garden.webp'),
+('Crispy BBQ Chicken', 13.50, 1, 'crispy-bbq-chicken.webp');
 
 INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, image) VALUES
-('Onion Rings', 4.50, 30, 2, 'onion-rings.png'),
-('Patatine Fritte', 3.50, 50, 2, 'patatine-fritte.png'),
-('Alette di Pollo BBQ', 6.00, 25, 2, 'alette-pollo-bbq.png'),
-('Mozzarella Sticks', 5.00, 20, 2, 'mozzarella-sticks.png'),
-('Crocchette di Patate', 4.00, 40, 2, 'crocchette-patate.png'),
-('Nuggets di Pollo', 5.50, 35, 2, 'nuggets-pollo.png'),
-('Jalapeño Popper', 5.00, 15, 2, 'jalapeno-popper.png');
+('Onion Rings', 4.50, 30, 2, 'onion-rings.webp'),
+('Patatine Fritte', 3.50, 50, 2, 'patatine-fritte.webp'),
+('Alette di Pollo BBQ', 6.00, 25, 2, 'alette-pollo-bbq.webp'),
+('Mozzarella Sticks', 5.00, 20, 2, 'mozzarella-sticks.webp'),
+('Crocchette di Patate', 4.00, 40, 2, 'crocchette-patate.webp'),
+('Nuggets di Pollo', 5.50, 35, 2, 'nuggets-pollo.webp'),
+('Jalapeño Popper', 5.00, 15, 2, 'jalapeno-popper.webp');
 
 INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, image) VALUES
-('Coca Cola', 3.00, 100, 3, 'coca-cola.png'),
-('Fanta', 3.00, 100, 3, 'fanta.png'),
-('Acqua Naturale', 1.50, 150, 3, 'acqua-naturale.png'),
-('Acqua Frizzante', 1.50, 150, 3, 'acqua-frizzante.png'),
-('Birra Artigianale Bionda', 5.00, 50, 3, 'birra-bionda.png'),
-('Tè al Limone', 2.50, 80, 3, 'te-limone.png'),
-('Sprite', 3.00, 90, 3, 'sprite.png');
+('Coca Cola', 3.00, 100, 3, 'coca-cola.webp'),
+('Fanta', 3.00, 100, 3, 'fanta.webp'),
+('Acqua Naturale', 1.50, 150, 3, 'acqua-naturale.webp'),
+('Acqua Frizzante', 1.50, 150, 3, 'acqua-frizzante.webp'),
+('Birra Artigianale Bionda', 5.00, 50, 3, 'birra-bionda.webp'),
+('Tè al Limone', 2.50, 80, 3, 'te-limone.webp'),
+('Sprite', 3.00, 90, 3, 'sprite.webp');
 
 INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, image) VALUES
-('Tiramisù', 5.00, 2, 4, 'tiramisu.png'),
-('Cheesecake ai Frutti di Bosco', 5.50, 30, 4, 'cheesecake-frutti-di-bosco.png'),
-('Brownie al Cioccolato', 4.50, 15, 4, 'brownie-cioccolato.png'),
-('Panna Cotta al Caramello', 4.00, 25, 4, 'panna-cotta-caramello.png'),
-('Mousse al Cioccolato', 5.00, 35, 4, 'mousse-cioccolato.png'),
-('Torta della Nonna', 5.50, 45, 4, 'torta-della-nonna.png'),
-('Dolci Misti', 6.00, 30, 4, 'dolci-misti.png');
+('Tiramisù', 5.00, 2, 4, 'tiramisu.webp'),
+('Cheesecake ai Frutti di Bosco', 5.50, 30, 4, 'cheesecake-frutti-di-bosco.webp'),
+('Brownie al Cioccolato', 4.50, 15, 4, 'brownie-cioccolato.webp'),
+('Panna Cotta al Caramello', 4.00, 25, 4, 'panna-cotta-caramello.webp'),
+('Mousse al Cioccolato', 5.00, 35, 4, 'mousse-cioccolato.webp'),
+('Torta della Nonna', 5.50, 45, 4, 'torta-della-nonna.webp'),
+('Dolci Misti', 6.00, 30, 4, 'dolci-misti.webp');
 
 
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES

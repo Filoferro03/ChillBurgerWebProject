@@ -1,16 +1,6 @@
 <?php
-/**
- * api/api-manager-add-ingredient.php
- *
- *  – GET  action=getIngredient&idingrediente=ID → dettaglio ingrediente
- *  – POST (form “nuovo ingrediente”)           → inserimento ingrediente
- */
-
 require_once __DIR__ . '/../bootstrap.php';
 
-/* -----------------------------------------------------------
- *  Output JSON + handler fatal error / exception
- * --------------------------------------------------------- */
 header('Content-Type: application/json; charset=utf-8');
 
 set_error_handler(function ($severity, $message, $file, $line) {
@@ -30,31 +20,24 @@ set_exception_handler(function (Throwable $e) {
     exit;
 });
 
-/* -----------------------------------------------------------
- *  Percorsi: file-system (assoluto) e URL pubblico
- * --------------------------------------------------------- */
 $uploadDirAbs = realpath(__DIR__ . '/../resources/ingredients');
-if (!$uploadDirAbs) {                                    // se la cartella non esiste
+if (!$uploadDirAbs) {                                    
     $uploadDirAbs = __DIR__ . '/../resources/ingredients';
     if (!is_dir($uploadDirAbs) && !mkdir($uploadDirAbs, 0775, true)) {
         throw new RuntimeException('Impossibile creare cartella upload: ' . $uploadDirAbs);
     }
 }
-$uploadDirRel = '/resources/ingredients/';               // URL da usare nel browser
 
-/* =========================================================
- *  GET → dettaglio singolo ingrediente
- * --------------------------------------------------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'GET'
     && ($_GET['action'] ?? '') === 'getIngredient'
     && isset($_GET['idingrediente'])) {
 
     $id   = (int) $_GET['idingrediente'];
-    $data = $dbh->getIngredient($id);                    // tuo metodo nel DB helper
+    $data = $dbh->getIngredient($id);
 
     if ($data) {
-        if (!empty($data['image']) && !str_starts_with($data['image'], $uploadDirRel)) {
-            $data['image'] = $uploadDirRel . $data['image'];    // completa l’URL
+        if (!empty($data['image']) && !str_starts_with($data['image'], RESOURCES_DIR)) {
+            $data['image'] = RESOURCES_DIR . "ingredients/" . $data['image'];
         }
         echo json_encode(['success' => true, 'data' => $data]);
     } else {
@@ -64,17 +47,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET'
     exit;
 }
 
-/* =========================================================
- *  Solo POST da qui in poi
- * --------------------------------------------------------- */
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     exit(json_encode(['success' => false, 'message' => 'Metodo non consentito']));
 }
 
-/* ---------------------------------------------------------
- *  Validazione campi
- * --------------------------------------------------------- */
 $name  = trim($_POST['name'] ?? '');
 $price = $_POST['price'] ?? '';
 $stock = $_POST['availability'] ?? '999';
@@ -87,9 +64,6 @@ if ($name === '' || !is_numeric($price) || $price < 0) {
     ]));
 }
 
-/* ---------------------------------------------------------
- *  Upload immagine (opzionale)
- * --------------------------------------------------------- */
 $imageFilenameForDb = null;
 
 if (!empty($_FILES['image']['tmp_name'])) {
@@ -110,14 +84,11 @@ if (!empty($_FILES['image']['tmp_name'])) {
     }
 }
 
-/* ---------------------------------------------------------
- *  Inserimento nel DB
- * --------------------------------------------------------- */
 $newId = $dbh->insertIngredient(
     $name,
     (float) $price,
     (int)   $stock,
-    $imageFilenameForDb          // può valere null se l’immagine non viene caricata
+    $imageFilenameForDb
 );
 
 if (!$newId) {

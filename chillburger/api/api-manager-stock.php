@@ -14,9 +14,37 @@ try {
     switch ($action) {
         case "getallproducts":
             $ingredients = $dbh->getAllIngredients();
+            foreach ($ingredients as &$item) {
+                if (!empty($item['image'])) {
+                    $item['image'] = RESOURCES_DIR . "ingredients/" . $item['image'];
+                }
+            }
+            unset($item);
+
             $drinks = $dbh->getAllDrinks();
+            foreach ($drinks as &$item) {
+                if (!empty($item['image'])) {
+                    $item['image'] = RESOURCES_DIR . "products/" . $item['image'];
+                }
+            }
+            unset($item);
+
             $desserts = $dbh->getAllDessertes();
+            foreach ($desserts as &$item) {
+                if (!empty($item['image'])) {
+                    $item['image'] = RESOURCES_DIR . "products/" . $item['image'];
+                }
+            }
+            unset($item);
+
             $friedFood = $dbh->getAllFrieds();
+            foreach ($friedFood as &$item) {
+                if (!empty($item['image'])) {
+                    $item['image'] = RESOURCES_DIR . "products/" . $item['image'];
+                }
+            }
+            unset($item);
+
 
             $result["success"] = true;
             $result["data"] = [
