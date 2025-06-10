@@ -19,9 +19,10 @@ async function fetchData(url, formData) {
 async function modifyQuantity(id, type, quantity) {
   const url = "api/api-cart.php";
   const formData = new FormData();
-  
-  const action = type === 'product' ? 'modifyProdQuantity' : 'modifyPersQuantity';
-  const idName = type === 'product' ? 'idprodotto' : 'idpersonalizzazione';
+
+  const action =
+    type === "product" ? "modifyProdQuantity" : "modifyPersQuantity";
+  const idName = type === "product" ? "idprodotto" : "idpersonalizzazione";
 
   formData.append("action", action);
   formData.append(idName, id);
@@ -33,51 +34,56 @@ async function modifyQuantity(id, type, quantity) {
 
 // Funzione per rimuovere un elemento (prodotto o personalizzazione)
 async function removeItem(id, type) {
-    const formData = new FormData();
-    formData.append("action", type === "product" ? "removeProd" : "removePers");
-    formData.append(type === "product" ? "idprodotto" : "idpersonalizzazione", id);
+  const formData = new FormData();
+  formData.append("action", type === "product" ? "removeProd" : "removePers");
+  formData.append(
+    type === "product" ? "idprodotto" : "idpersonalizzazione",
+    id
+  );
 
-    const response = await fetchData("api/api-cart.php", formData);
+  const response = await fetchData("api/api-cart.php", formData);
 
-    const modalEl = document.getElementById("confirmDeleteModal");
-    const modalInstance = bootstrap.Modal.getInstance(modalEl);
-    modalInstance.hide();
-    
-    if (response && response.success) {
-      await init(); // Ricarica il carrello dopo la rimozione
-    } else {
-      alert("Errore nel rimuovere l'elemento.");
-    }
+  const modalEl = document.getElementById("confirmDeleteModal");
+  const modalInstance = bootstrap.Modal.getInstance(modalEl);
+  modalInstance.hide();
+
+  if (response && response.success) {
+    await init(); // Ricarica il carrello dopo la rimozione
+  } else {
+    alert("Errore nel rimuovere l'elemento.");
+  }
 }
 
 // Aggiunge i listener per i pulsanti di rimozione
 function setupRemoveButtons() {
-    document.querySelectorAll(".btn-remove").forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const id = btn.getAttribute("data-id");
-            const type = btn.getAttribute("data-type");
+  document.querySelectorAll(".btn-remove").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      const type = btn.getAttribute("data-type");
 
-            const modal = new bootstrap.Modal(document.getElementById("confirmDeleteModal"));
-            modal.show();
+      const modal = new bootstrap.Modal(
+        document.getElementById("confirmDeleteModal")
+      );
+      modal.show();
 
-            const confirmBtn = document.getElementById("confirmDeleteBtn");
-            // Sostituisce il bottone per evitare listener multipli
-            const newConfirmBtn = confirmBtn.cloneNode(true);
-            confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+      const confirmBtn = document.getElementById("confirmDeleteBtn");
+      // Sostituisce il bottone per evitare listener multipli
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
 
-            newConfirmBtn.addEventListener("click", () => removeItem(id, type));
-        });
+      newConfirmBtn.addEventListener("click", () => removeItem(id, type));
     });
+  });
 }
 
 // Genera l'HTML per i prodotti e il riepilogo
 function generateCartHTML(products, personalizations, order) {
-    let itemsHtml = "";
-    
-    // Genera HTML per prodotti standard
-    products.forEach(product => {
-        const totalProductPrice = (product.prezzo * product.quantita).toFixed(2);
-        itemsHtml += `
+  let itemsHtml = "";
+
+  // Genera HTML per prodotti standard
+  products.forEach((product) => {
+    const totalProductPrice = (product.prezzo * product.quantita).toFixed(2);
+    itemsHtml += `
             <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-between col-12 border-bottom border-dark mb-2">
                 <div class="d-flex flex-column align-items-center col-8 col-md-3 m-1">
                     <a href="menu.php#${product.idprodotto}"><img src="${product.image}" class="col-10 m-2 rounded-3" alt="${product.nome}"></a>
@@ -99,12 +105,12 @@ function generateCartHTML(products, personalizations, order) {
                     </div>
                 </div>
             </div>`;
-    });
+  });
 
-    // Genera HTML per prodotti personalizzati
-    personalizations.forEach(pers => {
-        const totalPersPrice = (pers.prezzo * pers.quantita).toFixed(2);
-        itemsHtml += `
+  // Genera HTML per prodotti personalizzati
+  personalizations.forEach((pers) => {
+    const totalPersPrice = (pers.prezzo * pers.quantita).toFixed(2);
+    itemsHtml += `
             <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-between col-12 border-bottom border-dark mb-2">
                 <div class="d-flex flex-column align-items-center col-8 col-md-3 m-1">
                     <a href="burger-details.php?id=${pers.idprodotto}"><img src="${pers.image}" class="col-10 m-2 rounded-3" alt="${pers.nomeprodotto}"></a>
@@ -121,7 +127,10 @@ function generateCartHTML(products, personalizations, order) {
                             </div>
                         </div>
                         <div class="mt-2">
-                            <a href="./edit-burger.php?id=${pers.idpersonalizzazione}"><button class="btn btn-success">Modifica</button></a>
+                            <a href="./edit-burger.php?id=${pers.idpersonalizzazione}" class="btn btn-success" role="button">
+  Modifica
+</a>
+
                         </div>
                     </div>
                     <div class="d-flex justify-content-end pb-3 pt-2">
@@ -129,12 +138,15 @@ function generateCartHTML(products, personalizations, order) {
                     </div>
                 </div>
             </div>`;
-    });
+  });
 
-    // Genera HTML per il riepilogo
-    const subTotal = (order[0].prezzo_totale > 0) ? (order[0].prezzo_totale - 2.5).toFixed(2) : "0.00";
-    const total = (order[0].prezzo_totale > 0) ? order[0].prezzo_totale : "0.00";
-    let summaryHtml = `
+  // Genera HTML per il riepilogo
+  const subTotal =
+    order[0].prezzo_totale > 0
+      ? (order[0].prezzo_totale - 2.5).toFixed(2)
+      : "0.00";
+  const total = order[0].prezzo_totale > 0 ? order[0].prezzo_totale : "0.00";
+  let summaryHtml = `
         <div class="d-flex justify-content-between">
             <p class="fs-3">SubTotale</p>
             <p class="fs-3">${subTotal}€</p>
@@ -148,71 +160,92 @@ function generateCartHTML(products, personalizations, order) {
             <p class="fs-3">${total}€</p>
         </div>`;
 
-    return { itemsHtml, summaryHtml };
+  return { itemsHtml, summaryHtml };
 }
 
 // Funzione principale di inizializzazione
 async function init() {
-    // Seleziona i container
-    const cartItemsContainer = document.querySelector("#cart-elements");
-    const summaryDetailsContainer = document.querySelector("#summary-details");
-    const checkoutBtn = document.getElementById("checkoutBtn");
-    const alertContainer = document.getElementById("availability-alert");
+  // Seleziona i container
+  const cartItemsContainer = document.querySelector("#cart-elements");
+  const summaryDetailsContainer = document.querySelector("#summary-details");
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  const alertContainer = document.getElementById("availability-alert");
 
-    // 1. Fetch dei dati del carrello (prodotti e ordine)
-    const cartDataUrl = "api/api-cart.php";
-    const cartDataForm = new FormData();
-    cartDataForm.append("action", "getProducts");
-    const cartJson = await fetchData(cartDataUrl, cartDataForm);
+  // 1. Fetch dei dati del carrello (prodotti e ordine)
+  const cartDataUrl = "api/api-cart.php";
+  const cartDataForm = new FormData();
+  cartDataForm.append("action", "getProducts");
+  const cartJson = await fetchData(cartDataUrl, cartDataForm);
 
-    const orderDataUrl = "api/api-cart.php";
-    const orderDataForm = new FormData();
-    orderDataForm.append("action", "getCartPrice");
-    const orderJson = await fetchData(orderDataUrl, orderDataForm);
+  const orderDataUrl = "api/api-cart.php";
+  const orderDataForm = new FormData();
+  orderDataForm.append("action", "getCartPrice");
+  const orderJson = await fetchData(orderDataUrl, orderDataForm);
 
-    // Gestione carrello vuoto
-    if (!cartJson || (!cartJson.products?.length && !cartJson.personalizations?.length)) {
-        cartItemsContainer.innerHTML = `<p class="text-center">Nessun prodotto presente nel carrello</p>`;
-        summaryDetailsContainer.innerHTML = "";
-        checkoutBtn.disabled = true;
-        alertContainer.style.display = 'none';
-        return;
-    }
-    
-    // 2. Genera e visualizza l'HTML del carrello
-    const { itemsHtml, summaryHtml } = generateCartHTML(cartJson.products, cartJson.personalizations, orderJson.order);
-    cartItemsContainer.innerHTML = itemsHtml;
-    summaryDetailsContainer.innerHTML = summaryHtml;
-    setupRemoveButtons();
+  // Gestione carrello vuoto
+  if (
+    !cartJson ||
+    (!cartJson.products?.length && !cartJson.personalizations?.length)
+  ) {
+    cartItemsContainer.innerHTML = `<p class="text-center">Nessun prodotto presente nel carrello</p>`;
+    summaryDetailsContainer.innerHTML = "";
+    checkoutBtn.disabled = true;
+    alertContainer.style.display = "none";
+    return;
+  }
 
-    // 3. Esegui il controllo di disponibilità
-    const availabilityApiUrl = 'api/api-orders.php';
-    const availabilityFormData = new FormData();
-    availabilityFormData.append('action', 'check_availability');
-    const availabilityResponse = await fetchData(availabilityApiUrl, availabilityFormData);
+  // 2. Genera e visualizza l'HTML del carrello
+  const { itemsHtml, summaryHtml } = generateCartHTML(
+    cartJson.products,
+    cartJson.personalizations,
+    orderJson.order
+  );
+  cartItemsContainer.innerHTML = itemsHtml;
+  summaryDetailsContainer.innerHTML = summaryHtml;
+  setupRemoveButtons();
 
-    // 4. Abilita/Disabilita il pulsante di checkout e mostra avvisi
-    if (availabilityResponse && availabilityResponse.success) {
-        // Disponibile
-        alertContainer.style.display = 'none';
-        checkoutBtn.disabled = false;
-        checkoutBtn.classList.remove("disabled", "btn-secondary");
-        checkoutBtn.classList.add("bg-white");
-        checkoutBtn.onclick = () => { window.location.href = './checkout.php'; };
+  // 3. Esegui il controllo di disponibilità
+  const availabilityApiUrl = "api/api-orders.php";
+  const availabilityFormData = new FormData();
+  availabilityFormData.append("action", "check_availability");
+  const availabilityResponse = await fetchData(
+    availabilityApiUrl,
+    availabilityFormData
+  );
+
+  // 4. Abilita/Disabilita il pulsante di checkout e mostra avvisi
+  if (availabilityResponse && availabilityResponse.success) {
+    // Disponibile
+    alertContainer.style.display = "none";
+    checkoutBtn.disabled = false;
+    checkoutBtn.classList.remove("disabled", "btn-secondary");
+    checkoutBtn.classList.add("bg-white");
+    checkoutBtn.onclick = () => {
+      window.location.href = "./checkout.php";
+    };
+  } else {
+    // Non disponibile
+    let errorMessage =
+      "<strong>Checkout non disponibile.</strong> Alcuni articoli non sono disponibili: ";
+    if (
+      availabilityResponse &&
+      availabilityResponse.unavailable_items?.length
+    ) {
+      errorMessage +=
+        availabilityResponse.unavailable_items
+          .map((item) => item.name)
+          .join(", ") + ". Rimuovi o modifica gli articoli per procedere.";
     } else {
-        // Non disponibile
-        let errorMessage = '<strong>Checkout non disponibile.</strong> Alcuni articoli non sono disponibili: ';
-        if (availabilityResponse && availabilityResponse.unavailable_items?.length) {
-            errorMessage += availabilityResponse.unavailable_items.map(item => item.name).join(', ') + '. Rimuovi o modifica gli articoli per procedere.';
-        } else {
-            errorMessage = availabilityResponse?.error || 'Errore durante la verifica della disponibilità. Riprova.';
-        }
-        alertContainer.innerHTML = errorMessage;
-        alertContainer.style.display = 'block';
-        checkoutBtn.disabled = true;
-        checkoutBtn.classList.add("disabled", "btn-secondary");
-        checkoutBtn.classList.remove("bg-white");
+      errorMessage =
+        availabilityResponse?.error ||
+        "Errore durante la verifica della disponibilità. Riprova.";
     }
+    alertContainer.innerHTML = errorMessage;
+    alertContainer.style.display = "block";
+    checkoutBtn.disabled = true;
+    checkoutBtn.classList.add("disabled", "btn-secondary");
+    checkoutBtn.classList.remove("bg-white");
+  }
 }
 
 // Avvia la funzione all'avvio della pagina
