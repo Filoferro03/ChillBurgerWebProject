@@ -206,7 +206,7 @@ class DatabaseHelper
 
     public function hasLowStockIngredients()
     {
-        $query = "SELECT 1 FROM ingredienti WHERE giacenza <= 2 LIMIT 1"; // Ottimizzato per performance
+        $query = "SELECT 1 FROM ingredienti WHERE giacenza <= 2 LIMIT 1";
 
         $stmt = $this->db->prepare($query);
         $stmt->execute();
@@ -235,7 +235,7 @@ class DatabaseHelper
 
     public function hasLowStockProducts()
     {
-        $query = "SELECT 1 FROM prodotti WHERE giacenza <= 2 LIMIT 1"; // Ottimizzato per performance
+        $query = "SELECT 1 FROM prodotti WHERE giacenza <= 2 LIMIT 1";  
 
         $stmt = $this->db->prepare($query);
         $stmt->execute();
@@ -586,7 +586,7 @@ class DatabaseHelper
             $stmtCustom->bind_param('i', $idordine);
             $stmtCustom->execute();
             $resultCustom = $stmtCustom->get_result();
-            $orderCustom = $resultCustom->fetch_all(MYSQLI_ASSOC); // Questo conterrà più righe per personalizzazione se ci sono più modifiche
+            $orderCustom = $resultCustom->fetch_all(MYSQLI_ASSOC);
             $resultCustom->free();
             $stmtCustom->close();
         } else {
@@ -1399,15 +1399,8 @@ class DatabaseHelper
         return $compositions;
     }
 
-    // TODO       
-    /* ===========================================================
-    * Codice da riguardare inizia qui. 
-    * ============================================================
-    */
-    // DatabaseHelper.php
     public function getAllProductsWithIngredients()
     {
-        // TODO bisogna gestire la discrepanza tra idcategoria e descrizione
         $sql = "
             SELECT 
                 p.idprodotto, p.nome, p.descrizione, p.prezzo, p.image,
@@ -1611,7 +1604,7 @@ class DatabaseHelper
 
     public function advanceOrderStatus($orderId)
     {
-        $currentStatusQuery = "SELECT MAX(idstato) AS current_max_idstato FROM modifiche_stato WHERE idordine = ? AND idstato != " . ID_STATO_ANNULLATO_PER_STOCK; // Assicurati che ID_STATO_ANNULLATO_PER_STOCK sia definito
+        $currentStatusQuery = "SELECT MAX(idstato) AS current_max_idstato FROM modifiche_stato WHERE idordine = ? AND idstato != " . ID_STATO_ANNULLATO_PER_STOCK; 
         $stmtStatus = $this->db->prepare($currentStatusQuery);
         if (!$stmtStatus) {
             error_log("Errore preparazione currentStatusQuery in advanceOrderStatus: " . $this->db->error);

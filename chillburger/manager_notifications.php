@@ -2,9 +2,9 @@
 
 require_once("bootstrap.php");
 
-$templateParams["titolo"] = "ChillBurger – Manager_Notifications";
+$templateParams["titolo"] = "ChillBurger – Notifiche Manager";
 $templateParams["nome"] = "template/manager_notifications_main.php";
-$templateParams["css"] = array("css/style.css", "css/manager_style.css");
+$templateParams["css"] = array("css/manager_style.css");
 $templateParams["js"] = array("js/manager_notifications.js");
 
 require("template/base.php");

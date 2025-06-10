@@ -2,7 +2,7 @@
 require_once "bootstrap.php";
 
 $templateParams = [
-    "titolo" => "ChillBurger – Manager_Stock",
+    "titolo" => "ChillBurger – Magazzino Manager",
     "nome"   => "template/manager_stock_main.php",
     "css"    => [
         "css/style.css",

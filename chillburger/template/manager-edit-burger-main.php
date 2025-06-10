@@ -73,7 +73,7 @@
 
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
               <button type="button" id="btn-cancel" class="btn btn-outline-secondary me-md-2">Annulla</button>
-              <button type="submit" id="btn-submit" class="btn btn-primary">
+              <button type="submit" id="btn-submit" class="btn order-button">
                 <span id="submit-text">Aggiungi Prodotto</span>
                 <span id="submit-loading" class="spinner-border spinner-border-sm" style="display: none; vertical-align: middle;"></span>
               </button>

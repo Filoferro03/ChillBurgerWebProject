@@ -3,7 +3,6 @@
     font-family: cute;
 }
 
-/* -------------------- Text -------------------- */
 header {
     font-family: cute, Arial, Helvetica, sans-serif;
     color: black;
@@ -37,18 +36,15 @@ h1 {
     color: black;
 }
 
-/* -------------------- Text size -------------------- */
 .display-5 {
     font-size: 3rem;
 }
 
-/* -------------------- Title -------------------- */
 .custom-title {
     color: #9C6644;
     text-shadow: white;
 }
 
-/* -------------------- Logo -------------------- */
 .welcome-to-title {
     color: white;
 }
@@ -62,7 +58,6 @@ h1 {
     max-height: 50px;
 }
 
-/* ombra solo sul testo, NON sulle emoji */
 .custom-title .txt {
     text-shadow: 4px 4px 0 white;
 }
@@ -71,7 +66,6 @@ h1 {
     text-shadow: none;
 }
 
-/* -------------------- Animated underline -------------------- */
 .animate-underline {
     position: relative;
     text-decoration: none;
@@ -82,11 +76,11 @@ h1 {
     position: absolute;
     left: 0;
     bottom: -8px;
-    width: 0; /* Inizia con larghezza 0 */
+    width: 0; 
     height: 4px;
     background-color: #9C6644;
     border-radius: 5px;
-    animation: underline 2s ease forwards; /* Animazione che parte subito */
+    animation: underline 2s ease forwards; 
 }
 
 .animate-underline.light-brown::before {
@@ -95,11 +89,10 @@ h1 {
 
 @keyframes underline {
     to {
-        width: 100%; /* La linea si espande al 100% della larghezza */
+        width: 100%; 
     }
 }
 
-/* -------------------- Hover on <a> animation underline -------------------- */
 .a-underline {
     position: relative;
     text-decoration: none;
@@ -125,7 +118,6 @@ h1 {
     width: 100%;
 }
 
-/* -------------------- Underline <a> header -------------------- */
 .header-menu {
     position: relative;
     text-decoration: none;
@@ -147,12 +139,10 @@ h1 {
     width: 100%;
 }
 
-/* -------------------- Card prodotto -------------------- */
-.bg-dark {  /* Background */
+.bg-dark {  
     background-color: #9C6644 !important;
 }
 
-/* -------------------- Page style -------------------- */
 header, footer {
     background-color: #9C6644;
 }
@@ -199,14 +189,6 @@ html, body {
     z-index: 2;
 }
 
-/*
-    FIXME
-    bottoni, capire quale sia la configurazione migliore
-    è meglio avere il bottone trasparente prima o dopo
-    passarci con il mouse?
-*/
-
-/* -------------------- Buttons -------------------- */
 .btn-body {
     border: 4px solid transparent;
     background-color: #9C6644;
@@ -222,8 +204,6 @@ html, body {
     background-color: #b08968;
 }
 
-/* --------------------   card prodotto   -------------------- */
-/* Per il footer della card */
 .card-footer {
     display: flex;
     flex-direction: column;
@@ -255,60 +235,51 @@ html, body {
     box-shadow: 0 8px 18px rgba(0,0,0,.12);
 }
 
-/* --- Stile Personalizzato Paginazione (Nero/Grigio) --- */
 
-/* Colore base dei link/pulsanti */
 .pagination .page-link {
-    color: #7f5539; /* Testo scuro */
-    background-color: #f8f9fa; /* Sfondo grigio molto chiaro */
-    border: 1px solid #7f5539; /* Bordo grigio chiaro */
+    color: #7f5539; 
+    background-color: #f8f9fa; 
+    border: 1px solid #7f5539; 
 }
 
-/* Stile al passaggio del mouse (hover) */
 .pagination .page-link:hover {
-    color: #f8f9fa; /* Testo chiaro */
-    background-color: #b08968; /* Sfondo  medio */
-    border-color: #b08968; /* Bordo  medio */
+    color: #f8f9fa; 
+    background-color: #b08968; 
+    border-color: #b08968; 
 }
 
-/* Stile quando l'elemento ha il focus (per accessibilità) */
 .pagination .page-link:focus {
-    color: #f8f9fa; /* Testo chiaro */
-    background-color: #b08968; /* Sfondo  medio */
-    border-color: #b08968; /* Bordo  medio */
-    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5); /* Ombra grigia semitrasparente */
+    color: #f8f9fa; 
+    background-color: #b08968; 
+    border-color: #b08968; 
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5); 
 }
 
-/* Stile per il pulsante della pagina attiva */
 .pagination .page-item.active .page-link {
     z-index: 3;
-    color: #fff; /* Testo bianco */
-    background-color: #7f5539; /* Sfondo scuro */
-    border-color: #7f5539; /* Bordo scuro */
+    color: #fff; 
+    background-color: #7f5539; 
+    border-color: #7f5539; 
 }
 
-/* Stile per i pulsanti disabilitati (Precedente/Successivo o ellissi) */
 .pagination .page-item.disabled .page-link {
-    color: #b08968; /* Testo scuro */
+    color: #b08968; 
     pointer-events: none;
-    background-color: #e9ecef; /* Sfondo ancora più chiaro */
-    border-color: #e9ecef; /* Bordo chiaro */
+    background-color: #e9ecef;
+    border-color: #e9ecef;
 }
 
-/* Stile specifico per le ellissi */
-/* Rende lo span dentro l'<li> disabilitato visivamente simile ai link disabilitati */
 .pagination .page-item.disabled span.page-link {
     color: #b08968;
     background-color: #e9ecef;
     border-color: #e9ecef;
-    padding-top: 0.375rem; /* Aggiusta padding se necessario */
+    padding-top: 0.375rem; 
     padding-bottom: 0.375rem;
     padding-left: 0.75rem;
     padding-right: 0.75rem;
 }
 
 
-/* -------------------- Mobile --------------------  */
 @media (max-width: 768px) {
     .mobile {
         display: block;
@@ -368,23 +339,21 @@ html, body {
 }
 
 .icon {
-    font-size: 1rem; /* default per schermi piccoli */
+    font-size: 1rem;
   }
 
   @media (min-width: 768px) {
     .icon {
-      font-size: 2rem; /* per md e oltre */
+      font-size: 2rem; 
     }
   }
 
 
   .delete-notification {
-    /* Nessuno stile definito */
     display:flex;
 }
 
 .read-notification {
-    /* Nessuno stile definito */
     display: flex;
 }
 
@@ -419,7 +388,7 @@ html, body {
   background-color: red;
   border-radius: 50%;
   z-index: 1;
-  display: none; /* ← mantieni qui */
+  display: none;
 }
 
 .notification-badge.active {

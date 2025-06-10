@@ -16,7 +16,6 @@ async function fetchData(url, formData) {
 function displayOrderDetails(data) {
     let result = "";
 
-    // ---- SEZIONE PRODOTTI PERSONALIZZATI ----
     if (data.orderCustom && data.orderCustom.length > 0) {
         const customProductsMap = new Map();
 
@@ -25,21 +24,19 @@ data.orderCustom.forEach(item => {
             if (!customProductsMap.has(item.idpersonalizzazione)) {
                 customProductsMap.set(item.idpersonalizzazione, {
                     idpersonalizzazione: item.idpersonalizzazione,
-                    idprodotto: item.idprodotto || '', // Add the standard product ID
+                    idprodotto: item.idprodotto || '',
                     productName: item.nomeprodotto || 'Nome Prodotto N/D',
-                    productQuantity: item.quantita !== undefined ? item.quantita : 'N/D', // Quantità del prodotto personalizzato
-                    productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D', // Prezzo totale della personalizzazione
-                    modifiche: [] // Array per le modifiche ingredienti
+                    productQuantity: item.quantita !== undefined ? item.quantita : 'N/D', 
+                    productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D', 
+                    modifiche: [] 
                 });
             }
-            // Aggiungi la modifica specifica a questo prodotto personalizzato
             customProductsMap.get(item.idpersonalizzazione).modifiche.push({
                 ingredientName: item.nomeingrediente || '',
                 action: item.azione || ''
             });
         });
 
-        // 2. Itera sulla mappa dei prodotti personalizzati raggruppati e genera l'HTML
 customProductsMap.forEach(customProduct => {
             result += `
                 <div class="card shadow-sm mb-3">
@@ -71,7 +68,6 @@ customProductsMap.forEach(customProduct => {
         });
     }
 
-    // ---- SEZIONE PRODOTTI STANDARD ----
     if (data.orderStock && data.orderStock.length > 0) {
         data.orderStock.forEach(stockElement => {
             const productName = stockElement.nome || 'Nome Prodotto N/D';
@@ -95,7 +91,6 @@ customProductsMap.forEach(customProduct => {
         });
     }
 
-    // Spedizione e Totale
     result += `<div class="mt-3 pt-2 border-top">
                     <div class="d-flex justify-content-between align-items-center">
                         <p class="card-title mb-0 ms-3">Spedizione:</p>
@@ -138,8 +133,6 @@ async function loadOrderDetails() {
     }
 }
 
-// --- Payment Validation Functions ---
-
 function displayError(fieldId, message) {
     const errorElement = document.getElementById(`${fieldId}-error`);
     const inputElement = document.getElementById(fieldId);
@@ -173,14 +166,12 @@ function validateCardholderName(name) {
         displayError('cardholder-name', 'Il nome sulla carta è obbligatorio.');
         return false;
     }
-    // Theoretical: check for invalid characters, though typically names can be complex.
-    // For this example, we'll just check if it's not empty.
     clearError('cardholder-name');
     return true;
 }
 
 function validateCardNumber(cardNumber) {
-    const cleanedCardNumber = cardNumber.replace(/\s+/g, ''); // Remove spaces
+    const cleanedCardNumber = cardNumber.replace(/\s+/g, ''); 
     if (!cleanedCardNumber) {
         displayError('card-number', 'Il numero della carta è obbligatorio.');
         return false;
@@ -189,12 +180,10 @@ function validateCardNumber(cardNumber) {
         displayError('card-number', 'Il numero della carta deve contenere solo cifre.');
         return false;
     }
-    // Theoretical validation for common card lengths (e.g., 16 for Visa/Mastercard)
     if (cleanedCardNumber.length < 13 || cleanedCardNumber.length > 19) {
         displayError('card-number', 'Il numero della carta sembra non valido (lunghezza).');
         return false;
     }
-    // Add Luhn algorithm check here for a more robust validation if needed
     clearError('card-number');
     return true;
 }
@@ -204,14 +193,14 @@ function validateExpiryDate(expiryDate) {
         displayError('expiry-date', 'La data di scadenza è obbligatoria.');
         return false;
     }
-    const match = expiryDate.match(/^(\d{2})\/?(\d{2})$/); // MM/YY or MMYY
+    const match = expiryDate.match(/^(\d{2})\/?(\d{2})$/); 
     if (!match) {
         displayError('expiry-date', 'Formato data non valido. Usare MM/YY.');
         return false;
     }
 
     const month = parseInt(match[1], 10);
-    const year = parseInt(`20${match[2]}`, 10); // Assuming 21st century
+    const year = parseInt(`20${match[2]}`, 10); 
 
     if (month < 1 || month > 12) {
         displayError('expiry-date', 'Mese non valido.');
@@ -220,7 +209,7 @@ function validateExpiryDate(expiryDate) {
 
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth() + 1; // JavaScript months are 0-indexed
+    const currentMonth = currentDate.getMonth() + 1; 
 
     if (year < currentYear || (year === currentYear && month < currentMonth)) {
         displayError('expiry-date', 'La carta è scaduta.');
@@ -249,7 +238,6 @@ async function confirmOrder() {
     const formData = new FormData();
     formData.append('action', 'payed');
     
-    // Aggiungi data e ora di consegna
     const deliveryDate = document.getElementById('delivery-date').value;
     const deliveryTime = document.getElementById('delivery-time').value;
     
@@ -273,29 +261,23 @@ function populateDeliveryDates() {
     const dateSelect = document.getElementById('delivery-date');
     if (!dateSelect) return;
     
-    // Svuota il selettore
     dateSelect.innerHTML = '<option value="" selected disabled>Seleziona una data</option>';
     
-    // Ottieni la data corrente
     const today = new Date();
     
-    // Aggiungi la data corrente e i due giorni successivi
     for (let i = 0; i < 3; i++) {
         const date = new Date(today);
         date.setDate(today.getDate() + i);
         
-        const formattedDate = date.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+        const formattedDate = date.toISOString().split('T')[0]; 
         
-        // Formatta la data per la visualizzazione (es. "Lunedì 15 Maggio")
         const options = { weekday: 'long', day: 'numeric', month: 'long' };
         const displayDate = date.toLocaleDateString('it-IT', options);
         
-        // Crea l'opzione
         const option = document.createElement('option');
         option.value = formattedDate;
         option.textContent = displayDate.charAt(0).toUpperCase() + displayDate.slice(1); // Prima lettera maiuscola
         
-        // Se è oggi, aggiungi "(Oggi)" al testo
         if (i === 0) {
             option.textContent += ' (Oggi)';
         }
@@ -308,11 +290,9 @@ async function populateDeliveryTimes(date) {
     const timeSelect = document.getElementById('delivery-time');
     if (!timeSelect) return;
     
-    // Disabilita il selettore mentre carica
     timeSelect.disabled = true;
     timeSelect.innerHTML = '<option value="" selected disabled>Caricamento orari...</option>';
     
-    // Chiama l'API per ottenere gli orari disponibili
     const apiUrl = `api/api-orders.php`;
     const formData = new FormData();
     formData.append('action', 'getAvailableTimes');
@@ -320,11 +300,9 @@ async function populateDeliveryTimes(date) {
     
     const json = await fetchData(apiUrl, formData);
     
-    // Svuota il selettore
     timeSelect.innerHTML = '<option value="" selected disabled>Seleziona un orario</option>';
     
     if (json && json.success && json.data) {
-        // Popola il selettore con gli orari disponibili
         json.data.forEach(time => {
             const option = document.createElement('option');
             option.value = time;
@@ -332,10 +310,8 @@ async function populateDeliveryTimes(date) {
             timeSelect.appendChild(option);
         });
         
-        // Abilita il selettore
         timeSelect.disabled = false;
     } else {
-        // Gestisci l'errore
         timeSelect.innerHTML = '<option value="" selected disabled>Nessun orario disponibile</option>';
     }
 }
@@ -363,12 +339,10 @@ function validateDeliveryDateTime() {
     return isValid;
 }
 
-// --- Event Listener for Payment Form ---
 document.addEventListener('DOMContentLoaded', () => {
     loadOrderDetails();
     populateDeliveryDates();
     
-    // Event listener per il cambio della data
     const dateSelect = document.getElementById('delivery-date');
     if (dateSelect) {
         dateSelect.addEventListener('change', function() {
@@ -379,18 +353,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const paymentForm = document.getElementById('paymentForm');
     if (paymentForm) {
         paymentForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Stop default form submission
+            event.preventDefault(); 
 
-            // Clear previous general messages
             displayGeneralMessage('', false);
 
-            // Get form values
             const cardholderName = document.getElementById('cardholder-name').value;
             const cardNumber = document.getElementById('card-number').value;
             const expiryDate = document.getElementById('expiry-date').value;
             const cvv = document.getElementById('cvv').value;
 
-            // Perform validation
             const isDateTimeValid = validateDeliveryDateTime();
             const isNameValid = validateCardholderName(cardholderName);
             const isCardNumberValid = validateCardNumber(cardNumber);
@@ -398,8 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const isCvvValid = validateCVV(cvv);
 
             if (isDateTimeValid && isNameValid && isCardNumberValid && isExpiryValid && isCvvValid) {
-                // All validations passed
-                // Simulate payment processing
                 displayGeneralMessage('Pagamento in elaborazione...', true);
 
                 setTimeout(() => {
