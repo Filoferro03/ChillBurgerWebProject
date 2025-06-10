@@ -90,27 +90,27 @@
         <!-- slide -->
         <div class="carousel-inner rounded-4 shadow">
             <div class="carousel-item active">
-                <img src="./resources/carousel/rest_2.jpg" class="d-block w-100"
+                <img src="./resources/carousel/rest_2.webp" class="d-block w-100"
                     alt="La nostra gioia">
             </div>
 
             <div class="carousel-item">
-                <img src="./resources/carousel/smash_1.jpg" class="d-block w-100"
+                <img src="./resources/carousel/smash_1.webp" class="d-block w-100"
                     alt="La griglia in azione">
             </div>
 
             <div class="carousel-item">
-                <img src="./resources/carousel/ham_1.jpg" class="d-block w-100"
+                <img src="./resources/carousel/ham_1.webp" class="d-block w-100"
                     alt="Il nostro prodotto">
             </div>
 
             <div class="carousel-item">
-                <img src="./resources/carousel/fries_1.jpg" class="d-block w-100"
+                <img src="./resources/carousel/fries_1.webp" class="d-block w-100"
                     alt="Le nostre fries">
             </div>
 
             <div class="carousel-item">
-                <img src="./resources/carousel/rest_1.jpg" class="d-block w-100"
+                <img src="./resources/carousel/rest_1.webp" class="d-block w-100"
                     alt="Il nostro ristorante">
             </div>
         </div>
