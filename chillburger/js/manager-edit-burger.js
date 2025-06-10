@@ -1,4 +1,3 @@
-// chillburger/js/manager-edit-burger.js (Versione Finale)
 (() => {
     // === HELPERS ===
     const getEl = (sel) => document.querySelector(sel);
@@ -146,9 +145,6 @@
 
         getEl("#product-category").dispatchEvent(new Event('change'));
 
-        // *** PUNTO CHIAVE DELLA CORREZIONE ***
-        // Ora 'product.ingredients' è un array di oggetti con tutti i dettagli.
-        // Itera su di esso e popola le righe.
         if (product.idcategoria == paniniCategoryId && Array.isArray(product.ingredients)) {
             product.ingredients.forEach(ing => addIngredientRow(ing));
         } else {
@@ -157,7 +153,6 @@
     }
     
     // --- Gestori di Eventi ---
-    
     function setupFormHandlers() {
         getEl("#product-category").addEventListener("change", handleCategoryChange);
         getEl("#product-image").addEventListener("change", handleImagePreview);

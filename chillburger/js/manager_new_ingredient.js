@@ -1,8 +1,3 @@
-/*  manager_new_ingredient.js  
- *  Gestisce la creazione di un nuovo ingrediente.
- *  Richiede Bootstrap 5 (per Toast & Spinner) + FontAwesome per le icone.
- */
-
 document.addEventListener('DOMContentLoaded', () => {
     const form          = document.getElementById('product-form');
     const btnSubmit     = document.getElementById('btn-submit');

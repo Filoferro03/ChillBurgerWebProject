@@ -29,15 +29,13 @@ async function fetchData(url, formData) {
 
 
 let currentOrderIdToUpdate = null; 
-// currentOrderStatusId non è più necessario che sia globale in JS,
-// perché la logica di avanzamento è gestita principalmente dal backend.
 
 async function updateOrderStatusAPI(orderId) {
     const url = 'api/api-orders.php';
     const formData = new FormData();
     formData.append('action', 'update');
     formData.append('idordine', orderId);
-    // La chiamata a fetchData ora restituisce la promise con la risposta JSON completa
+    // La chiamata a fetchData restituisce la promise con la risposta JSON completa
     return fetchData(url, formData); 
 }
 
@@ -64,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (apiResponse.new_status_id === ID_STATO_ANNULLATO_PER_STOCK_JS) {
                             alert(`L'ordine #${currentOrderIdToUpdate} è stato annullato automaticamente a causa di stock insufficiente.`);
                         } else if (apiResponse.message) {
-                            // Potresti voler mostrare un toast/notifica più discreta invece di un alert per i successi standard
+                            // toast/notifica più discreta invece di un alert per i successi standard
                             // alert(apiResponse.message); 
                         }
                         // Ricarica entrambe le liste per riflettere i cambiamenti
@@ -193,7 +191,7 @@ function displayActiveOrders(orders) {
             let modalTarget = 'data-bs-target="#confirmStatusModal" data-bs-toggle="modal"';
 
             // Determina il testo e l'azione del bottone per gli stati avanzabili
-            switch (order.stato) { // order.stato è la descrizione testuale
+            switch (order.stato) { 
                 case 'In attesa':
                     nextStatusTextBtn = 'Metti In Preparazione';
                     break;
@@ -287,13 +285,11 @@ function displayOrderHistory(orders) {
 
 function addUpdateStatusButtonListeners() {
     document.querySelectorAll('.update-status-btn').forEach(button => {
-        // Assicurati che l'evento venga aggiunto solo a bottoni non disabilitati,
-        // o che il listener stesso verifichi se è disabilitato.
         if (button.hasAttribute('disabled')) return;
 
         button.addEventListener('click', function() {
             currentOrderIdToUpdate = this.dataset.orderId;
-            const nextStatusForModal = this.dataset.nextStatusText; // Usa il testo del bottone per il modale
+            const nextStatusForModal = this.dataset.nextStatusText;
 
             const modalOrderIdElem = document.getElementById('modalOrderId');
             const modalNewStatusElem = document.getElementById('modalNewStatus');

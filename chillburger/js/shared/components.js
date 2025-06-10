@@ -4,7 +4,7 @@ function createPaginationComponent(currentPage, totalPages, onPageClick, visible
     }
 
     const nav = document.createElement('nav');
-    nav.setAttribute('aria-label', 'Navigazione pagine'); // Etichetta più specifica
+    nav.setAttribute('aria-label', 'Navigazione pagine'); 
 
     const ul = document.createElement('ul');
     ul.className = 'pagination justify-content-center'; // Classi Bootstrap

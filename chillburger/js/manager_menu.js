@@ -1,5 +1,3 @@
-// chillburger/js/manager_menu.js
-// chillburger/js/manager_menu.js – versione con filtro categorie
 (() => {
   // === HELPERS ===
   const $ = (sel, root = document) => root.querySelector(sel);
@@ -191,7 +189,7 @@
     actions.append(btnEdit);
 
 
-    // Pulsante ELIMINA (dimensione costante per tutte le categorie)
+    // Pulsante ELIMINA
     const btnDel = createEl("button", { class: "btn btn-sm btn-danger" }, "Elimina");
     btnDel.addEventListener("click", () => openDeleteModal(product.idprodotto));
     actions.append(btnDel);
@@ -642,7 +640,6 @@
     }
   }
 
-  // Esegui al caricamento del DOM
   window.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       loadInitialData();

@@ -17,7 +17,7 @@ async function fetchData(url, formData) {
  * @param {Array} reviews - Array di recensioni
  * @returns {string} HTML delle recensioni
  */
-function generateReviewsHTML(reviews) { // Rinominata per chiarezza
+function generateReviewsHTML(reviews) {
     let result = "";
     reviews.forEach(review => {
         result += `
