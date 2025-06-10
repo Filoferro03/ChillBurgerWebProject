@@ -100,7 +100,7 @@
 
         <nav class="desktop navbar py-4 px-1">
             <div class="container-fluid">
-                <a href="index.php"><img src="./resources/ChillBurgerLogo.png" alt="ChillBurger Logo" class="logo" /></a>
+                <a href="index.php"><img src="./resources/ChillBurgerLogo.webp" alt="ChillBurger Logo" class="logo" /></a>
                 <ul class="list-group list-group-horizontal d-flex justify-content-center gap-2">
                     <li class="list-group-item">
                         <a class="nav-link header-menu fs-3" aria-current="page" href="menu.php">Menu</a>
