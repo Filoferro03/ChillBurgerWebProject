@@ -367,6 +367,28 @@ function validateDeliveryDateTime() {
   return isValid;
 }
 
+function formatCardNumber(value) {
+  const cleaned = value.replace(/\D/g, '');
+  
+  const limited = cleaned.substring(0, 19);
+  
+  const formatted = limited.replace(/(\d{4})(?=\d)/g, '$1 ');
+  
+  return formatted;
+}
+
+function formatExpiryDate(value) {
+  const cleaned = value.replace(/\D/g, '');
+  
+  const limited = cleaned.substring(0, 4);
+  
+  if (limited.length >= 2) {
+    return limited.substring(0, 2) + '/' + limited.substring(2);
+  }
+  
+  return limited;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   loadOrderDetails();
   populateDeliveryDates();
@@ -375,6 +397,34 @@ document.addEventListener("DOMContentLoaded", () => {
   if (dateSelect) {
     dateSelect.addEventListener("change", function () {
       populateDeliveryTimes(this.value);
+    });
+  }
+
+  const cardNumberInput = document.getElementById("card-number");
+  if (cardNumberInput) {
+    cardNumberInput.addEventListener("input", function (e) {
+      const cursorPosition = e.target.selectionStart;
+      const oldValue = e.target.value;
+      const newValue = formatCardNumber(oldValue);
+      
+      e.target.value = newValue;
+      
+      const newCursorPosition = cursorPosition + (newValue.length - oldValue.length);
+      e.target.setSelectionRange(newCursorPosition, newCursorPosition);
+    });
+  }
+
+  const expiryDateInput = document.getElementById("expiry-date");
+  if (expiryDateInput) {
+    expiryDateInput.addEventListener("input", function (e) {
+      const cursorPosition = e.target.selectionStart;
+      const oldValue = e.target.value;
+      const newValue = formatExpiryDate(oldValue);
+      
+      e.target.value = newValue;
+      
+      const newCursorPosition = cursorPosition + (newValue.length - oldValue.length);
+      e.target.setSelectionRange(newCursorPosition, newCursorPosition);
     });
   }
 
