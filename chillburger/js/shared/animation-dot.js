@@ -25,7 +25,26 @@ async function checkNewNotifications() {
   const badges = document.querySelectorAll(".notification-badge");
   console.log("badge:", badges, "json:", json, "dati: ", json.data);
   badges.forEach((badge) => {
-    if (json.length > 0 || json.data.length > 0) {
+    let shouldBeActive = false; // Presumiamo che il badge non debba essere attivo
+
+    // Caso 1: json è un array con elementi
+    if (json && Array.isArray(json) && json.length > 0) {
+      shouldBeActive = true;
+    }
+    // Caso 2: json.data è un array con elementi
+    // Usiamo else if per dare priorità al primo controllo o per non sovrapporsi
+    // Nota: 'length' corretto
+    else if (
+      json &&
+      typeof json === "object" &&
+      json.data &&
+      Array.isArray(json.data) &&
+      json.data.length > 0
+    ) {
+      shouldBeActive = true;
+    }
+
+    if (shouldBeActive) {
       badge.classList.add("active");
       console.log("ha aggiunto active");
     } else {
