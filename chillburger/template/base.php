@@ -124,7 +124,7 @@
                         <a href="notifications.php" class="text-decoration-none mx-2" aria-label="Notifiche">
                             <span class="notification-icon-wrapper">
                                 <strong class="fa-solid fa-bell text-black fs-2" aria-hidden="true"></strong>
-                                <span class="notification-badge"></span> <!-- pallino rosso -->
+                                <span class="notification-badge"></span>
                             </span>
                             <span class="visually-hidden">Notifiche</span>
                         </a>

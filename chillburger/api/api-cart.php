@@ -139,6 +139,18 @@ if (isset($_POST["action"])) {
             }
             break;
 
+        case "createNewCart":
+            if (isset($_SESSION["idutente"]) && isUserClient()) {
+                $idcart = $dbh->createEmptyOrder($_SESSION["idutente"]);
+                $result['createCart'] = true;
+                $result['idordine'] = $idcart;
+                setUserCart($result['idordine']);
+            } else {
+                $result['createCart'] = false;
+                $result['message'] = "Utente non loggato";
+            }
+            break;
+
         default:
             $result['success'] = false;
             $result['error'] = "Azione non riconosciuta";
