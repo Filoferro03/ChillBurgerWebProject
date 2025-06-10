@@ -91,8 +91,8 @@ function generateCartHTML(products, personalizations, order) {
                 <div class="d-flex w-100 h-100 flex-column justify-content-between p-1">
                     <div class="d-flex flex-column w-100 m-1">
                         <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-center">
-                            <p class="fs-3">${product.nome}</p>
-                            <p class="fs-3">${totalProductPrice}€</p>
+                            <p class="fs-3 text-center">${product.nome}</p>
+                            <p class="fs-3 text-center">${totalProductPrice}€</p>
                             <div class="d-flex flex-row justify-content-between align-items-center">
                                 <button type="button" class="btn p-1 p-md-3 md:m-1" onclick="modifyQuantity(${product.idprodotto}, 'product', -1)"><span class="fa-solid fa-circle-minus icon" aria-hidden="true"></span></button>
                                 <p class="fs-3 mx-2"><span class="quantita">${product.quantita}</span></p>
@@ -118,8 +118,8 @@ function generateCartHTML(products, personalizations, order) {
                 <div class="d-flex w-100 h-100 flex-column justify-content-between p-1">
                     <div class="d-flex flex-column w-100">
                         <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-center">
-                            <p class="fs-3">${pers.nomeprodotto}</p>
-                            <p class="fs-3">${totalPersPrice}€</p>
+                            <p class="fs-3 text-center">${pers.nomeprodotto}</p>
+                            <p class="fs-3 text-center">${totalPersPrice}€</p>
                             <div class="d-flex flex-row justify-content-between align-items-center">
                                 <button type="button" class="btn p-1 p-md-3 md:m-1" onclick="modifyQuantity(${pers.idpersonalizzazione}, 'personalization', -1)"><span class="fa-solid fa-circle-minus icon" aria-hidden="true"></span></button>
                                 <p class="fs-3 mx-2"><span class="quantita">${pers.quantita}</span></p>
