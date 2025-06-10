@@ -151,9 +151,6 @@ async function addProductToCart(idprodotto) {
 
     if (json.success) {
       console.log("Prodotto aggiunto al carrello!");
-      // TODO
-      // In caso non si refreshi il carrello scommenta
-      // await init();
     } else {
       console.error("Errore aggiungendo prodotto:", json.error);
     }
@@ -193,12 +190,4 @@ function showAddOnePopup(button) {
   });
 }
 
-// TODO
-// in caso non si refreshi il carrello scommenta
-/*async function init() {
-  await getAllProducts();
-  // optionally, you can call other UI refresh functions here
-} */
-
-// Funzione per generare il menu
 getAllProducts();

@@ -1,10 +1,4 @@
 <?php
-/* 
-    
-    FIXME
-    Per vedere gli errori nel browser, va tolto quando finiamo
-    
-*/
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
