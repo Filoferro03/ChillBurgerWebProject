@@ -1,6 +1,6 @@
 let currentOrderIdToReview = null;
 let currentReviewData = null;
-let currentOrderStatusInfo = null; // Store status info globally for the page context
+let currentOrderStatusInfo = null; 
 
 async function fetchData(url, formData) {
     try {
@@ -17,19 +17,10 @@ async function fetchData(url, formData) {
     }
 }
 
-
-/**
- * Genera l'HTML per visualizzare i dettagli di un ordine.
- * @param {object} data - L'oggetto contenente i dettagli dell'ordine,
- * che dovrebbe avere le proprietà: orderCustom, orderStock, totalPrice.
- * @returns {string} Una stringa HTML che rappresenta i dettagli dell'ordine.
- */
 function displayOrderDetails(data) {
     let result = "";
 
-    // ---- SEZIONE PRODOTTI PERSONALIZZATI ----
     if (data.orderCustom && data.orderCustom.length > 0) {
-        // 1. Raggruppa le modifiche per idpersonalizzazione (che idealmente identifica un prodotto personalizzato unico nell'ordine)
         const customProductsMap = new Map();
 
         data.orderCustom.forEach(item => {
@@ -37,33 +28,31 @@ function displayOrderDetails(data) {
             if (!customProductsMap.has(item.idpersonalizzazione)) {
                 customProductsMap.set(item.idpersonalizzazione, {
                     idpersonalizzazione: item.idpersonalizzazione,
-                    idprodotto: item.idprodotto || '', // Add the standard product ID
+                    idprodotto: item.idprodotto || '', 
                     productName: item.nomeprodotto || 'Nome Prodotto N/D',
-                    productQuantity: item.quantita !== undefined ? item.quantita : 'N/D', // Quantità del prodotto personalizzato
-                    productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D', // Prezzo totale della personalizzazione
-                    modifiche: [] // Array per le modifiche ingredienti
+                    productQuantity: item.quantita !== undefined ? item.quantita : 'N/D', 
+                    productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D', 
+                    modifiche: [] 
                 });
             }
-            // Aggiungi la modifica specifica a questo prodotto personalizzato
             customProductsMap.get(item.idpersonalizzazione).modifiche.push({
                 ingredientName: item.nomeingrediente || '',
                 action: item.azione || ''
             });
         });
 
-        // 2. Itera sulla mappa dei prodotti personalizzati raggruppati e genera l'HTML
         data.orderCustom.forEach(item => {
             if (!customProductsMap.has(item.idpersonalizzazione)) {
                 customProductsMap.set(item.idpersonalizzazione, {
                     idpersonalizzazione: item.idpersonalizzazione,
-                    idprodotto: item.idprodotto || '', // Add the standard product ID
+                    idprodotto: item.idprodotto || '', 
                     productName: item.nomeprodotto || 'Nome Prodotto N/D',
                     productQuantity: item.quantita !== undefined ? item.quantita : 'N/D',
                     productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D',
                     modifiche: []
                 });
             }
-            if (item.nomeingrediente && item.azione) { // Ensure ingredient name and action exist
+            if (item.nomeingrediente && item.azione) { 
                 customProductsMap.get(item.idpersonalizzazione).modifiche.push({
                     ingredientName: item.nomeingrediente,
                     action: item.azione
@@ -81,7 +70,7 @@ function displayOrderDetails(data) {
             if (customProduct.modifiche.length > 0 && customProduct.modifiche.some(mod => mod.ingredientName)) {
                 result += `<ul class="list-unstyled ms-md-3 small">`; 
                 customProduct.modifiche.forEach(mod => {
-                    if (mod.ingredientName) { // Only display if ingredientName is present
+                    if (mod.ingredientName) { 
                         let prefix = '';
                         if (mod.action === 'aggiunto') prefix = '+ ';
                         else if (mod.action === 'rimosso') prefix = '- ';
@@ -104,7 +93,6 @@ function displayOrderDetails(data) {
         });
     }
 
-    // ---- SEZIONE PRODOTTI STANDARD ----
     if (data.orderStock && data.orderStock.length > 0) {
         data.orderStock.forEach(stockElement => {
             const productName = stockElement.nome || 'Nome Prodotto N/D';
@@ -176,16 +164,16 @@ async function loadOrderDetails() {
 
     if (json && json.success && json.data) {
         orderDetailsContainer.innerHTML = displayOrderDetails(json.data);
-        currentOrderStatusInfo = json.data.statusInfo; // Store status info
-        await getReview(orderId, currentOrderStatusInfo); // Pass statusInfo to getReview
+        currentOrderStatusInfo = json.data.statusInfo;
+        await getReview(orderId, currentOrderStatusInfo); 
     } else {
         const errorMessage = json && json.error ? json.error : 'Dati non disponibili o si è verificato un errore.';
         orderDetailsContainer.innerHTML = `<p class='text-center text-danger'>Errore nel caricamento dei dettagli dell'ordine: ${errorMessage}</p>`;
-        await getReview(orderId, null); // Call getReview even on error to handle UI
+        await getReview(orderId, null); 
     }
 }
 
-async function getReview(orderid, statusInfo) { // Accept statusInfo
+async function getReview(orderid, statusInfo) { 
     const url = "api/api-reviews.php"; 
     const formData = new FormData();
     formData.append('action', 'getbyorder'); 
@@ -194,11 +182,11 @@ async function getReview(orderid, statusInfo) { // Accept statusInfo
     const json = await fetchData(url, formData);
 
     const reviewContainer = document.getElementById('reviewContainer');
-    if (!reviewContainer) return; // Guard clause
+    if (!reviewContainer) return; 
 
-    reviewContainer.innerHTML = `<h2 class="card-header align-items-center">La tua Recensione</h2>`; // Reset and add header
+    reviewContainer.innerHTML = `<h2 class="card-header align-items-center">La tua Recensione</h2>`; 
 
-    if (json && json.success && json.data && json.data.length > 0) { // Check if json.data exists and is not empty
+    if (json && json.success && json.data && json.data.length > 0) { 
         const reviewData = json.data[0]; 
         currentReviewData = reviewData;
         reviewContainer.innerHTML += `
@@ -212,8 +200,7 @@ async function getReview(orderid, statusInfo) { // Accept statusInfo
                 <button class="btn btn-sm btn-danger" id="cancelReviewButton" data-bs-toggle="modal" data-bs-target="#deleteModal">Elimina</button>
             </div>`;
     } else {
-        // No review exists, check order status
-        if (statusInfo && statusInfo.idstato === 5) { // 5 is "Confermato"
+        if (statusInfo && statusInfo.idstato === 5) {
             reviewContainer.innerHTML += `
                 <p class="text-center mt-2 px-3">Non hai ancora lasciato nessuna recensione per questo ordine...</p>
                 <div class="text-center mt-2 mb-2 px-3">
@@ -248,7 +235,7 @@ async function submitReview(orderId, title, rating, comment, action) {
             if (reviewModal) {
                 reviewModal.hide();
             }
-            document.getElementById('reviewForm').reset(); // Reset form fields
+            document.getElementById('reviewForm').reset(); 
             window.location.reload(); 
         } else {
             alert("Errore nell'invio della recensione: " + (json.error || "Dettagli non disponibili."));

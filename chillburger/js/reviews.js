@@ -12,12 +12,7 @@ async function fetchData(url, formData) {
     }
 }
 
-/**
- * Genera HTML per le singole recensioni
- * @param {Array} reviews - Array di recensioni
- * @returns {string} HTML delle recensioni
- */
-function generateReviewsHTML(reviews) { // Rinominata per chiarezza
+function generateReviewsHTML(reviews) { 
     let result = "";
     reviews.forEach(review => {
         result += `
@@ -38,30 +33,25 @@ function generateReviewsHTML(reviews) { // Rinominata per chiarezza
     return result;
 }
 
-/**
- * Carica le recensioni dalla API e le visualizza, usando il componente di paginazione.
- */
-async function loadReviews(page = 1) { // Accetta la pagina come argomento
-    currentReviewsPage = page; // Aggiorna la pagina corrente
+async function loadReviews(page = 1) { 
+    currentReviewsPage = page; 
 
-    // Seleziona i contenitori nel DOM
     const reviewsListContainer = document.getElementById('reviewsList');
-    const paginationContainer = document.getElementById('reviewsPagination'); // Contenitore per la paginazione
+    const paginationContainer = document.getElementById('reviewsPagination'); 
 
     if (!reviewsListContainer || !paginationContainer) {
         console.error("Elementi 'reviewsList' o 'reviewsPagination' non trovati.");
         return;
     }
 
-    // Opzionale: mostra un indicatore di caricamento
     reviewsListContainer.innerHTML = '<p class="text-center">Caricamento recensioni...</p>';
-    paginationContainer.innerHTML = ''; // Pulisci paginazione durante il caricamento
+    paginationContainer.innerHTML = '';
 
     try {
         const url = 'api/api-reviews.php';
         const formData = new FormData();
         formData.append('action', 'getall');
-        formData.append('page', page); // Passa la pagina come parametro
+        formData.append('page', page); 
         const json = await fetchData(url, formData);
         const data = json.data;
 
@@ -69,10 +59,8 @@ async function loadReviews(page = 1) { // Accetta la pagina come argomento
             throw new Error("Risposta API non valida.");
         }
 
-        // Verifica la risposta
         if (data && data.reviews && typeof data.currentPage !== 'undefined' && typeof data.totalPages !== 'undefined') {
 
-            // Mostra le recensioni
             if (data.reviews.length > 0) {
                 reviewsListContainer.innerHTML = generateReviewsHTML(data.reviews);
             } else if (data.currentPage === 1) {
@@ -81,16 +69,14 @@ async function loadReviews(page = 1) { // Accetta la pagina come argomento
                 reviewsListContainer.innerHTML = '<div class="list-group-item text-center">Nessuna recensione trovata per questa pagina.</div>';
             }
 
-            // Usa il componente per creare la paginazione
             const paginationElement = createPaginationComponent(
                 data.currentPage,
                 data.totalPages,
-                (newPage) => { // Funzione callback per il click sulla pagina
-                    loadReviews(newPage); // Ricarica le recensioni per la nuova pagina
+                (newPage) => {
+                    loadReviews(newPage); 
                 }
             );
 
-            // Aggiungi la paginazione al DOM (se necessario)
             if (paginationElement) {
                 paginationContainer.appendChild(paginationElement);
             }
@@ -102,13 +88,12 @@ async function loadReviews(page = 1) { // Accetta la pagina come argomento
     } catch (error) {
         console.error('Errore nel caricamento delle recensioni:', error);
         reviewsListContainer.innerHTML = `<div class="list-group-item text-danger text-center">Errore nel caricamento delle recensioni: ${error.message}</div>`;
-        paginationContainer.innerHTML = ''; // Assicurati che la paginazione sia vuota in caso di errore
+        paginationContainer.innerHTML = '';
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-     // Verifica se siamo sulla pagina delle recensioni controllando l'esistenza dei contenitori
      if (document.getElementById('reviewsList') && document.getElementById('reviewsPagination')) {
-         loadReviews(1); // Carica la prima pagina
+         loadReviews(1); 
      }
 });

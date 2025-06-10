@@ -1,22 +1,19 @@
-<?php // api-orders.php
+<?php 
 
 require_once '../bootstrap.php';
 
-// Definisci queste costanti se non sono in bootstrap.php
 if (!defined('ID_STATO_ANNULLATO_PER_STOCK')) {
-    define("ID_STATO_ANNULLATO_PER_STOCK", 6); // Assicurati che questo ID esista e sia corretto nel tuo DB
+    define("ID_STATO_ANNULLATO_PER_STOCK", 6);
 }
 if (!defined('MYSQL_SIGNAL_USER_EXCEPTION_SQLSTATE')) {
-    define("MYSQL_SIGNAL_USER_EXCEPTION_SQLSTATE", "45000"); // SQLSTATE standard per SIGNAL
+    define("MYSQL_SIGNAL_USER_EXCEPTION_SQLSTATE", "45000"); 
 }
-// Includi la definizione di StockUnavailableException se non è autocaricata o definita in DatabaseHelper.php prima della classe
-if (!class_exists('StockUnavailableException')) { // Evita ridefinizioni se inclusa altrove
+if (!class_exists('StockUnavailableException')) {
     class StockUnavailableException extends Exception {}
 }
 
 
 $response = [];
-// error_log("api-orders.php - Azione richiesta: " . ($_POST['action'] ?? 'N/D'));
 
 if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
     $idOrdine = null;
@@ -31,20 +28,18 @@ if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
     if ($idOrdine === null) {
         $response = ['success' => false, 'error' => 'ID ordine non specificato o non trovato.'];
     } else {
-        $orderDetails = $dbh->getOrderDetails($idOrdine); // Renamed to avoid conflict
-        $statusInfo = $dbh->getOrderCurrentStatusInfo($idOrdine); // Get current status
-
+        $orderDetails = $dbh->getOrderDetails($idOrdine); 
+        $statusInfo = $dbh->getOrderCurrentStatusInfo($idOrdine); 
         if ($orderDetails !== null) { 
             $response['success'] = true;
-            // Combine order details and status info into the data payload
-            $response['data'] = $orderDetails; // $orderDetails already contains orderCustom, orderStock, totalPrice
-            $response['data']['statusInfo'] = $statusInfo; // Add statusInfo to the data
+            $response['data'] = $orderDetails; 
+            $response['data']['statusInfo'] = $statusInfo; 
         } else {
             $response = ['success' => false, 'error' => 'Dettagli ordine non trovati per ID: ' . $idOrdine];
         }
     }
 } elseif (!isUserLoggedIn() || !isset($_SESSION['idutente'])) {
-    http_response_code(401); // Unauthorized
+    http_response_code(401); 
     $response = ['success' => false, 'error' => 'Utente non autenticato o sessione non valida'];
 } else {
     $idutente = $_SESSION['idutente'];
@@ -60,7 +55,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
 
     } else if (isset($_POST['action']) && $_POST['action'] == 'getActiveOrders') {
         if (!isUserAdmin()) {
-            http_response_code(403); // Forbidden
+            http_response_code(403); 
             $response = ['success' => false, 'error' => 'Accesso non autorizzato'];
         } else {
             $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
@@ -71,7 +66,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
         }
     } else if (isset($_POST['action']) && $_POST['action'] == 'getOrderHistory') {
         if (!isUserAdmin()) {
-            http_response_code(403); // Forbidden
+            http_response_code(403);
             $response = ['success' => false, 'error' => 'Accesso non autorizzato'];
         } else {
             $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
@@ -94,11 +89,9 @@ if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
                     $response['new_status_id'] = $latestStatusInfo['idstato'];
                     $response['new_status_description'] = $latestStatusInfo['descrizione'];
                 } else {
-                    // Questo caso non dovrebbe accadere se l'ordine esiste e advanceOrderStatus è andato a buon fine
                     $response['message'] = 'Stato ordine aggiornato, ma impossibile recuperare i dettagli del nuovo stato.';
                 }
             } else {
-                // advanceOrderStatus ha restituito false (es. stato già finale, o prossimo stato non valido)
                 $latestStatusInfo = $dbh->getOrderCurrentStatusInfo($idordine);
                 if ($latestStatusInfo) {
                      $response['success'] = true; 
@@ -115,7 +108,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
             error_log("StockUnavailableException per ordine $idordine: " . $e->getMessage());
             $annulResult = $dbh->setOrderStatus($idordine, ID_STATO_ANNULLATO_PER_STOCK);
             if ($annulResult) {
-                $response['success'] = true; // L'operazione complessiva (tentativo + annullamento) è considerata un successo gestito
+                $response['success'] = true; 
                 $response['message'] = 'Ordine annullato automaticamente per insufficienza di stock.';
                 $cancelledStatusInfo = $dbh->getStatusInfoById(ID_STATO_ANNULLATO_PER_STOCK);
                 $response['new_status_id'] = ID_STATO_ANNULLATO_PER_STOCK;
@@ -142,14 +135,10 @@ if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
         if (isset($_POST['deliveryDate']) && !empty($_POST['deliveryDate']) && isset($_POST['deliveryTime']) && !empty($_POST['deliveryTime'])) {
             $deliveryDate = $_POST['deliveryDate'];
             $deliveryTime = $_POST['deliveryTime'];
-        } else {
-            // Se data e ora non sono fornite, potresti voler impostare dei default o gestire l'errore
-            // Per ora, se non fornite, $dbh->updateStatusToPayed riceverà null e potrebbe non aggiornare data/ora.
-            // Assicurati che $dbh->updateStatusToPayed gestisca correttamente i valori null per data/ora.
-        }
-        $updateResult = $dbh->updateStatusToPayed($idordine, $deliveryDate, $deliveryTime); // $result è già usato
+        } 
+        $updateResult = $dbh->updateStatusToPayed($idordine, $deliveryDate, $deliveryTime); 
         if (!$updateResult) {
-            http_response_code(500); // Internal Server Error
+            http_response_code(500); 
             $response = ['success' => false, 'error' => 'Errore durante il pagamento dell\'ordine'];
         } else {
             $response['success'] = true;
@@ -173,7 +162,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'getDetails') {
         }
     }
     } else {
-        http_response_code(400); // Bad Request
+        http_response_code(400); 
         $response = ['success' => false, 'error' => 'Azione non specificata o non valida'];
     }
 }

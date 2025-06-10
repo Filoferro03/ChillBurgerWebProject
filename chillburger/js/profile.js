@@ -12,8 +12,6 @@ async function fetchData(url, formData) {
     }
 }
 
-
-// --- Funzione per caricare i dati profilo e la prima pagina ordini ---
 async function loadProfileData() { 
     const url = "api/api-profile.php";
     const formData = new FormData();
@@ -21,7 +19,6 @@ async function loadProfileData() {
 
     if (json && json.success && json.userData) {
         displayProfileData(json.userData);
-        // Carica la PRIMA PAGINA degli ordini dopo aver caricato il profilo
         await loadUserOrders(1);
     } else {
         console.error("Impossibile caricare i dati del profilo.");
@@ -32,7 +29,6 @@ async function loadProfileData() {
     }
 }
 
-// --- Funzione per visualizzare i dati del profilo (invariata rispetto a prima) ---
 function displayProfileData(userData) {
     const nomeElement = document.getElementById('profile-nome');
     const cognomeElement = document.getElementById('profile-cognome');
@@ -68,7 +64,7 @@ function generateOrdersHTML(orders) {
     return result;
 }
 
-let currentOrdersPage = 1; // Tiene traccia della pagina corrente
+let currentOrdersPage = 1; 
 
 async function loadUserOrders(page = 1) {
     currentOrdersPage = page;
@@ -81,33 +77,30 @@ async function loadUserOrders(page = 1) {
         return;
     }
 
-    // Mostra caricamento
     ordersList.innerHTML = '<p class="text-center">Caricamento ordini...</p>';
     paginationContainer.innerHTML = '';
 
     try {
-        const url = "api/api-orders.php"; // URL API ordini
+        const url = "api/api-orders.php"; 
         const formData = new FormData();
-        formData.append('action', 'getByUser'); // Azione richiesta dall'API
-        formData.append('page', page); // Numero di pagina da caricare
+        formData.append('action', 'getByUser'); 
+        formData.append('page', page); 
 
-        // 'responseJson' conterrà {success: true, data: {orders: [], currentPage: X, totalPages: Y}}
         const responseJson = await fetchData(url, formData);
 
         const ordersData = responseJson.data;
         const orders = ordersData.orders;
 
-        ordersList.innerHTML = ''; // Pulisci caricamento/lista precedente
+        ordersList.innerHTML = '';
 
         if (orders.length === 0 && ordersData.currentPage === 1) {
             ordersList.innerHTML = '<p class="text-center">Nessun ordine trovato</p>';
         } else if (orders.length === 0 && ordersData.currentPage > 1) {
             ordersList.innerHTML = '<p class="text-center">Nessun ordine trovato per questa pagina.</p>';
-            // Mostra comunque la paginazione per tornare indietro
             const paginationElement = createPaginationComponent(
                 ordersData.currentPage,
                 ordersData.totalPages,
-                loadUserOrders // Passa la funzione stessa come callback
+                loadUserOrders 
             );
             if (paginationElement) {
                 paginationContainer.appendChild(paginationElement);
@@ -115,11 +108,10 @@ async function loadUserOrders(page = 1) {
         } else {
             ordersList.innerHTML = generateOrdersHTML(orders);
 
-            // Crea e aggiungi il componente di paginazione
                 const paginationElement = createPaginationComponent(
                 ordersData.currentPage,
                 ordersData.totalPages,
-                loadUserOrders // Passa la funzione stessa come callback
+                loadUserOrders 
             );
             if (paginationElement) {
                 paginationContainer.appendChild(paginationElement);
@@ -129,7 +121,7 @@ async function loadUserOrders(page = 1) {
     } catch (error) {
         console.error('Errore caricamento ordini:', error);
         ordersList.innerHTML = `<p class="text-center text-danger">Errore nel caricamento degli ordini: ${error.message}</p>`;
-        paginationContainer.innerHTML = ''; // Pulisci paginazione in caso di errore
+        paginationContainer.innerHTML = ''; 
     }
 }
 
@@ -137,7 +129,7 @@ async function logout() {
     const url = "api/api-login.php";
     const formData = new FormData();
     formData.append('action', 'logout');
-    const json = await fetchData(url, formData); // Usa fetchData aggiornata
+    const json = await fetchData(url, formData); 
 
     if (json && json["logoutresult"]) {
         window.location.href = 'index.php';
@@ -165,9 +157,8 @@ async function updateOrderStatus(idOrdine) {
 
 
 
-// --- Listener DOMContentLoaded (Chiama loadProfileData all'avvio) ---
 document.addEventListener('DOMContentLoaded', async function() {
-    await loadProfileData(); // Carica profilo e prima pagina ordini
+    await loadProfileData(); 
 
     const logoutButton = document.getElementById('confirm-button');
     if (logoutButton) {
@@ -193,7 +184,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             if (currentOrderIdToConfirm) {
                 const success = await updateOrderStatus(currentOrderIdToConfirm);
                 if (success) {
-                    // Close the stateModal
                     const stateModalElement = document.getElementById('stateModal');
                     const stateModal = bootstrap.Modal.getInstance(stateModalElement);
                     if (stateModal) {

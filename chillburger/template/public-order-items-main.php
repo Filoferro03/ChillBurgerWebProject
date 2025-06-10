@@ -7,6 +7,6 @@
         <p class="text-center">Caricamento articoli...</p>
     </div>
     <div class="text-center mt-4">
-        <a href="reviews.php" class="btn btn-secondary">Torna alle Recensioni</a>
+        <a href="reviews.php" class="btn order-button">Torna alle Recensioni</a>
     </div>
 </section>
