@@ -1,5 +1,5 @@
 <section class="container">
-    <h2 class="text-center mt-4">Accesso e Registrazione</h2>
+    <h1 class="text-center mt-4 custom-title"><span class="txt">Accesso e Registrazione</span></h1>
     <div class="container d-flex flex-column flex-md-row">
         <div class="container d-flex flex-column align-items-center ">
             <div class="d-flex flex-column align-items-center col-12 col-lg-10">

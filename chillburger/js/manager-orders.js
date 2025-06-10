@@ -201,7 +201,7 @@ function displayActiveOrders(orders) {
         <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4"> 
             <div class="card text-center shadow-sm h-100 hover-up ${cardSpecificClass}">
                 <a href="order-details.php?id=${order.idordine}" class="text-decoration-none d-flex flex-column h-100" style="color:inherit;">
-                    <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;">
+                    <img src="./resources/ChillBurgerLogo.webp" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;">
                     <div class="card-body d-flex flex-column">
                         <p class="card-title fs-3">Ordine #${order.idordine}</p>
                         <p class="card-text small text-muted">${formattedDate} - ${formattedTime}</p>
@@ -243,7 +243,7 @@ function displayOrderHistory(orders) {
         <div class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4"> 
             <a href="order-details.php?id=${order.idordine}" class="text-decoration-none" style="color:inherit;">
                 <div class="card h-100 text-center shadow-sm hover-up ${cardSpecificClass}"> 
-                    <img src="./resources/ChillBurgerLogo.png" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;"> 
+                    <img src="./resources/ChillBurgerLogo.webp" class="card-img-top" alt="Order #${order.idordine}" style="max-height: 150px; object-fit: contain; margin-top: 10px;"> 
                     <div class="card-body d-flex flex-column">
                         <p class="card-title fs-3">Ordine #${order.idordine}</p>
                         <p class="card-text small text-muted">${formattedDate} - ${formattedTime}</p>

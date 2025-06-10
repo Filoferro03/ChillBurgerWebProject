@@ -32,7 +32,7 @@ function generateProducts(products) {
       <div class="card h-100 text-center shadow-sm hover-up">
         ${imgTag}
         <div class="card-body">
-          <h5 class="card-title">${product.nome}</h5>
+          <p class="card-title fs-bold">${product.nome}</p>
           <p class="card-text small text-muted">${product.descrizione || ""}</p>
         </div>
 
