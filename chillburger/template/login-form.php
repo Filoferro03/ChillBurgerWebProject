@@ -1,5 +1,9 @@
-<section class="container">
-    <h1 class="text-center mt-4 custom-title"><span class="txt">Accesso e Registrazione</span></h1>
+<section class="container py-5">
+    <h2 class="display-4 custom-title text-center mb-3">
+        <span class="txt">Accesso e Registrazione</span>
+        <span class="emoji">🧑🏼‍💻</span>
+    </h2>
+
     <div class="container d-flex flex-column flex-md-row">
         <div class="container d-flex flex-column align-items-center ">
             <div class="d-flex flex-column align-items-center col-12 col-lg-10">
