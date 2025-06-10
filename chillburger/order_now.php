@@ -1,6 +1,7 @@
 <?php
 require_once("bootstrap.php");
 
+// Inizializzo comunque l’array $templateParams in modo che sia sempre definito
 $templateParams = [];
 
 if (isUserLoggedIn()) {
@@ -25,7 +26,7 @@ if (isUserLoggedIn()) {
         ];
     }
 } else {
-    // Non loggato: mandato al login
+    // Non loggato: lo mando al login
     $templateParams["nome"]   = "template/login-form.php";
     $templateParams["titolo"] = "ChillBurger – Login";
     $templateParams["css"]    = [

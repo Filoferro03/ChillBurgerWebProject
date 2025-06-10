@@ -16,6 +16,7 @@ async function fetchData(url, formData) {
 }
 
 async function checkNewNotifications() {
+  console.log("ciao");
   const url = "api/api-notifications.php";
   const formData = new FormData();
   formData.append("action", "getallnotifications");

@@ -40,7 +40,7 @@ function generateProducts(products, categories) {
           : `<img src="${imgSrc}" class="card-img-top" alt="${altText}">`;
 
       categorySection += `
-            <div class="col-12 col-md-4 mb-5 d-flex flex-column menu-item align-items-center h-auto">
+            <div class="col-6 col-md-4 col-lg-3 mb-5 d-flex flex-column menu-item align-items-center h-auto">
                 <div id="${idProdotto}" class="card w-100 h-100 text-center hover-up">
     ${imgTag}
     <div class="card-body">

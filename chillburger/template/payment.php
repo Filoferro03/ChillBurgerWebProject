@@ -46,13 +46,13 @@
                     </div>
                     <div class="mb-3">
                         <label for="card-number" class="form-label">Numero Carta</label>
-                        <input type="text" class="form-control form-control-sm" id="card-number" name="card-number" placeholder="---- ---- ---- ----" required> 
+                        <input type="text" class="form-control form-control-sm" id="card-number" name="card-number" placeholder="---- ---- ---- ----" maxlength="23" required> 
                         <div class="invalid-feedback" id="card-number-error"></div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="expiry-date" class="form-label">Data di Scadenza</label>
-                            <input type="text" class="form-control form-control-sm" id="expiry-date" name="expiry-date" placeholder="MM/YY" required> 
+                            <input type="text" class="form-control form-control-sm" id="expiry-date" name="expiry-date" placeholder="MM/YY" maxlength="5" required> 
                             <div class="invalid-feedback" id="expiry-date-error"></div>
                         </div>
                         <div class="col-md-6 mb-3">

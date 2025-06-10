@@ -6,7 +6,6 @@
 
     <div class="container p-4">
 
-      <!-- Elenco prodotti + filtri -->
       <section class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
           <h2 class="mb-0 position-relative animate-underline">
@@ -20,19 +19,16 @@
           
         </div>
 
-        <!-- Gruppo pulsanti filtro (generato via JS) -->
         <div id="filter-group" class="d-flex flex-wrap justify-content-center gap-2 mb-4">
         </div>
 
-        <!-- Griglia prodotti -->
         <div id="product-list" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4"></div>
       </section>
 
 
   </div>
 
-    <!-- Modal overlay -->
     <div id="modal-overlay" class="d-none">
-      <div id="modal-box" class="bg-white shadow rounded p-4 mx-auto" style="max-width: 500px;"></div>
+      <div id="modal-box" class="shadow rounded p-4 mx-auto" style="max-width: 500px; background-color: #e6ccb2;"></div>
     </div>
 </section>

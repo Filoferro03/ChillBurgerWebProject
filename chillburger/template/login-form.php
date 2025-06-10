@@ -2,8 +2,8 @@
     <h2 class="text-center mt-4">Accesso e Registrazione</h2>
     <div class="container d-flex flex-column flex-md-row">
         <div class="container d-flex flex-column align-items-center ">
-            <div class="d-flex flex-column align-items-center col-12 col-md-10">
-                <form action="#" method="POST" id="formlogin" name="login" class="d-flex flex-column col-12 col-md-10">
+            <div class="d-flex flex-column align-items-center col-12 col-lg-10">
+                <form action="#" method="POST" id="formlogin" name="login" class="d-flex flex-column col-12 col-lg-10">
                     <fieldset class=" p-3 m-3 border border-dark rounded">
                         <legend class="text-center">Login</legend>
 
@@ -28,8 +28,8 @@
             </div>
         </div>
         <div class="container d-flex flex-column align-items-center">
-            <div class="d-flex flex-column align-items-center col-12 col-md-10">
-                <form action="#" method="POST" id="formregister" name="register" class="d-flex flex-column col-12 col-md-10">
+            <div class="d-flex flex-column align-items-center col-12 col-lg-10">
+                <form action="#" method="POST" id="formregister" name="register" class="d-flex flex-column col-12 col-lg-10">
                     <fieldset class="p-3 m-3 border border-dark rounded">
                         <legend>Registrazione</legend>
 

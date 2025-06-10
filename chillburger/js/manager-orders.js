@@ -1,11 +1,4 @@
-/**
- * Manager Orders JavaScript
- * Gestisce le chiamate API per recuperare e visualizzare gli ordini
- */
-
-// Definisci l'ID dello stato "Annullato per Stock" come costante JS
-// DEVE corrispondere all'ID nel database e in PHP (es. 6)
-const ID_STATO_ANNULLATO_PER_STOCK_JS = 6; // Assicurati che sia l'ID corretto
+const ID_STATO_ANNULLATO_PER_STOCK_JS = 6; 
 
 async function fetchData(url, formData) {
     try {
@@ -14,7 +7,7 @@ async function fetchData(url, formData) {
             body: formData
         });
         if (!response.ok) {
-            const errorText = await response.text(); // Leggi il corpo dell'errore se presente
+            const errorText = await response.text(); 
             console.error("Fetch error response text:", errorText);
             throw new Error(`Errore HTTP: ${response.status} - ${response.statusText}`);
         }
@@ -22,20 +15,17 @@ async function fetchData(url, formData) {
         return data; 
     } catch (error) {
         console.error("Errore durante la fetch:", error.message);
-        // Rilancia l'errore così può essere gestito dal chiamante
         throw error; 
     }
 }
 
 
 let currentOrderIdToUpdate = null; 
-
 async function updateOrderStatusAPI(orderId) {
     const url = 'api/api-orders.php';
     const formData = new FormData();
     formData.append('action', 'update');
     formData.append('idordine', orderId);
-    // La chiamata a fetchData restituisce la promise con la risposta JSON completa
     return fetchData(url, formData); 
 }
 
@@ -58,22 +48,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     const apiResponse = await updateOrderStatusAPI(currentOrderIdToUpdate);
 
                     if (apiResponse && apiResponse.success) {
-                        // Se l'aggiornamento ha avuto successo, o se l'ordine è stato annullato con successo
                         if (apiResponse.new_status_id === ID_STATO_ANNULLATO_PER_STOCK_JS) {
                             alert(`L'ordine #${currentOrderIdToUpdate} è stato annullato automaticamente a causa di stock insufficiente.`);
-                        } else if (apiResponse.message) {
-                            // toast/notifica più discreta invece di un alert per i successi standard
-                            // alert(apiResponse.message); 
-                        }
-                        // Ricarica entrambe le liste per riflettere i cambiamenti
+                        } 
                         loadActiveOrders(1);
                         loadOrderHistory(1); 
                     } else {
-                        // L'API ha restituito success: false
                         alert('Errore durante l\'aggiornamento: ' + (apiResponse ? apiResponse.error : 'Risposta non valida dall\'API.'));
                     }
                 } catch (error) {
-                    // Errore a livello di fetch (rete, HTTP error non 2xx, JSON malformato, ecc.)
                     alert('Errore di comunicazione durante l\'aggiornamento dello stato: ' + error.message);
                 }
                 currentOrderIdToUpdate = null;
@@ -139,7 +122,6 @@ async function loadOrderHistory(page = 1, perPage = 4) {
             throw new Error(apiResponse.error || "Dati storico ordini non validi.");
         }
         const responseData = apiResponse.data;
-        // Assicurati che responseData.orders esista
         displayOrderHistory(responseData.orders || []); 
 
         const paginationElement = createPaginationComponent(
@@ -168,8 +150,6 @@ function displayActiveOrders(orders) {
 
     let html = '';
     orders.forEach(order => {
-        // Se getActiveOrders è stato modificato per escludere ID_STATO_ANNULLATO_PER_STOCK_JS,
-        // questo controllo diventa una sicurezza aggiuntiva.
         const isCancelledByStock = order.idstato_attuale === ID_STATO_ANNULLATO_PER_STOCK_JS;
         
         const orderDate = new Date(order.data_ordine + ' ' + order.orario);
@@ -181,7 +161,6 @@ function displayActiveOrders(orders) {
         let cardSpecificClass = "";
 
         if (isCancelledByStock) {
-            // Questo non dovrebbe accadere se l'API li esclude da "active orders"
             buttonHtmlContent = `<button type="button" class="btn btn-sm btn-outline-danger w-100" disabled>Annullato (Stock)</button>`;
             cardSpecificClass = "border-danger order-cancelled-visual";
         } else {
@@ -190,7 +169,6 @@ function displayActiveOrders(orders) {
             let buttonDisabledBtn = "";
             let modalTarget = 'data-bs-target="#confirmStatusModal" data-bs-toggle="modal"';
 
-            // Determina il testo e l'azione del bottone per gli stati avanzabili
             switch (order.stato) { 
                 case 'In attesa':
                     nextStatusTextBtn = 'Metti In Preparazione';
@@ -201,11 +179,11 @@ function displayActiveOrders(orders) {
                 case 'In consegna':
                     nextStatusTextBtn = 'Segna Come Consegnato';
                     break;
-                default: // Stati come 'Consegnato', 'Confermato' o altri non avanzabili qui
-                    nextStatusTextBtn = order.stato; // Mostra lo stato attuale
+                default: 
+                    nextStatusTextBtn = order.stato; 
                     buttonClassBtn = "btn-secondary";
                     buttonDisabledBtn = "disabled";
-                    modalTarget = ""; // Non aprire modale per stati non azionabili
+                    modalTarget = ""; 
                     break;
             }
             buttonHtmlContent = `
@@ -257,7 +235,6 @@ function displayOrderHistory(orders) {
         const formattedTime = orderDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         const formattedPrice = parseFloat(order.prezzo_totale).toFixed(2).replace('.', ',') + ' €';
         
-        // Assumendo che getOrderHistoryPaginated ora ritorni order.idstato_attuale
         const isCancelledByStock = order.idstato_attuale === ID_STATO_ANNULLATO_PER_STOCK_JS;
         const cardSpecificClass = isCancelledByStock ? 'border-danger order-cancelled-visual' : '';
         const statusTextClass = isCancelledByStock ? 'text-danger fw-bold' : 'text-muted';
@@ -289,7 +266,7 @@ function addUpdateStatusButtonListeners() {
 
         button.addEventListener('click', function() {
             currentOrderIdToUpdate = this.dataset.orderId;
-            const nextStatusForModal = this.dataset.nextStatusText;
+            const nextStatusForModal = this.dataset.nextStatusText; 
 
             const modalOrderIdElem = document.getElementById('modalOrderId');
             const modalNewStatusElem = document.getElementById('modalNewStatus');

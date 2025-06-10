@@ -8,7 +8,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'submit') {
     $idordine = isset($_POST['idordine']) ? (int)$_POST['idordine'] : null;
     $titolo = isset($_POST['review_title']) ? trim($_POST['review_title']) : null;
     $voto = isset($_POST['review_rating']) ? (int)$_POST['review_rating'] : null;
-    $commento = isset($_POST['review_comment']) ? trim($_POST['review_comment']) : ''; // Comment can be empty
+    $commento = isset($_POST['review_comment']) ? trim($_POST['review_comment']) : ''; 
 
     if (!$idordine) {
             $response['error'] = 'ID ordine mancante.';
@@ -32,10 +32,8 @@ if (isset($_POST['action']) && $_POST['action'] === 'submit') {
         }
     }
 } else if (isset($_POST['action']) && $_POST['action'] === 'getall') {
-    // Ottieni il parametro page dalla richiesta GET, default a 1 se non specificato
     $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
 
-    // Assicurati che page sia almeno 1
     if ($page < 1) {
         $page = 1;
     }

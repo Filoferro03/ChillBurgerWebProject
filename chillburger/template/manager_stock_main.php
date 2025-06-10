@@ -54,7 +54,6 @@
       <div class="col-12 col-md-6 col-lg-8 mt-4">
         <label for="status-filter" class="form-label small text-secondary mb-1">Stato Scorta</label>
         <div class="row g-2">
-
           <!-- Select occupa 2/3 dello spazio -->
           <div class="col-8">
             <select id="status-filter" class="form-select w-auto rounded-2 shadow-sm">
@@ -64,7 +63,6 @@
               <option value="out-stock">Esaurito</option>
             </select>
           </div>
-
           <!-- Pulsante occupa 1/3, full-width nel suo col, ed è spinto a destra -->
           <div class="col-4 text-end">
             <a id="btn-new-product"

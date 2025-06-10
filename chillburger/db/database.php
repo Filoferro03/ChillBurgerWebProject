@@ -39,7 +39,6 @@ class DatabaseHelper
             $affectedRows = $stmt->affected_rows;
             $stmt->close();
 
-            // Verifica che l'esecuzione sia andata a buon fine e che almeno una riga sia stata inserita
             return $success && $affectedRows > 0;
         } catch (mysqli_sql_exception $e) {
             return false;
@@ -48,10 +47,8 @@ class DatabaseHelper
 
     public function getReviews($page, $perPage = 5)
     {
-        // Calcola l'offset per la paginazione
         $offset = ($page - 1) * $perPage;
 
-        // Prima ottieni il conteggio totale delle recensioni
         $countQuery = "SELECT COUNT(*) AS totalReviews FROM chillburgerdb.recensioni";
         $countStmt = $this->db->prepare($countQuery);
         $countStmt->execute();
@@ -60,7 +57,6 @@ class DatabaseHelper
         $countResult->free();
         $countStmt->close();
 
-        // Poi ottieni le recensioni paginate
         $query = "SELECT r.titolo, r.voto, r.commento, r.timestamp_recensione, o.idordine, u.nome, u.cognome
                   FROM recensioni r 
                   JOIN ordini o ON o.idordine = r.idordine
@@ -78,7 +74,6 @@ class DatabaseHelper
         $result->free();
         $stmt->close();
 
-        // Restituisci i dati con le informazioni di paginazione
         return [
             'reviews' => $reviews,
             'currentPage' => $page,
@@ -86,30 +81,22 @@ class DatabaseHelper
         ];
     }
 
-    /**
-     * Recupera i dati di un utente specifico dal suo username, escludendo la password.
-     * @param string $username L'username dell'utente da cercare.
-     * @return array|null Ritorna un array associativo con i dati dell'utente o null se non trovato.
-     */
     public function getUserDataByUsername($username)
     {
-        // Seleziona solo i campi necessari, ESCLUDENDO la password
         $query = "SELECT idutente, nome, cognome, username,idutente FROM utenti WHERE username = ?";
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
-            // Gestione errore preparazione statement
             error_log("Errore preparazione statement getUserDataByUsername: " . $this->db->error);
             return null;
         }
         $stmt->bind_param('s', $username);
         $stmt->execute();
         $result = $stmt->get_result();
-        // Usiamo fetch_assoc() perché ci aspettiamo al massimo un utente
         $userData = $result->fetch_assoc();
         $result->free();
         $stmt->close();
 
-        return $userData; // Ritorna l'array associativo dei dati o null se l'utente non esiste
+        return $userData; 
     }
 
 
@@ -181,8 +168,8 @@ class DatabaseHelper
 
         return [
             'orders' => $orders,
-            'currentPage' => (int)$page, // Assicura che sia un intero
-            'totalPages' => (int)$totalPages, // Assicura che sia un intero
+            'currentPage' => (int)$page,
+            'totalPages' => (int)$totalPages, 
         ];
     }
 
@@ -219,7 +206,7 @@ class DatabaseHelper
 
     public function hasLowStockIngredients()
     {
-        $query = "SELECT 1 FROM ingredienti WHERE giacenza <= 2 LIMIT 1"; // Ottimizzato per performance
+        $query = "SELECT 1 FROM ingredienti WHERE giacenza <= 2 LIMIT 1";
 
         $stmt = $this->db->prepare($query);
         $stmt->execute();
@@ -248,7 +235,7 @@ class DatabaseHelper
 
     public function hasLowStockProducts()
     {
-        $query = "SELECT 1 FROM prodotti WHERE giacenza <= 2 LIMIT 1"; // Ottimizzato per performance
+        $query = "SELECT 1 FROM prodotti WHERE giacenza <= 2 LIMIT 1";  
 
         $stmt = $this->db->prepare($query);
         $stmt->execute();
@@ -347,7 +334,6 @@ class DatabaseHelper
 
             $stmt = $this->db->prepare($query);
 
-            // Verifica che la preparazione sia riuscita
             if ($stmt === false) {
                 throw new Exception('Preparazione della query fallita');
             }
@@ -358,7 +344,6 @@ class DatabaseHelper
 
             $result = $stmt->get_result();
 
-            // Verifica se ci sono risultati
             if ($result->num_rows > 0) {
                 $notifications = $result->fetch_all(MYSQLI_ASSOC);
             } else {
@@ -370,9 +355,8 @@ class DatabaseHelper
 
             return $notifications;
         } catch (Exception $e) {
-            // Gestione degli errori
             error_log('Errore nella funzione getNotificationsByUserId: ' . $e->getMessage());
-            return [];  // Ritorna un array vuoto in caso di errore
+            return [];  
         }
     }
 
@@ -462,11 +446,10 @@ class DatabaseHelper
 
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
-            // Gestione errore di preparazione
             return false;
         }
 
-        $quantita = 1; // Valore predefinito per una personalizzazione "vuota"
+        $quantita = 1; 
 
         $stmt->bind_param("diii", $prezzo, $quantita, $idordine, $idprodotto);
         $success = $stmt->execute();
@@ -474,7 +457,7 @@ class DatabaseHelper
         if ($success) {
             $lastId = $this->db->insert_id;
             $stmt->close();
-            return $lastId; // restituisci l'id della personalizzazione creata
+            return $lastId; 
         } else {
             $stmt->close();
             return false;
@@ -482,11 +465,6 @@ class DatabaseHelper
     }
 
 
-    /* appena creata nuova istanza di personalizzazione del panino standard del menu, chiami questa fun che 
-       ti crea la composizione del panino personalizzato, all'inizio ovviamente sarà uguale al panino standard
-       nel js quindi dovrai avere un array di tutti gli ingredienti del panino standard e delle quantita e tramite un for 
-       chiamare questa funzione runnadola su tutti gli elementi dell'array
-     */
     public function createNewBurgerComposition($idpersonalizzazione, $idingrediente, $quantita)
     {
         $query = "INSERT INTO modifiche_ingredienti (idpersonalizzazione, idingrediente, quantita) VALUES (?, ?, ?)";
@@ -497,15 +475,12 @@ class DatabaseHelper
             $affectedRows = $stmt->affected_rows;
             $stmt->close();
 
-            // Verifica che l'esecuzione sia andata a buon fine e che almeno una riga sia stata inserita
             return $success && $affectedRows > 0;
         } catch (mysqli_sql_exception $e) {
             return false;
         }
     }
 
-    /*ogni volta che clicchi + o - su un ingrediente, aggiorni la composizione del panino personalizzato
-     */
     public function updateModifiedBurgerIngredientsQuantity($idpersonalizzazione, $idingrediente, $quantita)
     {
         $query = "UPDATE modifiche_ingredienti SET quantita = ? WHERE idpersonalizzazione = ? AND idingrediente = ?";
@@ -517,7 +492,6 @@ class DatabaseHelper
             $affectedRows = $stmt->affected_rows;
             $stmt->close();
 
-            // Verifica che l'esecuzione sia andata a buon fine e che almeno una riga sia stata aggiornata
             return $success && $affectedRows > 0;
         } catch (mysqli_sql_exception $e) {
             return false;
@@ -582,9 +556,9 @@ class DatabaseHelper
         }
 
         $panino = [
-            'nome' => $data[0]['nome'],               // nome del panino
-            'image' => $data[0]['image'],             // immagine del panino
-            'ingredienti' => array_column($data, 'nome_ingrediente') // lista ingredienti
+            'nome' => $data[0]['nome'],               
+            'image' => $data[0]['image'],             
+            'ingredienti' => array_column($data, 'nome_ingrediente') 
         ];
 
         return $panino;
@@ -596,7 +570,6 @@ class DatabaseHelper
         $orderStock = [];
         $totalPrice = 0;
 
-        // Recupera i prodotti personalizzati con le loro modifiche di ingredienti
         $queryCustom = "SELECT pe.idpersonalizzazione, p.nome AS nomeprodotto, 
                                pe.prezzo, pe.quantita, pe.idprodotto,
                                i.nome AS nomeingrediente, m.azione
@@ -613,15 +586,13 @@ class DatabaseHelper
             $stmtCustom->bind_param('i', $idordine);
             $stmtCustom->execute();
             $resultCustom = $stmtCustom->get_result();
-            $orderCustom = $resultCustom->fetch_all(MYSQLI_ASSOC); // Questo conterrà più righe per personalizzazione se ci sono più modifiche
+            $orderCustom = $resultCustom->fetch_all(MYSQLI_ASSOC);
             $resultCustom->free();
             $stmtCustom->close();
         } else {
-            // Gestisci errore di preparazione, es:
             error_log("Errore preparazione queryCustom in getOrderDetails: " . $this->db->error);
         }
 
-        // Recupera i prodotti standard (non personalizzati)
         $queryStock = "SELECT p.nome, p.prezzo, cp.quantita, p.idcategoria, p.idprodotto
                        FROM ordini o
                        JOIN carrelli_prodotti cp ON o.idordine = cp.idordine
@@ -638,7 +609,6 @@ class DatabaseHelper
             $resultStock->free();
             $stmtStock->close();
         } else {
-            // Gestisci errore di preparazione
             error_log("Errore preparazione queryStock in getOrderDetails: " . $this->db->error);
         }
 
@@ -750,9 +720,9 @@ class DatabaseHelper
         $stmt->close();
 
         if (!empty($orders)) {
-            return $orders[0]; // Restituisce il primo ordine non completato
+            return $orders[0]; 
         } else {
-            return null; // Nessun ordine trovato
+            return null; 
         }
     }
 
@@ -897,9 +867,9 @@ class DatabaseHelper
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("iii", $quantita, $idordine, $idprodotto);
         if ($stmt->execute()) {
-            return $this->db->insert_id; // Restituisce l'idpersonalizzazione appena inserito
+            return $this->db->insert_id; 
         } else {
-            return false; // Inserimento fallito
+            return false; 
         }
     }
 
@@ -909,9 +879,9 @@ class DatabaseHelper
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("iis", $idpersonalizzazione, $idingrediente, $azione);
         if ($stmt->execute()) {
-            return $this->db->insert_id; // Restituisce l'idpersonalizzazione appena inserito
+            return $this->db->insert_id; 
         } else {
-            return false; // Inserimento fallito
+            return false; 
         }
     }
 
@@ -920,7 +890,7 @@ class DatabaseHelper
         $query = "DELETE FROM modifiche_ingredienti WHERE idpersonalizzazione = ? AND idingrediente = ?";
         $stmt = $this->db->prepare($query);
         $stmt->bind_param("ii", $idpersonalizzazione, $idingrediente);
-        return $stmt->execute(); // Restituisce true se l'eliminazione è avvenuta con successo
+        return $stmt->execute(); 
     }
 
     public function ingredientModificationExists($idpersonalizzazione, $idingrediente)
@@ -951,7 +921,6 @@ class DatabaseHelper
             $stmt->close();
             return $success && $affectedRows > 0;
         } catch (mysqli_sql_exception $e) {
-            // Check for duplicate entry error (MySQL error code 1062 for ER_DUP_ENTRY)
             if ($e->getCode() == 1062) {
                 error_log("Attempt to insert duplicate review for order ID $idordine. Error: " . $e->getMessage());
             } else {
@@ -968,7 +937,7 @@ class DatabaseHelper
         $stmt = $this->db->prepare($query);
         if (!$stmt) {
             error_log("Error preparing statement for hasReviewForOrder: " . $this->db->error);
-            return false; // Or throw an exception
+            return false; 
         }
         $stmt->bind_param('i', $idordine);
         $stmt->execute();
@@ -1119,7 +1088,7 @@ class DatabaseHelper
                   FROM ordini
                   WHERE data_ordine = ?
               )
-              ORDER BY orario"; // aggiunto ORDER BY per avere gli orari in ordine
+              ORDER BY orario"; 
 
         $stmt = $this->db->prepare($query);
 
@@ -1144,21 +1113,16 @@ class DatabaseHelper
             return $slot['orario'];
         }, $availableSlots);
 
-        // Verifica se la data selezionata è oggi
         $today = date('Y-m-d');
         if ($date === $today) {
-            // Ottieni l'ora corrente
             $currentTime = date('H:i:s');
 
-            // Aggiungi un buffer di 30 minuti per la preparazione
             $minTime = date('H:i:s', strtotime($currentTime) + 30 * 60);
 
-            // Filtra gli orari per rimuovere quelli già passati
             $simplifiedSlots = array_filter($simplifiedSlots, function ($time) use ($minTime) {
                 return $time > $minTime;
             });
 
-            // Reindexing array
             $simplifiedSlots = array_values($simplifiedSlots);
         }
 
@@ -1215,16 +1179,11 @@ class DatabaseHelper
         return $stmt->num_rows > 0;
     }
 
-    /**
-     * Ottiene tutti gli ordini attivi (non completati)
-     * @return array Array di ordini attivi
-     */
-    public function getActiveOrdersPaginated($page = 1, $perPage = 5) // Added pagination parameters
+    public function getActiveOrdersPaginated($page = 1, $perPage = 5) 
     {
-        if ($page < 1) $page = 1; // Ensure page is at least 1
+        if ($page < 1) $page = 1; 
         $offset = ($page - 1) * $perPage;
 
-        // Count total active orders first
         $countQuery = "SELECT COUNT(*) AS totalOrders
                        FROM ordini o
                        LEFT JOIN (
@@ -1246,7 +1205,7 @@ class DatabaseHelper
         $totalPages = 0;
         if ($perPage > 0 && $totalOrders > 0) {
             $totalPages = ceil($totalOrders / $perPage);
-        } elseif ($totalOrders == 0) { // If there are no orders, there's still 1 page (empty)
+        } elseif ($totalOrders == 0) { 
             $totalPages = 1;
         }
 
@@ -1286,16 +1245,11 @@ class DatabaseHelper
         ];
     }
 
-    /**
-     * Ottiene lo storico degli ordini (completati)
-     * @return array Array di ordini completati
-     */
-    public function getOrderHistoryPaginated($page = 1, $perPage = 5) // Added pagination parameters
+    public function getOrderHistoryPaginated($page = 1, $perPage = 5) 
     {
-        if ($page < 1) $page = 1; // Ensure page is at least 1
+        if ($page < 1) $page = 1; 
         $offset = ($page - 1) * $perPage;
 
-        // Count total historical orders first
         $countQuery = "SELECT COUNT(*) AS totalOrders
                        FROM ordini o
                        LEFT JOIN (
@@ -1317,7 +1271,7 @@ class DatabaseHelper
         $totalPages = 0;
         if ($perPage > 0 && $totalOrders > 0) {
             $totalPages = ceil($totalOrders / $perPage);
-        } elseif ($totalOrders == 0) { // If there are no orders, there's still 1 page (empty)
+        } elseif ($totalOrders == 0) { 
             $totalPages = 1;
         }
 
@@ -1445,11 +1399,8 @@ class DatabaseHelper
         return $compositions;
     }
 
-    // DatabaseHelper.php
     public function getAllProductsWithIngredients()
     {
-
-       
         $sql = "
             SELECT 
                 p.idprodotto, p.nome, p.descrizione, p.prezzo, p.image,
@@ -1465,7 +1416,6 @@ class DatabaseHelper
         $res = $this->db->query($sql);
         $rows = $res->fetch_all(MYSQLI_ASSOC);
 
-        // raggruppa per prodotto
         $products = [];
         foreach ($rows as $r) {
             $id = $r['idprodotto'];
@@ -1492,18 +1442,15 @@ class DatabaseHelper
         return array_values($products);
     }
 
-    /* DatabaseHelper.php */
     public function insertProduct($nome, $prezzo, $imageFilenameForDb, $idcategoria, $disponibilita = null)
     {
-        // Per i panini, la disponibilità è sempre 999 (gestita tramite ingredienti)
-        // Per altri prodotti, usa il valore fornito o 1 (disponibile) come default
         if ($disponibilita === null) {
-            $disponibilita = 999; // Default per compatibilità
+            $disponibilita = 999; 
         }
 
         $sql = "INSERT INTO prodotti
                 (nome, prezzo, image, idcategoria, disponibilita)
-                VALUES (?, ?, ?, ?, ?)"; // 5 placeholders
+                VALUES (?, ?, ?, ?, ?)"; 
         $stmt = $this->db->prepare($sql);
 
         if ($stmt === false) {
@@ -1511,7 +1458,6 @@ class DatabaseHelper
             return false;
         }
 
-        // Tipi di parametri: nome (s), prezzo (d), image (s), idcategoria (i), disponibilita (i)
         $stmt->bind_param('sdsii', $nome, $prezzo, $imageFilenameForDb, $idcategoria, $disponibilita);
 
         if (!$stmt->execute()) {
@@ -1550,7 +1496,6 @@ class DatabaseHelper
                 error_log("Errore preparazione statement (con immagine e disponibilità) in updateProduct: " . $this->db->error);
                 return false;
             }
-            // CORRETTO: nome(s), prezzo(d), idcategoria(i), image(s), disponibilita(i), idprodotto(i)
             $stmt->bind_param('sdisii', $nome, $prezzo, $idcategoria, $imageFilenameForDb, $disponibilita, $idprodotto);
         } else if ($imageFilenameForDb) {
             $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ?, image = ? WHERE idprodotto = ?";
@@ -1559,7 +1504,6 @@ class DatabaseHelper
                 error_log("Errore preparazione statement (con immagine) in updateProduct: " . $this->db->error);
                 return false;
             }
-            // CORRETTO: nome(s), prezzo(d), idcategoria(i), image(s), idprodotto(i)
             $stmt->bind_param('sdisi', $nome, $prezzo, $idcategoria, $imageFilenameForDb, $idprodotto);
         } else if ($disponibilita !== null) {
             $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ?, disponibilita = ? WHERE idprodotto = ?";
@@ -1568,7 +1512,6 @@ class DatabaseHelper
                 error_log("Errore preparazione statement (con disponibilità) in updateProduct: " . $this->db->error);
                 return false;
             }
-            // CORRETTO: nome(s), prezzo(d), idcategoria(i), disponibilita(i), idprodotto(i)
             $stmt->bind_param('sdiii', $nome, $prezzo, $idcategoria, $disponibilita, $idprodotto);
         } else {
             $sql = "UPDATE prodotti SET nome = ?, prezzo = ?, idcategoria = ? WHERE idprodotto = ?";
@@ -1577,7 +1520,6 @@ class DatabaseHelper
                 error_log("Errore preparazione statement (senza immagine) in updateProduct: " . $this->db->error);
                 return false;
             }
-            // CORRETTO: nome(s), prezzo(d), idcategoria(i), idprodotto(i)
             $stmt->bind_param('sdii', $nome, $prezzo, $idcategoria, $idprodotto);
         }
         $success = $stmt->execute();
@@ -1588,11 +1530,6 @@ class DatabaseHelper
         return $success;
     }
 
-    /**
-     * Rimuove tutte le associazioni di ingredienti per un dato prodotto.
-     * @param int $idprodotto L'ID del prodotto.
-     * @return bool True se l'operazione ha avuto successo, false altrimenti.
-     */
     public function deleteProductCompositions($idprodotto)
     {
         $sql = "DELETE FROM composizioni WHERE idprodotto = ?";
@@ -1610,13 +1547,6 @@ class DatabaseHelper
         return $success;
     }
 
-    /**
-     * Rimuove un prodotto dalla tabella prodotti.
-     * ATTENZIONE: Chiamare questo metodo solo dopo aver gestito le dipendenze
-     * (es. cancellando da composizioni, personalizzazioni, ecc.) se non si usa ON DELETE CASCADE.
-     * @param int $idprodotto L'ID del prodotto da eliminare.
-     * @return bool True se l'eliminazione ha avuto successo, false altrimenti.
-     */
     public function deleteProduct($idprodotto)
     {
         $sql = "UPDATE prodotti SET eliminato = 1 WHERE idprodotto = ?";
@@ -1634,10 +1564,6 @@ class DatabaseHelper
         return $success;
     }
 
-    /**
-     * Recupera l'ID della categoria "Panini".
-     * @return int|null L'ID della categoria o null se non trovata.
-     */
     public function getPaniniCategoryId()
     {
         $query = "SELECT idcategoria FROM categorie WHERE LOWER(descrizione) = 'panini' LIMIT 1";
@@ -1657,11 +1583,6 @@ class DatabaseHelper
         return null;
     }
 
-    /**
-     * Recupera il nome del file immagine di un prodotto.
-     * @param int $productId L'ID del prodotto.
-     * @return string|null Il nome del file immagine o null se non trovato/non impostato.
-     */
     public function getProductImageFilename($productId)
     {
         $query = "SELECT image FROM prodotti WHERE idprodotto = ? LIMIT 1";
@@ -1683,7 +1604,7 @@ class DatabaseHelper
 
     public function advanceOrderStatus($orderId)
     {
-        $currentStatusQuery = "SELECT MAX(idstato) AS current_max_idstato FROM modifiche_stato WHERE idordine = ? AND idstato != " . ID_STATO_ANNULLATO_PER_STOCK; // Assicurati che ID_STATO_ANNULLATO_PER_STOCK sia definito
+        $currentStatusQuery = "SELECT MAX(idstato) AS current_max_idstato FROM modifiche_stato WHERE idordine = ? AND idstato != " . ID_STATO_ANNULLATO_PER_STOCK; 
         $stmtStatus = $this->db->prepare($currentStatusQuery);
         if (!$stmtStatus) {
             error_log("Errore preparazione currentStatusQuery in advanceOrderStatus: " . $this->db->error);
@@ -1697,8 +1618,6 @@ class DatabaseHelper
 
         $current_max_idstato = ($rowStatus && $rowStatus['current_max_idstato'] !== null) ? (int)$rowStatus['current_max_idstato'] : 0;
 
-        // Se lo stato corrente è 0 (nessuno stato precedente valido escluso annullato), il prossimo è 1 (In Attesa).
-        // Altrimenti, è lo stato massimo corrente + 1.
         $nextStatusId = ($current_max_idstato == 0 && !$this->hasAnyStatusOtherThanCancelled($orderId, ID_STATO_ANNULLATO_PER_STOCK)) ? 1 : $current_max_idstato + 1;
 
 
@@ -1715,9 +1634,7 @@ class DatabaseHelper
         $stmtCheck->close();
 
         if (!$stateExists) {
-            // Non c'è un prossimo stato valido definito nella tabella stati_ordine
-            // (es. si è provato ad andare oltre "Confermato")
-            return false; // Indica che non c'è stato un avanzamento o che lo stato non è valido.
+            return false; 
         }
 
         $insertQuery = "INSERT INTO modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (?, ?, NOW())";
@@ -1737,21 +1654,19 @@ class DatabaseHelper
             return $success && $affectedRows > 0;
         } catch (mysqli_sql_exception $e) {
             $stmt->close();
-            // Controlla specificamente l'SQLSTATE che il trigger dovrebbe usare per SIGNAL
-            if ($e->getSqlState() === MYSQL_SIGNAL_USER_EXCEPTION_SQLSTATE) { // MYSQL_SIGNAL_USER_EXCEPTION_SQLSTATE deve essere '45000'
+            if ($e->getSqlState() === MYSQL_SIGNAL_USER_EXCEPTION_SQLSTATE) { 
                 throw new StockUnavailableException("Stock insufficiente rilevato dal database: " . $e->getMessage(), $e->getCode(), $e);
             }
             error_log("SQL Exception in advanceOrderStatus for order ID $orderId: " . $e->getMessage() . " (Code: " . $e->getCode() . ", SQLSTATE: " . $e->getSqlState() . ")");
-            throw $e; // Rilancia altre eccezioni SQL
+            throw $e; 
         }
     }
 
-    // Funzione helper per advanceOrderStatus per determinare se l'ordine ha solo stati "annullato" o nessuno stato
     private function hasAnyStatusOtherThanCancelled($orderId, $idStatoAnnullato)
     {
         $query = "SELECT 1 FROM modifiche_stato WHERE idordine = ? AND idstato != ? LIMIT 1";
         $stmt = $this->db->prepare($query);
-        if (!$stmt) return true; // Assume there might be other states if query fails, to be safe
+        if (!$stmt) return true; 
         $stmt->bind_param('ii', $orderId, $idStatoAnnullato);
         $stmt->execute();
         $stmt->store_result();
@@ -1815,7 +1730,6 @@ class DatabaseHelper
         return $statusData;
     }
 
-    /** Ritorna l’ID appena creato */
     public function insertIngredient(
         string $name,
         float  $price,
@@ -1828,10 +1742,9 @@ class DatabaseHelper
         );
         $stmt->bind_param("sdis", $name, $price, $stock, $image);
         if (!$stmt->execute()) return 0;
-        return $this->db->insert_id;   // <-- nuovo idingrediente
+        return $this->db->insert_id;   
     }
 
-    /** Recupera un singolo ingrediente */
     public function getIngredient(int $id): ?array
     {
         $stmt = $this->db->prepare(
@@ -1843,15 +1756,12 @@ class DatabaseHelper
         return $res->fetch_assoc() ?: null;
     }
 
-    // Add this new method to the DatabaseHelper class in db/database.php
-
     public function checkOrderAvailability($idordine)
     {
         $required_ingredients = [];
         $required_products = [];
         $unavailable_items = [];
 
-        // 1. Get standard products from carrelli_prodotti
         $query_std_prods = "SELECT idprodotto, quantita FROM carrelli_prodotti WHERE idordine = ?";
         $stmt_std_prods = $this->db->prepare($query_std_prods);
         $stmt_std_prods->bind_param('i', $idordine);
@@ -1861,7 +1771,6 @@ class DatabaseHelper
         $stmt_std_prods->close();
 
         foreach ($standard_products as $prod) {
-            // Check if product is composite
             $query_is_composite = "SELECT 1 FROM composizioni WHERE idprodotto = ? LIMIT 1";
             $stmt_is_composite = $this->db->prepare($query_is_composite);
             $stmt_is_composite->bind_param('i', $prod['idprodotto']);
@@ -1871,7 +1780,6 @@ class DatabaseHelper
             $stmt_is_composite->close();
 
             if ($is_composite) {
-                // It's a composite product (e.g., a burger), aggregate its ingredients
                 $query_comp = "SELECT idingrediente, quantita FROM composizioni WHERE idprodotto = ?";
                 $stmt_comp = $this->db->prepare($query_comp);
                 $stmt_comp->bind_param('i', $prod['idprodotto']);
@@ -1888,7 +1796,6 @@ class DatabaseHelper
                     $required_ingredients[$ing['idingrediente']] += $total_required;
                 }
             } else {
-                // It's a simple product (drink, fries), track by id
                 if (!isset($required_products[$prod['idprodotto']])) {
                     $required_products[$prod['idprodotto']] = 0;
                 }
@@ -1896,7 +1803,6 @@ class DatabaseHelper
             }
         }
 
-        // 2. Get custom products from personalizzazioni
         $query_pers = "SELECT idpersonalizzazione, idprodotto, quantita FROM personalizzazioni WHERE idordine = ?";
         $stmt_pers = $this->db->prepare($query_pers);
         $stmt_pers->bind_param('i', $idordine);
@@ -1908,7 +1814,6 @@ class DatabaseHelper
         foreach ($personalizations as $pers) {
             $burger_ingredients = [];
 
-            // Get base composition
             $query_base_comp = "SELECT idingrediente, quantita FROM composizioni WHERE idprodotto = ?";
             $stmt_base_comp = $this->db->prepare($query_base_comp);
             $stmt_base_comp->bind_param('i', $pers['idprodotto']);
@@ -1921,7 +1826,6 @@ class DatabaseHelper
                 $burger_ingredients[$ing['idingrediente']] = $ing['quantita'];
             }
 
-            // Apply modifications from modifiche_ingredienti
             $query_mods = "SELECT idingrediente, azione FROM modifiche_ingredienti WHERE idpersonalizzazione = ?";
             $stmt_mods = $this->db->prepare($query_mods);
             $stmt_mods->bind_param('i', $pers['idpersonalizzazione']);
@@ -1933,18 +1837,17 @@ class DatabaseHelper
             foreach ($modifications as $mod) {
                 if ($mod['azione'] === 'rimosso') {
                     if (isset($burger_ingredients[$mod['idingrediente']])) {
-                        $burger_ingredients[$mod['idingrediente']] = 0; // Set quantity to 0 if removed
+                        $burger_ingredients[$mod['idingrediente']] = 0; 
                     }
                 } elseif ($mod['azione'] === 'aggiunto') {
                     if (isset($burger_ingredients[$mod['idingrediente']])) {
-                        $burger_ingredients[$mod['idingrediente']]++; // Add extra portion
+                        $burger_ingredients[$mod['idingrediente']]++; 
                     } else {
-                        $burger_ingredients[$mod['idingrediente']] = 1; // Add new ingredient
+                        $burger_ingredients[$mod['idingrediente']] = 1; 
                     }
                 }
             }
 
-            // Add calculated ingredients to the main required list
             foreach ($burger_ingredients as $id_ing => $qty) {
                 if ($qty > 0) {
                     $total_required = $qty * $pers['quantita'];
@@ -1956,8 +1859,6 @@ class DatabaseHelper
             }
         }
 
-        // 3. Final Check: Compare required quantities against stock
-        // Check non-composite products stock
         if (!empty($required_products)) {
             $product_ids = array_keys($required_products);
             $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
@@ -1977,7 +1878,6 @@ class DatabaseHelper
             $stmt_prod_stock->close();
         }
 
-        // Check ingredients stock
         if (!empty($required_ingredients)) {
             $ingredient_ids = array_keys($required_ingredients);
             $placeholders = implode(',', array_fill(0, count($ingredient_ids), '?'));
@@ -2000,19 +1900,12 @@ class DatabaseHelper
         return $unavailable_items;
     }
 
-    /**
-     * Recupera i dati di un prodotto specifico, inclusa la sua composizione dettagliata
-     * (ID ingrediente, nome, quantità, essenziale).
-     * @param int $productId L'ID del prodotto.
-     * @return array|null Un array associativo con i dati del prodotto e un array 'ingredients' con oggetti, o null se non trovato.
-     */
     public function getProductWithComposition($productId)
     {
-        // 1. Recupera i dati di base del prodotto
         $product = null;
-        $productBaseArray = $this->getProduct($productId); // getProduct esistente restituisce un array
+        $productBaseArray = $this->getProduct($productId); 
         if (!empty($productBaseArray)) {
-            $product = $productBaseArray[0]; // Prendiamo il primo (e unico atteso) prodotto
+            $product = $productBaseArray[0]; 
         }
 
         if (!$product) {
@@ -2020,13 +1913,10 @@ class DatabaseHelper
             return null;
         }
 
-        // 2. Recupera la composizione dettagliata se è un panino
         $ingredients = [];
-        // Controlla se il prodotto appartiene alla categoria panini
         $paniniCategoryId = $this->getPaniniCategoryId();
         if ($product['idcategoria'] == $paniniCategoryId) {
             
-            // Query che unisce composizioni e ingredienti per avere tutti i dati
             $query_comp = "SELECT 
                                 c.idingrediente, 
                                 i.nome, 
@@ -2042,7 +1932,6 @@ class DatabaseHelper
                 $stmt_comp->execute();
                 $result_comp = $stmt_comp->get_result();
                 while ($row_comp = $result_comp->fetch_assoc()) {
-                    // Popola l'array con oggetti strutturati
                     $ingredients[] = [
                         'idingrediente' => intval($row_comp['idingrediente']),
                         'nome'          => $row_comp['nome'],
@@ -2056,7 +1945,6 @@ class DatabaseHelper
             }
         }
         
-        // 3. Aggiungi l'array di ingredienti (anche se vuoto) al prodotto e restituisci
         $product['ingredients'] = $ingredients;
         return $product;
     }

@@ -1,14 +1,5 @@
--- *********************************************
--- * SQL MySQL population
--- *--------------------------------------------
--- * DB-MAIN version: 11.0.2
--- * Generator date: Sep 14 2021
--- * Generation date: Tue May 13 2025
--- *********************************************
-
 USE chillburgerdb;
 
--- Insert Ingredienti (sovrapprezzo ora NOT NULL DEFAULT 0.00)
 INSERT INTO chillburgerdb.ingredienti (nome, sovrapprezzo, giacenza, image) VALUES
 ('pane', 0.30, 100, 'pane.png'),
 ('hamburger di manzo', 1.20, 50, 'hamburger-di-manzo.png'),
@@ -35,15 +26,12 @@ INSERT INTO chillburgerdb.ingredienti (nome, sovrapprezzo, giacenza, image) VALU
 ('scamorza affumicata', 1.10, 35, 'scamorza.png'),
 ('hamburger vegano', 1.40, 40, 'hamburger-vegano.png');
 
--- Insert Categorie
 INSERT INTO chillburgerdb.categorie (descrizione) VALUES
 ('Panini'),
 ('Fritti'),
 ('Bevande'),
 ('Dolci');
 
--- Insert Prodotti
--- Categoria: panini (idcategoria = 1)
 INSERT INTO chillburgerdb.prodotti (nome, prezzo, idcategoria, image) VALUES
 ('Bacon Cheeseburger', 14.50, 1, 'bacon-cheeseburger.png'),
 ('Chicken Deluxe', 13.00, 1, 'chicken-deluxe.png'),
@@ -58,7 +46,6 @@ INSERT INTO chillburgerdb.prodotti (nome, prezzo, idcategoria, image) VALUES
 ('Green Garden', 12.50, 1, 'green-garden.png'),
 ('Crispy BBQ Chicken', 13.50, 1, 'crispy-bbq-chicken.png');
 
--- Categoria: fritti (idcategoria = 2)
 INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, image) VALUES
 ('Onion Rings', 4.50, 30, 2, 'onion-rings.png'),
 ('Patatine Fritte', 3.50, 50, 2, 'patatine-fritte.png'),
@@ -68,7 +55,6 @@ INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, im
 ('Nuggets di Pollo', 5.50, 35, 2, 'nuggets-pollo.png'),
 ('Jalapeño Popper', 5.00, 15, 2, 'jalapeno-popper.png');
 
--- Categoria: bevande (idcategoria = 3)
 INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, image) VALUES
 ('Coca Cola', 3.00, 100, 3, 'coca-cola.png'),
 ('Fanta', 3.00, 100, 3, 'fanta.png'),
@@ -78,7 +64,6 @@ INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, im
 ('Tè al Limone', 2.50, 80, 3, 'te-limone.png'),
 ('Sprite', 3.00, 90, 3, 'sprite.png');
 
--- Categoria: dolci (idcategoria = 4)
 INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, image) VALUES
 ('Tiramisù', 5.00, 2, 4, 'tiramisu.png'),
 ('Cheesecake ai Frutti di Bosco', 5.50, 30, 4, 'cheesecake-frutti-di-bosco.png'),
@@ -89,7 +74,6 @@ INSERT INTO chillburgerdb.prodotti (nome, prezzo, disponibilita, idcategoria, im
 ('Dolci Misti', 6.00, 30, 4, 'dolci-misti.png');
 
 
--- Bacon Cheeseburger (idprodotto = 1)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (1, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (1, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger di manzo'), 1, TRUE),
@@ -98,7 +82,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (1, (SELECT idingrediente FROM ingredienti WHERE nome = 'ketchup'), 1, default),
 (1, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default);
 
--- Chicken Deluxe (idprodotto = 2)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (2, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (2, (SELECT idingrediente FROM ingredienti WHERE nome = 'petto di pollo'), 1, TRUE),
@@ -106,7 +89,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (2, (SELECT idingrediente FROM ingredienti WHERE nome = 'insalata'), 1, default),
 (2, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default);
 
--- Smoky Burger (idprodotto = 3)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (3, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (3, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger di manzo'), 1, TRUE),
@@ -115,7 +97,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (3, (SELECT idingrediente FROM ingredienti WHERE nome = 'scamorza affumicata'), 1, TRUE),
 (3, (SELECT idingrediente FROM ingredienti WHERE nome = 'bacon'), 1, default);
 
--- Veggie Burger (idprodotto = 4)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (4, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (4, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger vegano'), 1, TRUE),
@@ -124,7 +105,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (4, (SELECT idingrediente FROM ingredienti WHERE nome = 'pomodori'), 1, default),
 (4, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default);
 
--- Double Beef BBQ (idprodotto = 5)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (5, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (5, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger di manzo'), 2, TRUE),
@@ -132,7 +112,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (5, (SELECT idingrediente FROM ingredienti WHERE nome = 'cheddar'), 1, default),
 (5, (SELECT idingrediente FROM ingredienti WHERE nome = 'cipolla'), 1, default);
 
--- Zucchini Delight (idprodotto = 6)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (6, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (6, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger vegano'), 1, TRUE),
@@ -140,7 +119,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (6, (SELECT idingrediente FROM ingredienti WHERE nome = 'insalata'), 1, default),
 (6, (SELECT idingrediente FROM ingredienti WHERE nome = 'salsa rosa'), 1, default);
 
--- Crispy Cotoletta (idprodotto = 7)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (7, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (7, (SELECT idingrediente FROM ingredienti WHERE nome = 'cotoletta'), 1, TRUE),
@@ -148,7 +126,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (7, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default),
 (7, (SELECT idingrediente FROM ingredienti WHERE nome = 'insalata'), 1, default);
 
--- Hot Pepper Burger (idprodotto = 8)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (8, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (8, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger di manzo'), 1, TRUE),
@@ -156,7 +133,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (8, (SELECT idingrediente FROM ingredienti WHERE nome = 'cheddar'), 1, default),
 (8, (SELECT idingrediente FROM ingredienti WHERE nome = 'ketchup'), 1, default);
 
--- Melanzana Veggie (idprodotto = 9)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (9, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (9, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger vegano'), 1, TRUE),
@@ -164,7 +140,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (9, (SELECT idingrediente FROM ingredienti WHERE nome = 'fontina'), 1, default),
 (9, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default);
 
--- Truffle Deluxe (idprodotto = 10)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (10, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (10, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger di manzo'), 1, TRUE),
@@ -172,7 +147,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (10, (SELECT idingrediente FROM ingredienti WHERE nome = 'funghi'), 1, default),
 (10, (SELECT idingrediente FROM ingredienti WHERE nome = 'maionese'), 1, default);
 
--- Green Garden (idprodotto = 11)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (11, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (11, (SELECT idingrediente FROM ingredienti WHERE nome = 'hamburger vegano'), 1, TRUE),
@@ -180,7 +154,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (11, (SELECT idingrediente FROM ingredienti WHERE nome = 'pomodori'), 1, default),
 (11, (SELECT idingrediente FROM ingredienti WHERE nome = 'insalata'), 1, default);
 
--- Crispy BBQ Chicken (idprodotto = 12)
 INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, essenziale) VALUES
 (12, (SELECT idingrediente FROM ingredienti WHERE nome = 'pane'), 1, TRUE),
 (12, (SELECT idingrediente FROM ingredienti WHERE nome = 'cotoletta'), 1, TRUE),
@@ -188,9 +161,6 @@ INSERT INTO chillburgerdb.composizioni (idprodotto, idingrediente, quantita, ess
 (12, (SELECT idingrediente FROM ingredienti WHERE nome = 'cheddar'), 1, default),
 (12, (SELECT idingrediente FROM ingredienti WHERE nome = 'insalata'), 1, default);
 
-
-
--- Insert Stati Ordine
 INSERT INTO chillburgerdb.stati_ordine (descrizione) VALUES
 ('In attesa'),
 ('In preparazione'),
@@ -199,7 +169,6 @@ INSERT INTO chillburgerdb.stati_ordine (descrizione) VALUES
 ('Confermato'), 
 ('Annullato');
 
--- Insert Utenti
 INSERT INTO chillburgerdb.utenti (nome, cognome, username, password, tipo) VALUES
 ('Mario', 'Rossi', 'mario.rossi', 'hashed_password1', 'cliente'),
 ('Luigi', 'Bianchi', 'admin', 'password123', 'venditore'),
@@ -221,7 +190,6 @@ INSERT INTO chillburgerdb.fasce_orari (orario) VALUES
 ('22:00:00'),('22:15:00'),('22:30:00'); 
  
 
--- Insert Ordini (timestamp_ordine è 'YYYY-MM-DD HH:MM:SS')
 INSERT INTO chillburgerdb.ordini (idutente, completato, data_ordine, orario) VALUES
 ((SELECT idutente FROM utenti WHERE username = 'mario.rossi'), 1, '2024-05-10', '12:30:00'),
 ((SELECT idutente FROM utenti WHERE username = 'anna.verdi'), 1, '2024-05-10', '19:00:00'),
@@ -231,7 +199,7 @@ INSERT INTO chillburgerdb.ordini (idutente, completato, data_ordine, orario) VAL
 ((SELECT idutente FROM utenti WHERE username = 'laura.bruni'), 1, '2025-05-12', '21:15:00'),
 ((SELECT idutente FROM utenti WHERE username = 'giuseppe.gialli'), 1, '2025-05-15', '19:15:00'),
 ((SELECT idutente FROM utenti WHERE username = 'mario.rossi'), 1, '2025-05-20', '12:00:00');
--- Esempio di popolamento manuale di modifiche_stato
+
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (1, 5, '2024-05-10 13:35:00');
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (2, 5, '2024-05-10 20:55:00');
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (3, 5, '2024-05-11 13:45:00');
@@ -241,7 +209,6 @@ INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (7, 5, '2025-05-15 19:55:00');
 INSERT INTO chillburgerdb.modifiche_stato (idordine, idstato, timestamp_modifica) VALUES (8, 5, '2024-05-12 13:10:00');
 
--- Insert Carrelli Prodotti
 INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VALUES
 (1, (SELECT idprodotto FROM prodotti WHERE nome = 'Patatine Fritte'), 1),
 (1, (SELECT idprodotto FROM prodotti WHERE nome = 'Coca Cola'), 2);
@@ -260,7 +227,6 @@ INSERT INTO chillburgerdb.carrelli_prodotti (idordine, idprodotto, quantita) VAL
 (3, (SELECT idprodotto FROM prodotti WHERE nome = 'Onion Rings'), 1),
 (3, (SELECT idprodotto FROM prodotti WHERE nome = 'Birra Artigianale Bionda'), 2);
 
--- Insert Personalizzazioni
 INSERT INTO chillburgerdb.personalizzazioni (idordine, idprodotto, quantita) VALUES
 (4, (SELECT idprodotto FROM prodotti WHERE nome = 'Chicken Deluxe'), 1);
 
@@ -317,10 +283,3 @@ INSERT INTO chillburgerdb.recensioni (idordine, titolo, voto, commento, timestam
 (4, 'Servizio da rivedere', 3, 'Il burger (Smoky) era buono, ma abbiamo aspettato un po troppo e le patatine erano tiepide.', '2025-05-11 19:45:00'),
 (5, 'Veggie Burger Sorprendente!', 5, 'Non mangio carne e trovare un Veggie Burger così saporito è una gioia. Consigliatissimo!', '2025-05-12 14:00:00'),
 (6, 'Perfetto per una serata chill!', 4, 'Tutto ottimo, dall''antipasto al dolce. La Piadina era farcita abbondantemente. Atmosfera rilassante.', '2025-05-12 20:45:00');
-
--- Esempio di Notifiche
-INSERT INTO chillburgerdb.notifiche (titolo, testo, tipo, idutente, idingrediente, timestamp_notifica) VALUES
-('Giacenza Bassa Bacon!', 'La giacenza di bacon è scesa sotto le 10 unità.', 'ingrediente', (SELECT idutente FROM utenti WHERE tipo = 'venditore' LIMIT 1), (SELECT idingrediente FROM ingredienti WHERE nome = 'bacon'), '2024-05-12 10:00:00');
-
-INSERT INTO chillburgerdb.notifiche (titolo, testo, tipo, idutente, idordine, timestamp_notifica) VALUES
-('Ordine Annullato', 'L''ordine #2 è stato annullato dal cliente.', 'ordine', (SELECT idutente FROM utenti WHERE tipo = 'venditore' LIMIT 1), 2, '2024-05-10 19:12:00');

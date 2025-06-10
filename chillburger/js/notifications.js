@@ -21,6 +21,16 @@ async function fetchData(url, formData) {
   }
 }
 
+// TODO
+/**
+ * controllare che non abbia fatto danni,
+ * vecchio codice di let result....
+ *
+ * let result = `<div class="d-flex flex-row justify-content-center mb-4">
+ *                  <p class="text-black fs-1">Notifiche</p>
+ *                </div>`;
+ *
+ */
 function generateNotifications(notes) {
   let result = `<div class="d-flex flex-row justify-content-center mb-4"></div>`;
 

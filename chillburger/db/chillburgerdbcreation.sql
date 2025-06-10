@@ -1,10 +1,7 @@
--- Database Section
-
 DROP DATABASE IF EXISTS chillburgerdb;
 CREATE DATABASE IF NOT EXISTS chillburgerdb;
 USE chillburgerdb;
 
--- Tables Section
 
 CREATE TABLE categorie (
      idcategoria INT AUTO_INCREMENT NOT NULL,
@@ -36,20 +33,20 @@ CREATE TABLE notifiche (
 );
 
 CREATE TABLE fasce_orari (
-    orario TIME NOT NULL, -- L'ID è l'orario stesso
+    orario TIME NOT NULL,
     PRIMARY KEY (orario)
 );
 
 CREATE TABLE ordini (
      idordine INT AUTO_INCREMENT NOT NULL,
      idutente INT NOT NULL,
-     data_ordine DATE DEFAULT NULL, -- Data dell'ordine
-     orario TIME DEFAULT NULL, -- Chiave esterna che punta a fasce_orari
+     data_ordine DATE DEFAULT NULL, 
+     orario TIME DEFAULT NULL,
      completato boolean DEFAULT false,
      timestamp_ordine TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
      prezzo_totale DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
      PRIMARY KEY (idordine),
-     UNIQUE KEY unique_data_orario_ordine (data_ordine, orario) -- Vincolo di unicità
+     UNIQUE KEY unique_data_orario_ordine (data_ordine, orario) 
 );
 
 CREATE TABLE personalizzazioni (
@@ -129,7 +126,6 @@ CREATE TABLE utenti (
      UNIQUE KEY unique_username (username)
 );
 
--- Constraints Section
 
 ALTER TABLE notifiche
 ADD CONSTRAINT fkrelativa
@@ -229,7 +225,6 @@ ADD CONSTRAINT chk_giacenza_non_negative CHECK (giacenza >= 0);
 ALTER TABLE prodotti
 ADD CONSTRAINT chk_disponibilita_non_negative CHECK (disponibilita >= 0);
 
--- Index Section
 
 CREATE INDEX idx_notifiche_idutente ON notifiche (idutente);
 CREATE INDEX idx_notifiche_idprodotto ON notifiche (idprodotto);
@@ -263,7 +258,6 @@ CREATE INDEX idx_modificheingredienti_idingrediente ON modifiche_ingredienti (id
 CREATE INDEX idx_recensioni_idordine ON recensioni (idordine);
 CREATE INDEX idx_recensioni_timestamp ON recensioni (timestamp_recensione);
 
--- Triggers Section
 
 DELIMITER //
 
@@ -342,7 +336,6 @@ END //
 
 DELIMITER ;
 
--- Stored Procedure per aggiornare la disponibilità di un prodotto
 DELIMITER //
 
 CREATE PROCEDURE SP_UpdateProductAvailability(IN p_idprodotto INT)
@@ -350,42 +343,25 @@ BEGIN
     DECLARE calculated_availability INT;
     DECLARE is_composite BOOLEAN DEFAULT FALSE;
 
-    -- Verifica se il prodotto è effettivamente composto da ingredienti
     SELECT COUNT(*) > 0 INTO is_composite
     FROM composizioni
     WHERE idprodotto = p_idprodotto;
 
     IF is_composite THEN
-        -- Calcola la disponibilità basata sul minimo producibile con gli ingredienti attuali.
-        -- Se un ingrediente ha una quantità richiesta (c.quantita) pari a 0, viene ignorato
-        -- per prevenire divisioni per zero. Se tutti gli ingredienti hanno c.quantita = 0
-        -- o se non ci sono ingredienti validi, calculated_availability sarà NULL.
         SELECT MIN(FLOOR(i.giacenza / c.quantita))
         INTO calculated_availability
         FROM composizioni c
         JOIN ingredienti i ON c.idingrediente = i.idingrediente
         WHERE c.idprodotto = p_idprodotto AND c.quantita > 0;
 
-        -- Aggiorna la disponibilità del prodotto.
-        -- Se calculated_availability è NULL (es. nessun ingrediente valido per il calcolo),
-        -- la disponibilità viene impostata a 0.
         UPDATE prodotti
         SET disponibilita = COALESCE(calculated_availability, 0)
         WHERE idprodotto = p_idprodotto;
-    -- ELSE
-        -- Se il prodotto non è (o non è più) definito in 'composizioni',
-        -- la sua disponibilità non viene gestita da questa logica.
-        -- Si potrebbe voler impostare la disponibilità a 0 o un valore di default
-        -- per i prodotti che erano compositi ma ora non lo sono più.
-        -- Ad esempio:
-        -- UPDATE prodotti SET disponibilita = 0 WHERE idprodotto = p_idprodotto;
-        -- Per ora, se il prodotto non è composito, la sua disponibilità non viene alterata da questa procedura.
     END IF;
 END //
 
 DELIMITER ;
 
--- Trigger sulla tabella `ingredienti` per aggiornare la disponibilità dei prodotti
 DELIMITER //
 
 CREATE TRIGGER trg_after_ingredient_update_manage_availability
@@ -394,14 +370,12 @@ FOR EACH ROW
 BEGIN
     DECLARE done INT DEFAULT FALSE;
     DECLARE current_idprodotto INT;
-    -- Cursore per selezionare tutti i prodotti che contengono l'ingrediente la cui giacenza è stata modificata
     DECLARE cur_affected_products CURSOR FOR
         SELECT DISTINCT c.idprodotto
         FROM composizioni c
         WHERE c.idingrediente = NEW.idingrediente;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-    -- Se la giacenza dell'ingrediente è effettivamente cambiata
     IF OLD.giacenza <> NEW.giacenza THEN
         OPEN cur_affected_products;
         product_loop: LOOP
@@ -409,7 +383,6 @@ BEGIN
             IF done THEN
                 LEAVE product_loop;
             END IF;
-            -- Chiama la stored procedure per aggiornare la disponibilità del prodotto specifico
             CALL SP_UpdateProductAvailability(current_idprodotto);
         END LOOP product_loop;
         CLOSE cur_affected_products;
@@ -418,7 +391,6 @@ END //
 
 DELIMITER ;
 
--- Trigger sulla tabella `composizioni` dopo l'inserimento di una nuova composizione
 DELIMITER //
 
 CREATE TRIGGER trg_after_composition_insert_manage_availability
@@ -430,27 +402,20 @@ END //
 
 DELIMITER ;
 
--- Trigger sulla tabella `composizioni` dopo l'aggiornamento di una composizione
 DELIMITER //
 
 CREATE TRIGGER trg_after_composition_update_manage_availability
 AFTER UPDATE ON composizioni
 FOR EACH ROW
 BEGIN
-    -- Se l'idprodotto della composizione è cambiato (scenario meno comune dato che è parte della PK)
-    -- Questo gestisce il caso in cui la chiave primaria stessa venga aggiornata, il che di solito
-    -- è un DELETE seguito da un INSERT, ma per completezza lo includiamo.
     IF OLD.idprodotto <> NEW.idprodotto THEN
         CALL SP_UpdateProductAvailability(OLD.idprodotto);
     END IF;
-    -- Aggiorna sempre la disponibilità per il prodotto coinvolto nella riga aggiornata
-    -- (NEW.idprodotto), che sia per cambio di quantità o di ingrediente.
     CALL SP_UpdateProductAvailability(NEW.idprodotto);
 END //
 
 DELIMITER ;
 
--- Trigger sulla tabella `composizioni` dopo la cancellazione di una composizione
 DELIMITER //
 
 CREATE TRIGGER trg_after_composition_delete_manage_availability
@@ -462,7 +427,6 @@ END //
 
 DELIMITER ;
 
--- Stored Procedure per aggiornare il prezzo totale di un ordine
 DELIMITER //
 
 CREATE PROCEDURE SP_UpdateOrderTotalPrice(IN p_idordine INT)
@@ -470,20 +434,17 @@ BEGIN
     DECLARE total_from_personalizzazioni DECIMAL(10, 2);
     DECLARE total_from_carrelli_prodotti DECIMAL(10, 2);
 
-    -- Calcola il totale dalla tabella personalizzazioni (prezzo unitario * quantità)
     SELECT COALESCE(SUM(prezzo * quantita), 0)
     INTO total_from_personalizzazioni
     FROM personalizzazioni
     WHERE idordine = p_idordine;
 
-    -- Calcola il totale dalla tabella carrelli_prodotti (prezzo prodotto * quantità)
     SELECT COALESCE(SUM(p.prezzo * cp.quantita), 0)
     INTO total_from_carrelli_prodotti
     FROM carrelli_prodotti cp
     JOIN prodotti p ON cp.idprodotto = p.idprodotto
     WHERE cp.idordine = p_idordine;
 
-    -- Aggiorna il prezzo_totale nella tabella ordini
     UPDATE ordini
     SET prezzo_totale = total_from_personalizzazioni + total_from_carrelli_prodotti + 2.50
     WHERE idordine = p_idordine;
@@ -491,7 +452,6 @@ END //
 
 DELIMITER ;
 
--- Triggers per la tabella 'personalizzazioni'
 DELIMITER //
 
 CREATE TRIGGER trg_after_personalizzazioni_insert_update_order_total
@@ -509,8 +469,6 @@ CREATE TRIGGER trg_after_personalizzazioni_update_update_order_total
 AFTER UPDATE ON personalizzazioni
 FOR EACH ROW
 BEGIN
-    -- Ricalcola se il prezzo o la quantità della personalizzazione sono cambiati.
-    -- NEW.idordine dovrebbe essere uguale a OLD.idordine in un update standard.
     IF OLD.prezzo <> NEW.prezzo OR OLD.quantita <> NEW.quantita THEN
         CALL SP_UpdateOrderTotalPrice(NEW.idordine);
     END IF;
@@ -529,7 +487,6 @@ END //
 
 DELIMITER ;
 
--- Triggers per la tabella 'carrelli_prodotti'
 DELIMITER //
 
 CREATE TRIGGER trg_after_carrelli_prodotti_insert_update_order_total
@@ -548,7 +505,7 @@ AFTER UPDATE ON carrelli_prodotti
 FOR EACH ROW
 BEGIN
     IF OLD.quantita <> NEW.quantita THEN
-        CALL SP_UpdateOrderTotalPrice(NEW.idordine); -- NEW.idordine sarà uguale a OLD.idordine
+        CALL SP_UpdateOrderTotalPrice(NEW.idordine); 
     END IF;
 END //
 
@@ -571,7 +528,6 @@ CREATE TRIGGER trg_process_order_stock_on_preparation_atomic
 AFTER INSERT ON modifiche_stato
 FOR EACH ROW
 BEGIN
-    -- Variabili locali per lo scope principale del trigger
     DECLARE v_idordine INT;
     DECLARE v_idprodotto_standard INT;
     DECLARE v_quantita_standard INT;
@@ -580,21 +536,19 @@ BEGIN
     DECLARE v_idprodotto_base_pers INT;
     DECLARE v_quantita_personalizzazione INT;
     DECLARE v_idingrediente_comp_loop INT;
-    DECLARE v_quantita_ingrediente_base_loop INT; -- Corretto tipo da DECIMAL a INT
+    DECLARE v_quantita_ingrediente_base_loop INT; 
     DECLARE v_is_removed INT;
     DECLARE v_idingrediente_aggiunto_loop INT;
     DECLARE QTA_INGREDIENTE_AGGIUNTO_UNITARIA INT DEFAULT 1;
-    DECLARE v_current_giacenza INT; -- Corretto tipo da DECIMAL a INT
+    DECLARE v_current_giacenza INT; 
     DECLARE v_current_disponibilita INT;
-    DECLARE v_decrement_amount INT; -- Corretto tipo da DECIMAL a INT
+    DECLARE v_decrement_amount INT;
     DECLARE v_error_message VARCHAR(255);
-    -- I flag 'done_...' verranno dichiarati localmente nei blocchi nidificati
 
     IF NEW.idstato = 2 THEN
         SET v_idordine = NEW.idordine;
 
-        -- Sezione 1: Processa i prodotti standard da carrelli_prodotti
-        BEGIN -- Blocco per il cursore dei prodotti standard
+        BEGIN 
             DECLARE done_standard_products INT DEFAULT FALSE;
             DECLARE cur_standard_products CURSOR FOR
                 SELECT cp.idprodotto, cp.quantita
@@ -614,14 +568,13 @@ BEGIN
                 WHERE c.idprodotto = v_idprodotto_standard;
 
                 IF v_is_composite > 0 THEN
-                    -- Prodotto standard composito: decrementa ingredienti
-                    BEGIN -- Blocco per il cursore degli ingredienti del prodotto standard composito
+                    BEGIN 
                         DECLARE done_std_comp_ing INT DEFAULT FALSE;
                         DECLARE v_id_ing_std_comp INT;
-                        DECLARE v_qta_ing_std_comp INT; -- Corretto tipo
+                        DECLARE v_qta_ing_std_comp INT; 
                         DECLARE cur_std_comp_ing CURSOR FOR
                             SELECT c.idingrediente, c.quantita
-                            FROM composizioni c -- Assicurarsi che l'alias 'c' sia corretto
+                            FROM composizioni c 
                             WHERE c.idprodotto = v_idprodotto_standard;
                         DECLARE CONTINUE HANDLER FOR NOT FOUND SET done_std_comp_ing = TRUE;
 
@@ -642,9 +595,8 @@ BEGIN
                             UPDATE ingredienti SET giacenza = giacenza - v_decrement_amount WHERE idingrediente = v_id_ing_std_comp;
                         END LOOP loop_std_comp_ing;
                         CLOSE cur_std_comp_ing;
-                    END; -- Fine blocco cursore ingredienti prodotto standard composito
+                    END; 
                 ELSE
-                    -- Prodotto standard non composito: decrementa disponibilità diretta
                     SET v_decrement_amount = v_quantita_standard;
                     SELECT disponibilita INTO v_current_disponibilita FROM prodotti WHERE idprodotto = v_idprodotto_standard FOR UPDATE;
 
@@ -656,10 +608,9 @@ BEGIN
                 END IF;
             END LOOP loop_standard_products;
             CLOSE cur_standard_products;
-        END; -- Fine blocco cursore prodotti standard
+        END; 
 
-        -- Sezione 2: Processa i prodotti personalizzati da personalizzazioni
-        BEGIN -- Blocco per il cursore delle personalizzazioni
+        BEGIN 
             DECLARE done_personalizzazioni INT DEFAULT FALSE;
             DECLARE cur_personalizzazioni CURSOR FOR
                 SELECT p.idpersonalizzazione, p.idprodotto, p.quantita
@@ -674,10 +625,8 @@ BEGIN
                     LEAVE loop_personalizzazioni;
                 END IF;
 
-                -- 2a. Ingredienti base (considerando rimozioni)
-                BEGIN -- Blocco per cursore ingredienti base personalizzazione
+                BEGIN 
                     DECLARE done_base_ing_pers INT DEFAULT FALSE;
-                    -- v_idingrediente_comp_loop e v_quantita_ingrediente_base_loop sono già dichiarate nello scope esterno
                     DECLARE cur_base_ing_pers CURSOR FOR
                         SELECT c.idingrediente, c.quantita
                         FROM composizioni c
@@ -695,7 +644,7 @@ BEGIN
                           AND mi.idingrediente = v_idingrediente_comp_loop
                           AND mi.azione = 'rimosso';
 
-                        IF v_is_removed = 0 THEN -- Non rimosso
+                        IF v_is_removed = 0 THEN 
                             SET v_decrement_amount = v_quantita_ingrediente_base_loop * v_quantita_personalizzazione;
                             SELECT giacenza INTO v_current_giacenza FROM ingredienti WHERE idingrediente = v_idingrediente_comp_loop FOR UPDATE;
 
@@ -707,12 +656,10 @@ BEGIN
                         END IF;
                     END LOOP loop_base_ing_pers;
                     CLOSE cur_base_ing_pers;
-                END; -- Fine blocco cursore ingredienti base personalizzazione
+                END; 
 
-                -- 2b. Ingredienti aggiunti
-                BEGIN -- Blocco per cursore ingredienti aggiunti personalizzazione
+                BEGIN 
                     DECLARE done_added_ing_pers INT DEFAULT FALSE;
-                    -- v_idingrediente_aggiunto_loop è già dichiarata nello scope esterno
                     DECLARE cur_added_ing_pers CURSOR FOR
                         SELECT mi.idingrediente
                         FROM modifiche_ingredienti mi
@@ -734,28 +681,23 @@ BEGIN
                         UPDATE ingredienti SET giacenza = giacenza - v_decrement_amount WHERE idingrediente = v_idingrediente_aggiunto_loop;
                     END LOOP loop_added_ing_pers;
                     CLOSE cur_added_ing_pers;
-                END; -- Fine blocco cursore ingredienti aggiunti personalizzazione
+                END; 
 
             END LOOP loop_personalizzazioni;
             CLOSE cur_personalizzazioni;
-        END; -- Fine blocco cursore personalizzazioni
-
-    END IF; -- Fine IF NEW.idstato = 2
+        END;
+    END IF; 
 END //
 
 DELIMITER ;
 
--- Trigger per notifiche automatiche quando giacenza ingredienti <= 3
 DELIMITER //
 
 CREATE TRIGGER trg_after_ingredienti_update_low_stock_notification
 AFTER UPDATE ON ingredienti
 FOR EACH ROW
 BEGIN
-    -- Controlla se la giacenza è scesa a 3 o meno E non era già <= 3 prima
-    -- (per evitare notifiche duplicate)
     IF NEW.giacenza <= 3 AND OLD.giacenza > 3 THEN
-        -- Inserisce notifica per tutti gli utenti di tipo 'venditore'
         INSERT INTO notifiche (
             titolo, 
             testo, 
@@ -778,17 +720,13 @@ END //
 
 DELIMITER ;
 
--- Trigger per notifiche automatiche quando disponibilità prodotti <= 3
 DELIMITER //
 
 CREATE TRIGGER trg_after_prodotti_update_low_availability_notification
 AFTER UPDATE ON prodotti
 FOR EACH ROW
 BEGIN
-    -- Controlla se la disponibilità è scesa a 3 o meno E non era già <= 3 prima
-    -- (per evitare notifiche duplicate)
     IF NEW.disponibilita <= 3 AND OLD.disponibilita > 3 THEN
-        -- Inserisce notifica per tutti gli utenti di tipo 'venditore'
         INSERT INTO notifiche (
             titolo, 
             testo, 
@@ -826,18 +764,15 @@ BEGIN
     DECLARE v_data_ordine DATE;
     DECLARE v_orario_ordine TIME;
 
-    -- Ottieni l'ID dell'utente cliente, la data e l'orario associati all'ordine
     SELECT idutente, data_ordine, orario INTO v_idutente_cliente, v_data_ordine, v_orario_ordine
     FROM ordini
     WHERE idordine = NEW.idordine;
 
-    -- Ottieni l'ID di un utente venditore (assumiamo che ce ne sia almeno uno)
     SELECT idutente INTO v_idutente_venditore
     FROM utenti
     WHERE tipo = 'venditore'
     LIMIT 1;
 
-    -- Notifica al cliente (per stati diversi da 5 - "Confermato" e 1 - "In Attesa")
     IF NEW.idstato <> 5 AND NEW.idstato <> 1 THEN
         SELECT descrizione INTO v_testo
         FROM stati_ordine
@@ -850,7 +785,6 @@ BEGIN
         VALUES (v_titolo, v_testo, 0, 'ordine', v_idutente_cliente, NEW.idordine);
     END IF;
 
-    -- Notifica al venditore (solo per stato 1 - "In Attesa" e 5 - "Completato")
     IF NEW.idstato = 1 THEN
         SET v_titolo = CONCAT('Nuovo Ordine Ricevuto #', NEW.idordine);
         SET v_testo = CONCAT('È stato effettuato un nuovo ordine #', NEW.idordine, ' in data ', DATE_FORMAT(v_data_ordine, '%d/%m/%Y'), ' alle ', v_orario_ordine, '.');

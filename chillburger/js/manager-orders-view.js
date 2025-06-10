@@ -13,19 +13,10 @@ async function fetchData(url, formData) {
     }
 }
 
-
-/**
- * Genera l'HTML per visualizzare i dettagli di un ordine.
- * @param {object} data - L'oggetto contenente i dettagli dell'ordine,
- * che dovrebbe avere le proprietà: orderCustom, orderStock, totalPrice.
- * @returns {string} Una stringa HTML che rappresenta i dettagli dell'ordine.
- */
 function displayOrderDetails(data) {
     let result = "";
 
-    // ---- SEZIONE PRODOTTI PERSONALIZZATI ----
     if (data.orderCustom && data.orderCustom.length > 0) {
-        // 1. Raggruppa le modifiche per idpersonalizzazione (che idealmente identifica un prodotto personalizzato unico nell'ordine)
         const customProductsMap = new Map();
 
         data.orderCustom.forEach(item => {
@@ -33,13 +24,13 @@ function displayOrderDetails(data) {
             if (!customProductsMap.has(item.idpersonalizzazione)) {
                 customProductsMap.set(item.idpersonalizzazione, {
                     idpersonalizzazione: item.idpersonalizzazione,
+                    idprodotto: item.idprodotto || '',
                     productName: item.nomeprodotto || 'Nome Prodotto N/D',
-                    productQuantity: item.quantita !== undefined ? item.quantita : 'N/D', // Quantità del prodotto personalizzato
-                    productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D', // Prezzo totale della personalizzazione
-                    modifiche: [] // Array per le modifiche ingredienti
+                    productQuantity: item.quantita !== undefined ? item.quantita : 'N/D',
+                    productPrice: item.prezzo !== undefined ? parseFloat(item.prezzo).toFixed(2) : 'N/D', 
+                    modifiche: [] 
                 });
             }
-            // Aggiungi la modifica specifica a questo prodotto personalizzato
             customProductsMap.get(item.idpersonalizzazione).modifiche.push({
                 ingredientName: item.nomeingrediente || '',
                 action: item.azione || ''
@@ -51,7 +42,7 @@ function displayOrderDetails(data) {
                 <div class="card shadow-sm mb-3">
                     <div class="card-body d-flex flex-column flex-md-row justify-content-md-between align-items-md-center text-center text-md-start">
                         <div class="w-100 w-md-50 mb-2 mb-md-0">
-                            <p class="card-title">${customProduct.productName}</p>`;
+                            <p class="card-title fw-bold"><a href="burger-details.php?id=${customProduct.idprodotto}" style="color: inherit; text-decoration: none;">${customProduct.productName}</a></p>`;
 
             if (customProduct.modifiche.length > 0 && customProduct.modifiche[0].ingredientName != '') {
                 result += `<ul class="list-unstyled ms-md-3 small">`;
@@ -66,9 +57,9 @@ function displayOrderDetails(data) {
             result += `</div>
                         <div class="d-flex flex-column align-items-center align-items-md-end w-100 w-md-auto mt-2 mt-md-0">
                             <p class="card-text m-0 mb-1"> 
-                                <strong>Q.tà:</strong> ${customProduct.productQuantity}
+                                Q.tà: ${customProduct.productQuantity}
                             </p>
-                            <p class="card-text m-0 fw-bold">
+                            <p class="card-text m-0">
                                 €${customProduct.productPrice}
                             </p>
                         </div>
@@ -77,7 +68,6 @@ function displayOrderDetails(data) {
         });
     }
 
-    // ---- SEZIONE PRODOTTI STANDARD ----
     if (data.orderStock && data.orderStock.length > 0) {
         data.orderStock.forEach(stockElement => {
             const productName = stockElement.nome || 'Nome Prodotto N/D';
@@ -87,12 +77,12 @@ function displayOrderDetails(data) {
             result += `
                 <div class="card shadow-sm mb-3">
                     <div class="card-body d-flex flex-column flex-md-row justify-content-md-between align-items-md-center text-center text-md-start">
-                        <p class="card-title w-100 w-md-50 mb-2 mb-md-0">${productName}</p>
+                        <p class="card-title w-100 w-md-50 mb-2 mb-md-0 fw-bold"><a href="menu.php#${stockElement.idprodotto || ''}" style="color: inherit; text-decoration: none;">${productName}</a></p>
                         <div class="d-flex flex-column align-items-center align-items-md-end w-100 w-md-auto mt-2 mt-md-0"> 
                             <p class="card-text m-0 mb-1">
-                                <strong>Q.tà:</strong> ${quantity}
+                                Q.tà: ${quantity}
                             </p>
-                            <p class="card-text m-0 fw-bold">
+                            <p class="card-text m-0 ">
                                 € ${price}
                             </p>
                         </div>
@@ -101,11 +91,10 @@ function displayOrderDetails(data) {
         });
     }
 
-    // Spedizione e Totale
     result += `<div class="mt-3 pt-2 border-top">
                     <div class="d-flex justify-content-between align-items-center">
                         <p class="card-title mb-0 ms-3">Spedizione:</p>
-                        <p class="card-text mb-0 fw-bold">
+                        <p class="card-text mb-0 ">
                             € 2.50
                         </p>
                     </div>
@@ -115,7 +104,7 @@ function displayOrderDetails(data) {
         const totalPriceFormatted = parseFloat(data.totalPrice).toFixed(2);
         result += `
             <div class="text-end mt-3 pt-3 border-top">
-                <p><strong>Totale: €${totalPriceFormatted}</strong></p>
+                <p>Totale: €${totalPriceFormatted}</p>
             </div>`;
     } else {
         result += '<p class="text-muted mt-4 text-end">Prezzo totale non disponibile.</p>';
@@ -141,17 +130,14 @@ async function loadOrderDetails() {
 
     orderDetailsContainer.innerHTML = "<p class='text-center'>Caricamento dettagli ordine...</p>";
 
-    // L'action viene mandata via POST con formData, idordine via GET nell'URL
-    const apiUrl = `api/api-orders.php?idordine=${orderId}`; // idordine via GET
+    const apiUrl = `api/api-orders.php?idordine=${orderId}`; 
     const formData = new FormData();
-    formData.append('action', 'getDetails'); // action via POST
-
+    formData.append('action', 'getDetails'); 
     const json = await fetchData(apiUrl, formData);
 
     if (json && json.success && json.data) {
         orderDetailsContainer.innerHTML = displayOrderDetails(json.data);
     } else {
-        // Usa il messaggio di errore dall'API se disponibile, altrimenti un messaggio generico
         const errorMessage = json && json.error ? json.error : 'Dati non disponibili o si è verificato un errore.';
         orderDetailsContainer.innerHTML = `<p class='text-center text-danger'>Errore nel caricamento dei dettagli dell'ordine: ${errorMessage}</p>`;
     }

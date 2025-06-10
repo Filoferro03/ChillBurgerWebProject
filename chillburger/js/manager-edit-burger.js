@@ -1,18 +1,14 @@
 (() => {
-    // === HELPERS ===
     const getEl = (sel) => document.querySelector(sel);
     const getAllEl = (sel) => document.querySelectorAll(sel);
 
-    // === STATE ===
     let allAvailableIngredients = [];
     let paniniCategoryId = null;
 
-    // === API ENDPOINTS ===
     const API_MENU_PAGE_DATA = "api/api-menu.php";
     const API_STOCK_DATA = "api/api-manager-stock.php";
     const API_MANAGER_PRODUCT_HANDLER = "api/api-manager-menu.php";
 
-    // --- Funzione Fetch Generica ---
     async function fetchData(url, options = {}) {
         try {
             const response = await fetch(url, options);
@@ -27,7 +23,6 @@
         }
     }
     
-    // --- Notifiche Toast ---
     function showToast(title, message, type = 'info') {
         const toast = getEl("#toast-message");
         if (!toast) return;
@@ -38,12 +33,6 @@
         bsToast.show();
     }
 
-    // --- Funzioni UI Ingredienti ---
-
-    /**
-     * Aggiunge una riga di ingrediente al form.
-     * @param {object} [ingredientData] - Dati per pre-popolare la riga.
-     */
     function addIngredientRow(ingredientData = {}) {
         const container = getEl('#ingredients-rows-container');
         const row = document.createElement('div');
@@ -74,7 +63,6 @@
         });
     }
 
-    /** Popola il datalist con gli ingredienti disponibili */
     function populateIngredientDatalist() {
         const datalist = getEl('#ingredients-datalist');
         if (!datalist) return;
@@ -86,9 +74,6 @@
         });
     }
     
-    // --- Caricamento Dati e Setup Iniziale ---
-    
-    /** Inizializzazione principale della pagina */
     async function initializePage() {
         const urlParams = new URLSearchParams(window.location.search);
         const currentProductId = urlParams.get('id');
@@ -108,7 +93,6 @@
         }
     }
 
-    /** Carica categorie e ingredienti disponibili */
     async function loadInitialData() {
         const menuData = await fetchData(API_MENU_PAGE_DATA);
         
@@ -130,7 +114,6 @@
         populateIngredientDatalist();
     }
 
-    /** Carica i dati di un prodotto esistente per la modifica */
     async function loadProductData(productId) {
         const { data: product } = await fetchData(`${API_MANAGER_PRODUCT_HANDLER}?action=getProduct&idprodotto=${productId}`);
         
@@ -151,8 +134,7 @@
              getEl("#product-availability").value = product.disponibilita ?? 0;
         }
     }
-    
-    // --- Gestori di Eventi ---
+        
     function setupFormHandlers() {
         getEl("#product-category").addEventListener("change", handleCategoryChange);
         getEl("#product-image").addEventListener("change", handleImagePreview);
@@ -241,6 +223,5 @@
         }
     }
     
-    // === AVVIO ===
     document.addEventListener("DOMContentLoaded", initializePage);
 })();
