@@ -1,22 +1,22 @@
 async function fetchData(url, formData) {
   try {
-      const response = await fetch(url, {
-          method: "POST",
-          body: formData
-      });
-      if (!response.ok) {
-          throw new Error(`Response status: ${response.status}`);
-      }
-      return await response.json();
+    const response = await fetch(url, {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+    return await response.json();
   } catch (error) {
-      console.log(error.message);
+    console.log(error.message);
   }
 }
 
 function generateProducts(products) {
   let result = "";
   products.forEach((product) => {
-    const isBurger = product.categoryDescrizione.toLowerCase() === 'panini';
+    const isBurger = product.categoryDescrizione.toLowerCase() === "panini";
 
     // Se è un panino, avvolge l'immagine in un link alla pagina di dettaglio
     const imgTag = isBurger
@@ -26,18 +26,22 @@ function generateProducts(products) {
       : `<img src="${product.image}" class="card-img-top" alt="${product.nome}">`;
 
     result += `
-    <div class="col-6 col-md-4 col-lg-3 menu-item" data-category="${product.categoryDescrizione}">
+    <div class="col-6 col-md-4 col-lg-3 menu-item" data-category="${
+      product.categoryDescrizione
+    }">
       <div class="card h-100 text-center shadow-sm hover-up">
         ${imgTag}
         <div class="card-body">
           <h5 class="card-title">${product.nome}</h5>
-          <p class="card-text small text-muted">${product.descrizione || ''}</p>
+          <p class="card-text small text-muted">${product.descrizione || ""}</p>
         </div>
 
         <div class="card-footer bg-white border-0">
           <span class="fw-bold text-primary">${product.prezzo} €</span>
           <div class="d-flex justify-content-center">
-          <button class="btn btn-add btn-sm btn-green" data-idprodotto="${product.idprodotto}">+</button>
+          <button class="btn btn-add btn-sm btn-green" data-idprodotto="${
+            product.idprodotto
+          }">+</button>
 
           </div>
         </div>
@@ -50,24 +54,29 @@ function generateProducts(products) {
 
 // Funzione per generare dinamicamente i bottoni dei filtri
 function generateFilterButtons(products) {
-    const filterButtonsContainer = document.querySelector(".d-flex.flex-wrap.justify-content-center.gap-2.mb-4");
-    if (!filterButtonsContainer) return;
+  const filterButtonsContainer = document.querySelector(
+    ".d-flex.flex-wrap.justify-content-center.gap-2.mb-4"
+  );
+  if (!filterButtonsContainer) return;
 
-    // Aggiungi il bottone "Tutto" fisso
-    let buttonsHtml = '<button class="btn btn-filter active" data-category="all">Tutto</button>';
+  // Aggiungi il bottone "Tutto" fisso
+  let buttonsHtml =
+    '<button class="btn btn-filter active" data-category="all">Tutto</button>';
 
-    // Estrai le categorie uniche dai prodotti
-    const categories = [...new Set(products.map(product => product.categoryDescrizione))];
-    
-    // Ordina le categorie alfabeticamente (opzionale)
-    categories.sort();
+  // Estrai le categorie uniche dai prodotti
+  const categories = [
+    ...new Set(products.map((product) => product.categoryDescrizione)),
+  ];
 
-    // Genera i bottoni per ogni categoria
-    categories.forEach(category => {
-        buttonsHtml += `<button class="btn btn-filter" data-category="${category}">${category}</button>`;
-    });
+  // Ordina le categorie alfabeticamente (opzionale)
+  categories.sort();
 
-    filterButtonsContainer.innerHTML = buttonsHtml;
+  // Genera i bottoni per ogni categoria
+  categories.forEach((category) => {
+    buttonsHtml += `<button class="btn btn-filter" data-category="${category}">${category}</button>`;
+  });
+
+  filterButtonsContainer.innerHTML = buttonsHtml;
 }
 
 async function getAllProducts() {
@@ -76,10 +85,10 @@ async function getAllProducts() {
   formData.append("action", "getAllProducts");
 
   const jsonResponse = await fetchData(url, formData);
-  products = jsonResponse.products;  // store globally
+  products = jsonResponse.products; // store globally
 
   // Genera i bottoni dei filtri prima di generare i prodotti e impostare i filtri
-  generateFilterButtons(products); 
+  generateFilterButtons(products);
 
   const productsHtml = generateProducts(products);
   const main = document.querySelector("#menuGrid");
@@ -89,22 +98,22 @@ async function getAllProducts() {
   setupAddToCartButtons(); // call after products generated
 }
 
-
 function setupFiltering() {
   const buttons = document.querySelectorAll(".btn-filter");
   const items = document.querySelectorAll(".menu-item");
 
-  buttons.forEach(btn => {
+  buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
       // Remove active from all buttons
-      buttons.forEach(b => b.classList.remove("active"));
+      buttons.forEach((b) => b.classList.remove("active"));
       // Add active to clicked button
       btn.classList.add("active");
 
       const cat = btn.dataset.category;
 
-      items.forEach(card => {
-        card.style.display = (cat === "all" || card.dataset.category === cat) ? "" : "none";
+      items.forEach((card) => {
+        card.style.display =
+          cat === "all" || card.dataset.category === cat ? "" : "none";
       });
     });
   });
@@ -112,7 +121,7 @@ function setupFiltering() {
 
 async function addProductToCart(idprodotto) {
   // Find the product in the loaded products list
-  const product = products.find(p => p.idprodotto == idprodotto);
+  const product = products.find((p) => p.idprodotto == idprodotto);
   if (!product) {
     console.error("Prodotto non trovato:", idprodotto);
     return;
@@ -120,7 +129,7 @@ async function addProductToCart(idprodotto) {
 
   const url = "api/api-cart.php";
   const formData = new FormData();
-  
+
   if (product.categoryDescrizione.toLowerCase() === "panini") {
     // Call addPers
     formData.append("action", "addPers");
@@ -136,7 +145,7 @@ async function addProductToCart(idprodotto) {
   try {
     const response = await fetch(url, {
       method: "POST",
-      body: formData
+      body: formData,
     });
     const json = await response.json();
 
@@ -155,7 +164,7 @@ async function addProductToCart(idprodotto) {
 
 function setupAddToCartButtons() {
   const buttons = document.querySelectorAll(".btn-add");
-  buttons.forEach(button => {
+  buttons.forEach((button) => {
     button.addEventListener("click", async () => {
       showAddOnePopup(button); // show +1 animation
       const idprodotto = button.dataset.idprodotto;
@@ -184,7 +193,7 @@ function showAddOnePopup(button) {
   });
 }
 
-// TODO 
+// TODO
 // in caso non si refreshi il carrello scommenta
 /*async function init() {
   await getAllProducts();

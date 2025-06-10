@@ -126,20 +126,21 @@ function generateCartHTML(products, personalizations, order) {
                                 <button type="button" class="btn p-1 p-md-3 md:m-1" onclick="modifyQuantity(${pers.idpersonalizzazione}, 'personalization', 1)"><span class="fa-solid fa-circle-plus icon" aria-hidden="true"></span></button>
                             </div>
                         </div>
-                        <div class="mt-2">
-                            <a href="./edit-burger.php?id=${pers.idpersonalizzazione}" class="btn btn-success" role="button">
-  Modifica
-</a>
-
+                        
+                        <div class="mt-2 d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                            <div class="d-flex justify-content-center justify-content-md-start w-100">
+                                <a href="./edit-burger.php?id=${pers.idpersonalizzazione}" class="btn btn-success" role="button">
+                                    Modifica
+                                </a>
+                            </div>
+                            <div class="d-flex justify-content-center justify-content-md-end w-100 mt-2 mt-md-0">
+                                <button class="btn btn-danger btn-remove" data-id="${pers.idpersonalizzazione}" data-type="personalization">Rimuovi</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="d-flex justify-content-end pb-3 pt-2">
-                        <button class="btn btn-danger btn-remove" data-id="${pers.idpersonalizzazione}" data-type="personalization">Rimuovi</button>
                     </div>
                 </div>
             </div>`;
   });
-
   // Genera HTML per il riepilogo
   const subTotal =
     order[0].prezzo_totale > 0
