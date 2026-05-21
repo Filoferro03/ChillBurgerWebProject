@@ -40,6 +40,8 @@
 
 Built as an academic project at the **University of Bologna**, ChillBurger demonstrates modern web development practices with a clean MVC-inspired architecture, responsive design, and a rich RESTful API layer.
 
+*😎 **Small Flex:** We received the highest possible score from the professors. 😎*
+
 ---
 
 ## ✨ Features
